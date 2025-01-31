@@ -4,7 +4,7 @@ void LoginWindow::ToggleVisibility() {
     isVisible = !isVisible;
 }
 
-void LoginWindow::Draw() {
+void LoginWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
     if (!isVisible) 
         return;
 
@@ -14,15 +14,24 @@ void LoginWindow::Draw() {
     ImGui::InputText("Password", password, IM_ARRAYSIZE(password), ImGuiInputTextFlags_Password);
     ImGui::InputText("Slot Name", slot, IM_ARRAYSIZE(slot));
 
-    if (ImGui::Button("Connect")) {
-        if (strlen(server) > 0 && strlen(slot) > 0) {
-            ArchipelagoHandler::ConnectAP(this);
-            SetMessage("Connecting to " + std::string(server) + "...");
-        }
-        else {
-            SetMessage("Please enter server and slot name");
+    if (!ArchipelagoHandler::IsConnected()) {
+        if (ImGui::Button("Connect")) {
+            if (strlen(server) > 0 && strlen(slot) > 0) {
+                ArchipelagoHandler::ConnectAP(this);
+                SetMessage("Connecting to " + std::string(server) + "...");
+            }
+            else {
+                SetMessage("Please enter server and slot name");
+            }
         }
     }
+    else {
+        if (ImGui::Button("Disconnect")) {
+            ArchipelagoHandler::DisconnectAP(this);
+            SetMessage("Connecting to " + std::string(server) + "...");
+        }
+    }
+
 
     ImGui::TextWrapped("%s", message.c_str());
     ImGui::End();

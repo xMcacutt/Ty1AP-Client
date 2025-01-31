@@ -32,7 +32,16 @@ public:
 	static inline bool polling;
 	static void Poll();
 	static void ConnectAP(LoginWindow* login);
+	static void DisconnectAP(LoginWindow* login);
 	static bool IsConnected();
+	static Goal goal;
+	static bool deathlink;
+	static bool startWithBoom;
+	static LevelUnlockStyle levelUnlockStyle;
+	static std::vector<int> portalMap;
+	static std::vector<int> bossMap;
+	static int hubTheggCounts;
+	static double deathtime;
 private:
 	static void SetAPStatus(std::string status, char important);
 };

@@ -68,6 +68,19 @@ bool isEqual(double a, double b)
     return fabs(a - b) < std::numeric_limits<double>::epsilon() * fmax(fabs(a), fabs(b));
 }
 
+void ArchipelagoHandler::DisconnectAP(LoginWindow* login) {
+    login->SetMessage("");
+    LoggerWindow::Log("Disconnected");
+    SetAPStatus("Disconnected", 1);
+    polling = false;
+    ap_connect_sent = false;
+    ap_connected = false;
+    if (GameState::onLoadScreenOrMainMenu())
+        GameHandler::SetLoadActive(false);
+    else
+        GameState::forceMainMenu();
+}
+
 void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 {
     ap.reset();
@@ -210,18 +223,15 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
             auto sender = item.player ? (ap->get_player_alias(item.player) + "'s world") : "out of nowhere";
             auto location = ap->get_location_name(item.location);
 
-            printf("  #%d: %s (%" PRId64 ") from %s - %s\n",
-                item.index, itemname.c_str(), item.item,
-                sender.c_str(), location.c_str());
+            LoggerWindow::Log(itemname + " found at " + location + " from " + sender);
 
-            if (item.index < nextCheckToGet) {
-                printf("Ignoring\n");
+            if (item.index < nextCheckToGet)
                 continue;
-            }
+           
             nextCheckToGet = item.index + 1;
 
             // HANDLE ITEMS
-            //ItemHandler->receivedItemsQueue.push_front(item);
+            GameHandler::HandleItemReceived(item);
         }
     });
 

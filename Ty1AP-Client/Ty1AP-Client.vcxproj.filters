@@ -81,6 +81,9 @@
     <ClInclude Include="SaveDataHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ItemHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -138,6 +141,9 @@
       <Filter>Source Files\minhook</Filter>
     </ClCompile>
     <ClCompile Include="SaveDataHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ItemHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

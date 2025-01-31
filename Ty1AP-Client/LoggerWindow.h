@@ -10,7 +10,7 @@ class LoggerWindow : public Window
 public:
 	LoggerWindow() : Window("Logger") {};
 	void ToggleVisibility() override;
-	void Draw() override;
+	void Draw(int outerWidth, int outerHeight, float uiScale) override;
 	void AddLogMessage(const std::string& message);
 	static void Log(const std::string& message);
 private:

@@ -9,7 +9,7 @@ bool GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         if (wParam == VK_F2) {
             GUI::isShown = !GUI::isShown;
         }
-        if (wParam == 0x4D) {
+        if (wParam == VK_F3) {
             for (auto& window : windows) {
                 if (auto login = dynamic_cast<LoginWindow*>(window.get())) {
                     login->ToggleVisibility();
@@ -53,10 +53,25 @@ void GUI::DrawUI() {
         Initialize();
     if (!GUI::isShown)
         return;
+
+    HWND hwnd = (HWND)API::GetTyWindowHandle();
+    RECT rect;
+    if (!GetClientRect(hwnd, &rect)) {
+        API::LogPluginMessage("Failed to get window size.");
+        return;
+    }
+    int windowWidth = rect.right - rect.left;
+    int windowHeight = rect.bottom - rect.top;
+    const int baseWidth = 1920;
+    const int baseHeight = 1080;
+    float widthScale = static_cast<float>(windowWidth) / baseWidth;
+    float heightScale = static_cast<float>(windowHeight) / baseHeight;
+    float uiScale = (((widthScale) < (heightScale)) ? (widthScale) : (heightScale));
+
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
-    for (auto& window : windows) { window.get()->Draw(); }
+    for (auto& window : windows) { window.get()->Draw(windowWidth, windowHeight, uiScale); }
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }

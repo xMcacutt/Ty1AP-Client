@@ -4,14 +4,14 @@ void LoggerWindow::ToggleVisibility() {
 	isVisible = !isVisible;
 }
 
-void LoggerWindow::Draw() {
+void LoggerWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
 	if (!isVisible)
 		return;
 
     // Render the Logger window at the bottom-left
-    ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_Always);
-    ImGui::SetNextWindowSize(ImVec2(500, 200), ImGuiCond_Always);
-    ImGui::Begin(name.c_str(), nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar);
+    ImGui::SetNextWindowPos(ImVec2(10, outerHeight - 500 - 10), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(600, 500), ImGuiCond_Always);
+    ImGui::Begin(name.c_str(), nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar);
 
     // Iterate through the log messages and display them
     auto now = std::chrono::steady_clock::now();
@@ -22,20 +22,29 @@ void LoggerWindow::Draw() {
 
     // Get the window draw list for custom drawing
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
-    ImVec2 text_pos = ImGui::GetCursorScreenPos();  // Initial cursor position
 
-    for (const auto& log : logMessages) {
-        // Draw a semi-transparent background rectangle for each message
-        ImVec2 text_size = ImGui::CalcTextSize(log.message.c_str());  // Calculate the size of the text
-        ImVec2 box_min = text_pos; // Start point of the background box
-        ImVec2 box_max = ImVec2(text_pos.x + text_size.x, text_pos.y + text_size.y);  // End point of the background box
+    // Get the available window size
+    ImVec2 window_pos = ImGui::GetCursorScreenPos(); // Top-left corner of content
+    ImVec2 window_size = ImGui::GetContentRegionAvail(); // Available space inside window
 
-        // Draw semi-transparent background (RGBA format: red, green, blue, alpha)
-        draw_list->AddRectFilled(box_min, box_max, IM_COL32(0, 0, 0, 100));  // Semi-transparent black background (alpha=100)
-        // Now draw the actual text on top of the background
-        ImGui::TextWrapped("%s", log.message.c_str());
-        // Update text position for next message
-        text_pos.y += text_size.y + 2.0f;
+    // Start drawing from the bottom
+    float y_pos = window_pos.y + window_size.y;
+
+    // Iterate messages in reverse order (newest at bottom)
+    for (auto it = logMessages.rbegin(); it != logMessages.rend(); ++it) {
+        const LogMessage& log = *it;
+
+        ImVec2 text_size = ImGui::CalcTextSize(log.message.c_str());
+        y_pos -= text_size.y + 2.0f;  // Move up for next message
+
+        ImVec2 box_min = ImVec2(window_pos.x, y_pos);
+        ImVec2 box_max = ImVec2(window_pos.x + text_size.x, y_pos + text_size.y);
+
+        // Draw semi-transparent background for text
+        draw_list->AddRectFilled(box_min, box_max, IM_COL32(0, 0, 0, 100));
+
+        // Draw the text
+        draw_list->AddText(ImVec2(window_pos.x, y_pos), IM_COL32(255, 255, 255, 255), log.message.c_str());
     }
 
     ImGui::End();

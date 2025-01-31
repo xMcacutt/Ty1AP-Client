@@ -6,10 +6,18 @@ LevelInitFunctionType levelInitOrigin = nullptr;
 typedef void(__stdcall* MainMenuFunctionType)(void);
 MainMenuFunctionType mainMenuOrigin = nullptr;
 
+typedef void(__stdcall* LoadSavesFunctionType)(void);
+MainMenuFunctionType loadSavesOrigin = nullptr;
+
 
 void __stdcall GameHandler::LevelInitHook() {
 	GameHandler::OnEnterLevel();
 	levelInitOrigin();
+}
+
+void __stdcall GameHandler::LoadSavesHook() {
+	GameHandler::OnLoadSaves();
+	loadSavesOrigin();
 }
 
 void __stdcall GameHandler::MainMenuHook() {
@@ -38,6 +46,8 @@ void GameHandler::Setup()
 	MH_CreateHook((LPVOID)addr, &LevelInitHook, reinterpret_cast<LPVOID*>(&levelInitOrigin));
 	addr = (char*)(Core::moduleBase + 0xE018C);  // Target address
 	MH_CreateHook((LPVOID)addr, &MainMenuHook, reinterpret_cast<LPVOID*>(&mainMenuOrigin));
+	addr = (char*)(Core::moduleBase + 0x1724C7);
+	MH_CreateHook((LPVOID)addr, &LoadSavesHook, reinterpret_cast<LPVOID*>(&loadSavesOrigin));
 	MH_EnableHook(MH_ALL_HOOKS);
 
 	GameState::setNoIdle(true);
@@ -84,7 +94,16 @@ void GameHandler::OnEnterRainbowCliffs() {
 	}
 }
 
+void GameHandler::HandleItemReceived(APClient::NetworkItem item) {
+	if (GameState::onLoadScreenOrMainMenu())
+		ItemHandler::storedItems.push(item);
+	else
+		ItemHandler::HandleItem(item);
+}
+
 void GameHandler::OnEnterLevel() {
+	ItemHandler::HandleStoredItems();
+
 	auto levelId = Level::getCurrentLevel();
 	if (levelId == LevelCode::Z1)
 		OnEnterRainbowCliffs();
@@ -102,6 +121,17 @@ void GameHandler::OnMainMenu() {
 	}
 	*(char*)(menuAddr + 0x168 + 0x164) = 0x0;
 	*(char*)(menuAddr + 0x168 + 0x165) = 0x0;
+}
+
+void GameHandler::OnLoadSaves() {
+	//*(int*)(Core::moduleBase + 0x28E6C4) = 2;
+	//*(int*)(Core::moduleBase + 0x52F2B8) = 2;
+	//*(int*)(Core::moduleBase + 0x273838) = 2;
+	//*(int*)(Core::moduleBase + 0x27383C) = 0;
+	//*(int*)(Core::moduleBase + 0x273840) = 2;
+	*(int*)(Core::moduleBase + 0x288730) = *(int*)&SaveDataHandler::saveData;
+	//*(int*)(Core::moduleBase + 0x52F2A4) = 0x3;
+	//*(int*)(Core::moduleBase + 0x273F74) = 0x9;
 }
 
 void GameHandler::SetLoadActive(bool value)
