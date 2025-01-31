@@ -82,7 +82,23 @@ bool SaveDataHandler::LoadSaveData(std::string seed)
         saveData.Size = sizeof(ExtendedSaveData);
         saveData.Magic = 0x701EE;
         saveData.AttributeData.GotBoomerang = true;
-        saveData.AttributeData.GotSecondRang = true;
+        saveData.ProgressiveRang = 1;
+        if (ArchipelagoHandler::progressiveRang && !ArchipelagoHandler::startWithBoom) {
+            saveData.AttributeData.GotBoomerang = false;
+            saveData.ProgressiveRang--;
+        }
+        saveData.PortalOpen[4] = true;
+        if (ArchipelagoHandler::levelUnlockStyle == LevelUnlockStyle::VANILLA) {
+            saveData.PortalOpen[5] = true;
+            saveData.PortalOpen[6] = true;
+            saveData.PortalOpen[8] = true;
+            saveData.PortalOpen[9] = true;
+            saveData.PortalOpen[10] = true;
+            saveData.PortalOpen[12] = true;
+            saveData.PortalOpen[13] = true;
+            saveData.PortalOpen[14] = true;
+            saveData.PortalOpen[21] = true;
+        }
         saveToFile(filePath, saveData);
         LoggerWindow::Log("Save file created");
     }

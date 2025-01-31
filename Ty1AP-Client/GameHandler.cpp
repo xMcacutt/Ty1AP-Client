@@ -67,7 +67,7 @@ void GameHandler::SetupOnConnect(std::string seed) {
 }
 
 void GameHandler::OnEnterRainbowCliffs() {
-	// TODO FIX RAINBOW SCALE BULLSHIT
+	// TODO FIX RAINBOW SCALE BS
 	auto theggCollectorCount = *(int*)(Core::moduleBase + 0x26D944);
 	auto addr = *(int*)(Core::moduleBase + 0x26D948);
 	for (auto tcIndex = 0; tcIndex < theggCollectorCount; tcIndex++) {
@@ -91,6 +91,48 @@ void GameHandler::OnEnterRainbowCliffs() {
 			memset((char*)(triggerAddr + 0x85), 0x1, 1);
 		}
 		triggerAddr = *(int*)(triggerAddr + 0x34);
+	}
+
+	if (ArchipelagoHandler::levelUnlockStyle != LevelUnlockStyle::VANILLA) {
+		auto portalCount = *(int*)(Core::moduleBase + 0x267404);
+		auto portalAddr = *(int*)(Core::moduleBase + 0x267408);
+		for (auto portalIndex = 0; portalIndex < portalCount; portalIndex++) {
+			auto portalDestination = *(int*)(portalAddr + 0xAC);
+			if (SaveDataHandler::saveData.PortalOpen[portalAddr])
+				*(int*)(portalAddr + 0x9C) = 1;
+			else
+				*(int*)(portalAddr + 0x9C) = 3;
+		}
+	}
+
+	auto portalCount = *(int*)(Core::moduleBase + 0x267404);
+	auto portalAddr = *(int*)(Core::moduleBase + 0x267408);
+	for (auto portalIndex = 0; portalIndex < portalCount; portalIndex++) {
+		auto portalDestination = *(int*)(portalAddr + 0xAC);
+		if (portalDestination == 4)
+			*(int*)(portalAddr + 0xAC) = ArchipelagoHandler::portalMap[0];
+		if (portalDestination == 5)
+			*(int*)(portalAddr + 0xAC) = ArchipelagoHandler::portalMap[1];
+		if (portalDestination == 6)
+			*(int*)(portalAddr + 0xAC) = ArchipelagoHandler::portalMap[2];
+		if (portalDestination == 7)
+			*(int*)(portalAddr + 0xAC) = ArchipelagoHandler::bossMap[0];
+		if (portalDestination == 8)
+			*(int*)(portalAddr + 0xAC) = ArchipelagoHandler::portalMap[3];
+		if (portalDestination == 9)
+			*(int*)(portalAddr + 0xAC) = ArchipelagoHandler::portalMap[4];
+		if (portalDestination == 10)
+			*(int*)(portalAddr + 0xAC) = ArchipelagoHandler::portalMap[5];
+		if (portalDestination == 19)
+			*(int*)(portalAddr + 0xAC) = ArchipelagoHandler::bossMap[1];
+		if (portalDestination == 12)
+			*(int*)(portalAddr + 0xAC) = ArchipelagoHandler::portalMap[6];
+		if (portalDestination == 13)
+			*(int*)(portalAddr + 0xAC) = ArchipelagoHandler::portalMap[7];
+		if (portalDestination == 14)
+			*(int*)(portalAddr + 0xAC) = ArchipelagoHandler::portalMap[8];
+		if (portalDestination == 15)
+			*(int*)(portalAddr + 0xAC) = ArchipelagoHandler::bossMap[2];
 	}
 }
 

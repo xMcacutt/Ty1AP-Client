@@ -41,7 +41,7 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 	}
 	if (item.item >= 0x8750040 && item.item < 0x8750050) {
 		SaveDataHandler::saveData.StopwatchesActive[item.item - 0x8750040] = true;
-		// IF LEVEL IS CURRENT LEVEL SPAWN THE STOPWATCH
+		// TODO IF LEVEL IS CURRENT LEVEL SPAWN THE STOPWATCH
 		return;
 	}
 	if (item.item >= 0x8750020 && item.item < 0x8750030) {
@@ -62,15 +62,15 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 		return;
 	}
 	if (item.item == 0x8750082) {
-		// TRIGGER EXTRA LIFE
+		// TODO TRIGGER EXTRA LIFE
 		return;
 	}
 	if (item.item == 0x8750083) {
-		// TRIGGER OPAL MAGNET
+		// TODO TRIGGER OPAL MAGNET
 		return;
 	}
 	//if (item.item == 0x8750084) {
-		// TRIGGER CHARGE BITE POWERUP
+		// TODO TRIGGER CHARGE BITE POWERUP
 	//}
 }
 
