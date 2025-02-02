@@ -66,6 +66,7 @@ void createDirectoriesIfNeeded(const std::string& filepath) {
 
 bool SaveDataHandler::LoadSaveData(std::string seed)
 {
+    auto& ap = ArchipelagoHandler::get();
     auto filePath = "./Saves/" + seed;
     createDirectoriesIfNeeded(filePath);
     ExtendedSaveData saveData = {};
@@ -83,12 +84,11 @@ bool SaveDataHandler::LoadSaveData(std::string seed)
         saveData.Magic = 0x701EE;
         saveData.AttributeData.GotBoomerang = true;
         saveData.ProgressiveRang = 1;
-        if (ArchipelagoHandler::progressiveRang && !ArchipelagoHandler::startWithBoom) {
-            saveData.AttributeData.GotBoomerang = false;
+        if (!ap.startWithBoom) {
             saveData.ProgressiveRang--;
         }
         saveData.PortalOpen[4] = true;
-        if (ArchipelagoHandler::levelUnlockStyle == LevelUnlockStyle::VANILLA) {
+        if (ap.levelUnlockStyle == LevelUnlockStyle::VANILLA) {
             saveData.PortalOpen[5] = true;
             saveData.PortalOpen[6] = true;
             saveData.PortalOpen[8] = true;

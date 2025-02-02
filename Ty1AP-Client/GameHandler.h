@@ -1,5 +1,6 @@
 #pragma once
 #include "ArchipelagoHandler.h"
+#include "CheckHandler.h"
 #include "ItemHandler.h"
 #include "core.h"
 #include "gameobject.h"

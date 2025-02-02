@@ -41,6 +41,7 @@ void GameHandler::Setup()
 	VirtualProtect(addr, 6, PAGE_EXECUTE_READWRITE, &oldProtect);
 	memset(addr, 0x90, 6);
 
+	MH_Uninitialize();
 	MH_Initialize();
 	addr = (char*)(Core::moduleBase + 0x10A1AB);  // Target address
 	MH_CreateHook((LPVOID)addr, &LevelInitHook, reinterpret_cast<LPVOID*>(&levelInitOrigin));
@@ -48,6 +49,7 @@ void GameHandler::Setup()
 	MH_CreateHook((LPVOID)addr, &MainMenuHook, reinterpret_cast<LPVOID*>(&mainMenuOrigin));
 	addr = (char*)(Core::moduleBase + 0x1724C7);
 	MH_CreateHook((LPVOID)addr, &LoadSavesHook, reinterpret_cast<LPVOID*>(&loadSavesOrigin));
+	//CheckHandler::SetupHooks();
 	MH_EnableHook(MH_ALL_HOOKS);
 
 	GameState::setNoIdle(true);
@@ -93,46 +95,52 @@ void GameHandler::OnEnterRainbowCliffs() {
 		triggerAddr = *(int*)(triggerAddr + 0x34);
 	}
 
-	if (ArchipelagoHandler::levelUnlockStyle != LevelUnlockStyle::VANILLA) {
+	/*
+	if (ArchipelagoHandler::get().levelUnlockStyle != LevelUnlockStyle::VANILLA) {
 		auto portalCount = *(int*)(Core::moduleBase + 0x267404);
 		auto portalAddr = *(int*)(Core::moduleBase + 0x267408);
 		for (auto portalIndex = 0; portalIndex < portalCount; portalIndex++) {
+			API::LogPluginMessage(portalIndex + " " + portalAddr);
 			auto portalDestination = *(int*)(portalAddr + 0xAC);
 			if (SaveDataHandler::saveData.PortalOpen[portalAddr])
 				*(int*)(portalAddr + 0x9C) = 1;
 			else
 				*(int*)(portalAddr + 0x9C) = 3;
+			portalAddr = *(int*)(portalAddr + 0x34);
 		}
-	}
+	}*/
 
+	auto& ap = ArchipelagoHandler::get(); 
 	auto portalCount = *(int*)(Core::moduleBase + 0x267404);
 	auto portalAddr = *(int*)(Core::moduleBase + 0x267408);
+	API::LogPluginMessage(std::to_string(ap.levelA1));
 	for (auto portalIndex = 0; portalIndex < portalCount; portalIndex++) {
 		auto portalDestination = *(int*)(portalAddr + 0xAC);
 		if (portalDestination == 4)
-			*(int*)(portalAddr + 0xAC) = ArchipelagoHandler::portalMap[0];
+			*(int*)(portalAddr + 0xAC) = ap.levelA1;
 		if (portalDestination == 5)
-			*(int*)(portalAddr + 0xAC) = ArchipelagoHandler::portalMap[1];
+			*(int*)(portalAddr + 0xAC) = ap.levelA2;
 		if (portalDestination == 6)
-			*(int*)(portalAddr + 0xAC) = ArchipelagoHandler::portalMap[2];
+			*(int*)(portalAddr + 0xAC) = ap.levelA3;
 		if (portalDestination == 7)
-			*(int*)(portalAddr + 0xAC) = ArchipelagoHandler::bossMap[0];
+			*(int*)(portalAddr + 0xAC) = ap.levelA4;
 		if (portalDestination == 8)
-			*(int*)(portalAddr + 0xAC) = ArchipelagoHandler::portalMap[3];
+			*(int*)(portalAddr + 0xAC) = ap.levelB1;
 		if (portalDestination == 9)
-			*(int*)(portalAddr + 0xAC) = ArchipelagoHandler::portalMap[4];
+			*(int*)(portalAddr + 0xAC) = ap.levelB2;
 		if (portalDestination == 10)
-			*(int*)(portalAddr + 0xAC) = ArchipelagoHandler::portalMap[5];
+			*(int*)(portalAddr + 0xAC) = ap.levelB3;
 		if (portalDestination == 19)
-			*(int*)(portalAddr + 0xAC) = ArchipelagoHandler::bossMap[1];
+			*(int*)(portalAddr + 0xAC) = ap.levelD4;
 		if (portalDestination == 12)
-			*(int*)(portalAddr + 0xAC) = ArchipelagoHandler::portalMap[6];
+			*(int*)(portalAddr + 0xAC) = ap.levelC1;
 		if (portalDestination == 13)
-			*(int*)(portalAddr + 0xAC) = ArchipelagoHandler::portalMap[7];
+			*(int*)(portalAddr + 0xAC) = ap.levelC2;
 		if (portalDestination == 14)
-			*(int*)(portalAddr + 0xAC) = ArchipelagoHandler::portalMap[8];
+			*(int*)(portalAddr + 0xAC) = ap.levelC3;
 		if (portalDestination == 15)
-			*(int*)(portalAddr + 0xAC) = ArchipelagoHandler::bossMap[2];
+			*(int*)(portalAddr + 0xAC) = ap.levelC4;
+		portalAddr = *(int*)(portalAddr + 0x34);
 	}
 }
 
@@ -144,6 +152,11 @@ void GameHandler::HandleItemReceived(APClient::NetworkItem item) {
 }
 
 void GameHandler::OnEnterLevel() {
+	*(int*)(Core::moduleBase + 0x288730) = reinterpret_cast<int>(&SaveDataHandler::saveData);
+	
+	if (SaveDataHandler::saveData.ProgressiveLevel == 0) 
+		SaveDataHandler::saveData.AttributeData.GotBoomerang = false;
+
 	ItemHandler::HandleStoredItems();
 
 	auto levelId = Level::getCurrentLevel();
@@ -157,7 +170,7 @@ void GameHandler::OnEnterLevel() {
 
 void GameHandler::OnMainMenu() {
 	auto menuAddr = *(int*)(Core::moduleBase + 0x286644);
-	if (!ArchipelagoHandler::IsConnected()) {
+	if (!ArchipelagoHandler::get().ap_connected) {
 		*(char*)(menuAddr + 0x164) = 0x0;
 		*(char*)(menuAddr + 0x165) = 0x0;
 	}
@@ -171,7 +184,7 @@ void GameHandler::OnLoadSaves() {
 	//*(int*)(Core::moduleBase + 0x273838) = 2;
 	//*(int*)(Core::moduleBase + 0x27383C) = 0;
 	//*(int*)(Core::moduleBase + 0x273840) = 2;
-	*(int*)(Core::moduleBase + 0x288730) = *(int*)&SaveDataHandler::saveData;
+	//API::LogPluginMessage(std::to_string(reinterpret_cast<int>(&SaveDataHandler::saveData)));
 	//*(int*)(Core::moduleBase + 0x52F2A4) = 0x3;
 	//*(int*)(Core::moduleBase + 0x273F74) = 0x9;
 }

@@ -1,7 +1,7 @@
 #include "ItemHandler.h"
 
 
-std::queue<APClient::NetworkItem> storedItems;
+std::queue<APClient::NetworkItem> ItemHandler::storedItems;
 
 void ItemHandler::HandleItem(APClient::NetworkItem item)
 {
@@ -82,8 +82,8 @@ void ItemHandler::HandleStoredItems()
 	}
 }
 
-void HandleProgressiveLevel() {
-	bool bossesIncluded = ArchipelagoHandler::levelUnlockStyle == LevelUnlockStyle::CHECKS;
+void ItemHandler::HandleProgressiveLevel() {
+	bool bossesIncluded = ArchipelagoHandler::get().levelUnlockStyle == LevelUnlockStyle::CHECKS;
 	if (SaveDataHandler::saveData.ProgressiveLevel >= 1) {
 		SaveDataHandler::saveData.PortalOpen[5] = true;
 	}
@@ -121,15 +121,15 @@ void HandleProgressiveLevel() {
 		SaveDataHandler::saveData.PortalOpen[14] = true;
 	}
 	if (SaveDataHandler::saveData.ProgressiveLevel >= 11 && bossesIncluded) {
-		SaveDataHandler::saveData.PortalOpen[21] = true;
+		SaveDataHandler::saveData.PortalOpen[15] = true;
 	}
 	if (SaveDataHandler::saveData.ProgressiveLevel >= 9 && !bossesIncluded ||
 		SaveDataHandler::saveData.ProgressiveLevel >= 12 && bossesIncluded) {
-		SaveDataHandler::saveData.PortalOpen[21] = true;
+		SaveDataHandler::saveData.PortalOpen[20] = true;
 	}
 }
 
-void HandleIndividualLevel(int code) {
+void ItemHandler::HandleIndividualLevel(int code) {
 	switch (code) {
 	case 1:
 		SaveDataHandler::saveData.PortalOpen[5] = true;
@@ -165,12 +165,12 @@ void HandleIndividualLevel(int code) {
 		SaveDataHandler::saveData.PortalOpen[15] = true;
 		break;
 	case 12:
-		SaveDataHandler::saveData.PortalOpen[21] = true;
+		SaveDataHandler::saveData.PortalOpen[20] = true;
 		break;
 	}
 }
 
-void HandleProgressiveRang() {
+void ItemHandler::HandleProgressiveRang() {
 	if (SaveDataHandler::saveData.ProgressiveRang >= 1) {
 		SaveDataHandler::saveData.AttributeData.GotBoomerang = true;
 	}
@@ -200,7 +200,7 @@ void HandleProgressiveRang() {
 	}
 }
 
-void HandleIndividualRang(int code) {
+void ItemHandler::HandleIndividualRang(int code) {
 	switch (code) {
 	case 0:
 		SaveDataHandler::saveData.AttributeData.LearntToSwim = true;
