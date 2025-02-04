@@ -167,13 +167,7 @@ void CheckHandler::OnCollectBilby(int bilbyIndex) {
 
 void CheckHandler::OnCollectFrame(int frameIndex)
 {
-	if (ArchipelagoHandler::framesanity == Bilbysanity::NONE) {
-		SaveDataHandler::SaveGame();
-		return;
-	}
-	int level = (int)Level::getCurrentLevel();
-	auto adjustedLevel = level - 4;
-	adjustedLevel -= (adjustedLevel > 3) + (adjustedLevel > 7);
-	ArchipelagoHandler::Check(0x87501AC + static_cast<int64_t>(adjustedLevel) * 0x5 + static_cast<int64_t>(bilbyIndex));
-	SaveDataHandler::SaveGame();
+	frameIndex += 3;
+	frameIndex -= 3;
+	API::LogPluginMessage(std::to_string(frameIndex));
 }

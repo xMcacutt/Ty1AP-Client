@@ -30,9 +30,11 @@ public:
 	static void __stdcall CollectTheggHook();
     static void __stdcall CollectCogHook();
     static void __stdcall CollectBilbyHook();
+    static void __stdcall CollectFrameHook();
 	static void SetupHooks();
 	static void OnCollectThegg(int theggIndex);
     static void OnCollectCog(int cogIndex);
     static void OnCollectBilby(int bilbyIndex);
+    static void OnCollectFrame(int frameIndex);
 };
 
