@@ -184,6 +184,19 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
         if (data.find("HubTheggCounts") != data.end() && data["HubTheggCounts"].is_number_integer())
             hubTheggCounts = data["HubTheggCounts"].get<int>();
 
+        if (data.find("Cogsanity") != data.end() && data["Cogsanity"].is_number_integer()) {
+            cogsanity = (Cogsanity)data["Cogsanity"].get<int>();
+        }
+        if (data.find("Bilbysanity") != data.end() && data["Bilbysanity"].is_number_integer()) {
+            bilbysanity = (Bilbysanity)data["Bilbysanity"].get<int>();
+        }
+        if (data.find("Attributesanity") != data.end() && data["Attributesanity"].is_number_integer()) {
+            attributesanity = (Attributesanity)data["Attributesanity"].get<int>();
+        }
+        if (data.find("Framesanity") != data.end() && data["Framesanity"].is_number_integer()) {
+            framesanity = (Framesanity)data["Framesanity"].get<int>();
+        }
+
         if (deathlink) ap->ConnectUpdate(false, 0b111, true, { "DeathLink" });
         ap->StatusUpdate(APClient::ClientStatus::PLAYING);
 
@@ -215,9 +228,6 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
             return;
         }
         for (const auto& item : items) {
-            std::string itemname = ap->get_item_name(item.item);
-            std::string sender = ap->get_player_alias(item.player);
-            std::string location = ap->get_location_name(item.location);
 
             /*
             //Check if we should ignore this item
@@ -225,9 +235,7 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
                 continue;
             }*/
 
-            //Add the item to the list of already received items, only for logging purpose
             ItemHandler::HandleItem(item);
-            LoggerWindow::Log(itemname + " found at " + location + " in " + sender + "'s world");
         }
 
     });
@@ -239,6 +247,21 @@ void ArchipelagoHandler::Check(int64_t locationId)
     check.push_back(locationId);
     ap->LocationScouts(check);
     ap->LocationChecks(check);
+}
+
+std::string ArchipelagoHandler::GetItemName(int64_t itemId)
+{
+    return ap->get_item_name(itemId);
+}
+
+std::string ArchipelagoHandler::GetPlayerAlias(int64_t playerId)
+{
+    return ap->get_player_alias(playerId);
+}
+
+std::string ArchipelagoHandler::GetLocationName(int64_t locId)
+{
+    return ap->get_location_name(locId);
 }
 
 void ArchipelagoHandler::Poll() {

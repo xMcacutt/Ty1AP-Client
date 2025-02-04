@@ -5,6 +5,16 @@ std::queue<APClient::NetworkItem> ItemHandler::storedItems;
 
 void ItemHandler::HandleItem(APClient::NetworkItem item)
 {
+	if (GameState::onLoadScreenOrMainMenu()) {
+		storedItems.push(item);
+		return;
+	}
+
+	std::string itemname = ArchipelagoHandler::GetItemName(item.item);
+	std::string sender = ArchipelagoHandler::GetPlayerAlias(item.player);
+	std::string location = ArchipelagoHandler::GetLocationName(item.location);
+	LoggerWindow::Log(itemname + " found at " + location + " in " + sender + "'s world");
+
 	if (item.item == 0x8750000) {
 		SaveDataHandler::saveData.FireThunderEggCount++;
 		return;
@@ -41,7 +51,9 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 	}
 	if (item.item >= 0x8750040 && item.item < 0x8750050) {
 		SaveDataHandler::saveData.StopwatchesActive[item.item - 0x8750040] = true;
-		// TODO IF LEVEL IS CURRENT LEVEL SPAWN THE STOPWATCH
+		if ((int)Level::getCurrentLevel() == item.item - 0x8750040)
+			if (*(int*)(Core::moduleBase + 0x27041C) != 0)
+				*(int*)(*(int*)(Core::moduleBase + 0x270420) + 0x68) = 0x2;
 		return;
 	}
 	if (item.item >= 0x8750020 && item.item < 0x8750030) {
@@ -60,7 +72,14 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 		return;
 	}
 	if (item.item == 0x8750082) {
-		// TODO TRIGGER EXTRA LIFE
+		// EXTRA LIFE
+		Sound::PlayTySoundByIndex(0x1BC);
+		auto objAddr = Core::moduleBase + 0x2888AC;
+		void (*incrementLives)() = reinterpret_cast<void(*)()>(Core::moduleBase + 0xF6A80);
+		__asm {
+			mov ecx, objAddr
+			call incrementLives
+		}
 		return;
 	}
 	if (item.item == 0x8750083) {

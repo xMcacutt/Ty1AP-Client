@@ -12,6 +12,9 @@ CollectBilbyFunctionType collectBilbyOrigin = nullptr;
 typedef void(__stdcall* CollectFrameFunctionType)();
 CollectFrameFunctionType collectFrameOrigin = nullptr;
 
+typedef void(__stdcall* CollectFrame2FunctionType)();
+CollectFrame2FunctionType collectFrameOrigin2 = nullptr;
+
 __declspec(naked) void __stdcall CheckHandler::CollectTheggHook() {
 	__asm {
 		push ebp
@@ -107,19 +110,45 @@ __declspec(naked) void __stdcall CheckHandler::CollectFrameHook()
 	}
 }
 
+uintptr_t collectFrameOrigin2Addr;
+__declspec(naked) void __stdcall CheckHandler::CollectFrameHook2()
+{
+	__asm {
+		push ebx
+		push ecx
+		push edx
+		push esi
+		push edi
+		push eax
+		call SaveDataHandler::SaveGame
+		pop eax
+		pop edi
+		pop esi
+		pop edx
+		pop ecx
+		pop ebx
+		sar eax,0x3
+		rol bl,0x1
+		jmp dword ptr[collectFrameOrigin2Addr]
+	}
+}
+
 
 void CheckHandler::SetupHooks()
 {
 	collectBilbyOriginAddr = Core::moduleBase + 0xF7AF7 + 5;
 	collectFrameOriginAddr = Core::moduleBase + 0xF7F00 + 5;
-	auto addr = (char*)(Core::moduleBase + 0xF6E80);  // Target address
+	collectFrameOrigin2Addr = Core::moduleBase + 0xF7F72 + 5;
+	auto addr = (char*)(Core::moduleBase + 0xF6E80);
 	MH_CreateHook((LPVOID)addr, &CollectTheggHook, reinterpret_cast<LPVOID*>(&collectTheggOrigin));
-	addr = (char*)(Core::moduleBase + 0xF6CC0);  // Target address
+	addr = (char*)(Core::moduleBase + 0xF6CC0);
 	MH_CreateHook((LPVOID)addr, &CollectCogHook, reinterpret_cast<LPVOID*>(&collectCogOrigin));
-	addr = (char*)(Core::moduleBase + 0xF7AF7);  // Target address
+	addr = (char*)(Core::moduleBase + 0xF7AF7);
 	MH_CreateHook((LPVOID)addr, &CollectBilbyHook, reinterpret_cast<LPVOID*>(&collectBilbyOrigin));
-	addr = (char*)(Core::moduleBase + 0xF7F00);  // Target address
+	addr = (char*)(Core::moduleBase + 0xF7F00);
 	MH_CreateHook((LPVOID)addr, &CollectFrameHook, reinterpret_cast<LPVOID*>(&collectFrameOrigin));
+	addr = (char*)(Core::moduleBase + 0xF7F72);
+	MH_CreateHook((LPVOID)addr, &CollectFrameHook2, reinterpret_cast<LPVOID*>(&collectFrameOrigin2));
 }
 
 void CheckHandler::OnCollectThegg(int theggIndex) {
@@ -133,7 +162,7 @@ void CheckHandler::OnCollectThegg(int theggIndex) {
 }
 
 void CheckHandler::OnCollectCog(int cogIndex) {
-	if (ArchipelagoHandler::cogsanity == Cogsanity::NONE){
+	if (ArchipelagoHandler::cogsanity == Cogsanity::NONE) {
 		SaveDataHandler::SaveGame();
 		return;
 	}
@@ -167,13 +196,22 @@ void CheckHandler::OnCollectBilby(int bilbyIndex) {
 
 void CheckHandler::OnCollectFrame(int frameIndex)
 {
-	if (ArchipelagoHandler::framesanity == Bilbysanity::NONE) {
+	if (ArchipelagoHandler::framesanity == Framesanity::NONE) {
 		SaveDataHandler::SaveGame();
 		return;
 	}
 	int level = (int)Level::getCurrentLevel();
-	auto adjustedLevel = level - 4;
+	SaveDataHandler::saveData.FrameCount[level]++;
+	auto adjustedLevel = level - (3 + (level > 7) + (level > 9) + (level > 11));
 	adjustedLevel -= (adjustedLevel > 3) + (adjustedLevel > 7);
-	ArchipelagoHandler::Check(0x87501AC + static_cast<int64_t>(adjustedLevel) * 0x5 + static_cast<int64_t>(bilbyIndex));
+	if (adjustedLevel == -3)
+		adjustedLevel = 0;
+	auto levelFrameCount = SaveDataHandler::saveData.FrameCount[level];
+	if (ArchipelagoHandler::framesanity == Framesanity::PER_LEVEL) {
+		if (levelFrameCount == FRAME_COUNTS.find(level)->second)
+			ArchipelagoHandler::Check(0x8750258 + static_cast<int64_t>(adjustedLevel));
+	}
+	else
+		ArchipelagoHandler::Check(0x87501D9 + static_cast<int64_t>(frameIndex));
 	SaveDataHandler::SaveGame();
 }

@@ -43,6 +43,7 @@ struct ExtendedSaveData {
 	int AirThunderEggCount;
 	int GoldenCogCount;
 	char BilbyCount[24];
+	char FrameCount[24];
 	bool PortalOpen[24];
 	char ProgressiveRang;
 	char ProgressiveLevel;

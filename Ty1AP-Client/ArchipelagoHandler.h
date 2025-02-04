@@ -52,11 +52,14 @@ class LoginWindow;
 class ArchipelagoHandler
 {
 public:
-	static bool polling;
 	static void Poll();
 	static void ConnectAP(LoginWindow* login);
 	static void DisconnectAP(LoginWindow* login);
 	static void Check(int64_t locationId);
+	static std::string GetItemName(int64_t itemId);
+	static std::string GetPlayerAlias(int64_t playerId);
+	static std::string GetLocationName(int64_t locId);
+	static bool polling;
 	static Goal goal;
 	static bool deathlink;
 	static bool startWithBoom;

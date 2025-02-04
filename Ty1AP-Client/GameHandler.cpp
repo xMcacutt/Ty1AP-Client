@@ -163,6 +163,7 @@ void GameHandler::OnEnterLevel() {
 	if (SaveDataHandler::saveData.ProgressiveLevel == 0) 
 		SaveDataHandler::saveData.AttributeData.GotBoomerang = false;
 		*/
+
 	ItemHandler::HandleStoredItems();
 
 	auto levelId = Level::getCurrentLevel();

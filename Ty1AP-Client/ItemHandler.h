@@ -4,6 +4,7 @@
 #include "ArchipelagoHandler.h"
 #include "SaveDataHandler.h"
 #include <queue>
+#include "sound.h"
 
 class ItemHandler
 {
