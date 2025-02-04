@@ -47,12 +47,10 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 	if (item.item >= 0x8750020 && item.item < 0x8750030) {
 		SaveDataHandler::saveData.BilbyCount[item.item - 0x8750020]++;
 		if (SaveDataHandler::saveData.BilbyCount[item.item - 0x8750020] == 5) {
-			if (item.item - 0x8750020 < 8)
-				SaveDataHandler::saveData.FireThunderEggCount++;
-			else if (item.item - 0x8750020 < 12)
-				SaveDataHandler::saveData.IceThunderEggCount++;
-			else
-				SaveDataHandler::saveData.AirThunderEggCount++;
+			auto level = item.item - 0x8750020;
+			auto adjustedLevel = level - 4;
+			adjustedLevel -= (adjustedLevel > 3) + (adjustedLevel > 7);
+			ArchipelagoHandler::Check(0x8750270 + adjustedLevel);
 		}
 		return;
 	}
@@ -83,7 +81,7 @@ void ItemHandler::HandleStoredItems()
 }
 
 void ItemHandler::HandleProgressiveLevel() {
-	bool bossesIncluded = ArchipelagoHandler::get().levelUnlockStyle == LevelUnlockStyle::CHECKS;
+	bool bossesIncluded = ArchipelagoHandler::levelUnlockStyle == LevelUnlockStyle::CHECKS;
 	if (SaveDataHandler::saveData.ProgressiveLevel >= 1) {
 		SaveDataHandler::saveData.PortalOpen[5] = true;
 	}

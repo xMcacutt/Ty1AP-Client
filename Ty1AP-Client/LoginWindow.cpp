@@ -14,12 +14,10 @@ void LoginWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
     ImGui::InputText("Password", password, IM_ARRAYSIZE(password), ImGuiInputTextFlags_Password);
     ImGui::InputText("Slot Name", slot, IM_ARRAYSIZE(slot));
 
-    auto& ap = ArchipelagoHandler::get();
-
-    if (!ap.ap_connected) {
+    if (!ArchipelagoHandler::ap_connected) {
         if (ImGui::Button("Connect")) {
             if (strlen(server) > 0 && strlen(slot) > 0) {
-                ap.ConnectAP(this);
+                ArchipelagoHandler::ConnectAP(this);
                 SetMessage("Connecting to " + std::string(server) + "...");
             }
             else {
@@ -29,7 +27,7 @@ void LoginWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
     }
     else {
         if (ImGui::Button("Disconnect")) {
-            ap.DisconnectAP(this);
+            ArchipelagoHandler::DisconnectAP(this);
             SetMessage("");
         }
     }

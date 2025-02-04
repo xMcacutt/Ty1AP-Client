@@ -1,6 +1,7 @@
 #pragma once
 #include "ArchipelagoHandler.h"
 #include "GameHandler.h"
+#include <algorithm>
 
 const std::unordered_map<int, std::string> LEVEL_NAMES = {
     {0, "Rainbow Cliffs"},
@@ -26,8 +27,12 @@ const std::unordered_map<int, std::string> LEVEL_NAMES = {
 class CheckHandler
 {
 public:
-	static void __stdcall CollectTheggHook(void* ecx, int param);
+	static void __stdcall CollectTheggHook();
+    static void __stdcall CollectCogHook();
+    static void __stdcall CollectBilbyHook();
 	static void SetupHooks();
 	static void OnCollectThegg(int theggIndex);
+    static void OnCollectCog(int cogIndex);
+    static void OnCollectBilby(int bilbyIndex);
 };
 

@@ -52,51 +52,30 @@ class LoginWindow;
 class ArchipelagoHandler
 {
 public:
-	static ArchipelagoHandler& get() {
-		if (!instance) {
-			instance = new ArchipelagoHandler();
-		}
-		return *instance;
-	}
-	static ArchipelagoHandler* instance;
-	bool polling;
-	void Poll();
-	void ConnectAP(LoginWindow* login);
-	void DisconnectAP(LoginWindow* login);
-	void Check(int64_t locationId);
-	Goal goal;
-	bool deathlink;
-	bool startWithBoom;
-	LevelUnlockStyle levelUnlockStyle;
-	std::vector<int> portalMap;
-	std::vector<int> bossMap;
-	int hubTheggCounts;
-	double deathtime;
-	Cogsanity cogsanity;
-	Bilbysanity bilbysanity;
-	Attributesanity attributesanity;
-	Framesanity framesanity;
-	bool progressiveRang;
-	bool progressiveLevel;
-	bool ap_sync_queued;
-	bool ap_connected;
-	int levelA1;
-	int levelA2;
-	int levelA3;
-	int levelA4;
-	int levelB1;
-	int levelB2;
-	int levelB3;
-	int levelD4;
-	int levelC1;
-	int levelC2;
-	int levelC3;
-	int levelC4;
+	static bool polling;
+	static void Poll();
+	static void ConnectAP(LoginWindow* login);
+	static void DisconnectAP(LoginWindow* login);
+	static void Check(int64_t locationId);
+	static Goal goal;
+	static bool deathlink;
+	static bool startWithBoom;
+	static LevelUnlockStyle levelUnlockStyle;
+	static std::vector<int> portalMap;
+	static std::vector<int> bossMap;
+	static int hubTheggCounts;
+	static double deathtime;
+	static Cogsanity cogsanity;
+	static Bilbysanity bilbysanity;
+	static Attributesanity attributesanity;
+	static Framesanity framesanity;
+	static bool progressiveRang;
+	static bool progressiveLevel;
+	static bool ap_sync_queued;
+	static bool ap_connected;
+	static std::string seed;
 private:
-	std::unique_ptr<APClient> ap;
-	void SetAPStatus(std::string status, char important);
-	ArchipelagoHandler();
-	ArchipelagoHandler(const ArchipelagoHandler&) = delete;
-	ArchipelagoHandler& operator=(const ArchipelagoHandler&) = delete;
+	static std::unique_ptr<APClient> ap;
+	static void SetAPStatus(std::string status, char important);
 };
 

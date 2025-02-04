@@ -5,7 +5,6 @@
 #include <fstream>
 #include <string>
 
-#pragma pack(push, 1)
 struct ExtendedSaveData {
 	int Size;
 	int Magic;
@@ -54,5 +53,5 @@ class SaveDataHandler
 public:
 	static inline ExtendedSaveData saveData;
 	static bool LoadSaveData(std::string seed);
+	static void SaveGame();
 };
-

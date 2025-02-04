@@ -49,27 +49,25 @@ unsigned connect_error_count = 0;
 bool awaiting_password = false;
 std::string slot = "Player";
 int nextCheckToGet = 0;
-ArchipelagoHandler* ArchipelagoHandler::instance = nullptr;
-
-
-ArchipelagoHandler::ArchipelagoHandler() {
-    bool ap_sync_queued = false;
-    bool ap_connected = false;
-    bossMap.clear();
-    portalMap.clear();
-    goal = Goal::BEAT_CASS;
-    deathlink = false;
-    startWithBoom = true;
-    levelUnlockStyle = LevelUnlockStyle::VANILLA;
-    hubTheggCounts = 17;
-    deathtime = -1;
-    cogsanity = Cogsanity::EACH_COG;
-    bilbysanity = Bilbysanity::ALL_NO_THEGG;
-    attributesanity = Attributesanity::SKIP_ELEMENTALS;
-    framesanity = Framesanity::NONE;
-    progressiveRang = false;
-    progressiveLevel = false;
-}
+bool ArchipelagoHandler::ap_sync_queued = false;
+bool ArchipelagoHandler::ap_connected = false;
+bool ArchipelagoHandler::polling = false;
+Goal ArchipelagoHandler::goal = Goal::BEAT_CASS;
+bool ArchipelagoHandler::deathlink = false;
+bool ArchipelagoHandler::startWithBoom = true;
+LevelUnlockStyle ArchipelagoHandler::levelUnlockStyle = LevelUnlockStyle::VANILLA;
+int ArchipelagoHandler::hubTheggCounts = 17;
+double ArchipelagoHandler::deathtime = -1;
+Cogsanity ArchipelagoHandler::cogsanity = Cogsanity::EACH_COG;
+Bilbysanity ArchipelagoHandler::bilbysanity = Bilbysanity::ALL_NO_THEGG;
+Attributesanity ArchipelagoHandler::attributesanity = Attributesanity::SKIP_ELEMENTALS;
+Framesanity ArchipelagoHandler::framesanity = Framesanity::NONE;
+bool ArchipelagoHandler::progressiveRang = false;
+bool ArchipelagoHandler::progressiveLevel = false;
+std::vector<int> ArchipelagoHandler::portalMap;
+std::vector<int> ArchipelagoHandler::bossMap;
+std::unique_ptr<APClient> ArchipelagoHandler::ap;
+std::string ArchipelagoHandler::seed;
 
 bool isEqual(double a, double b)
 {
@@ -125,12 +123,12 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
     catch (std::exception) { /* ignore */ }
 
     ap_sync_queued = false;
-    ap->set_socket_connected_handler([login, this]() {
+    ap->set_socket_connected_handler([login]() {
         login->SetMessage("Connected, authenticating...");
         SetAPStatus("Authenticating", 1);
     });
 
-    ap->set_socket_disconnected_handler([login, this]() {
+    ap->set_socket_disconnected_handler([login]() {
         login->SetMessage("");
         LoggerWindow::Log("Disconnected");
         SetAPStatus("Disconnected", 1);
@@ -142,13 +140,13 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
             GameState::forceMainMenu();
     });
 
-    ap->set_room_info_handler([login, this]() {
+    ap->set_room_info_handler([login]() {
         login->SetMessage("Room info received");
         ap->ConnectSlot(login->slot, login->password, 0b111, {}, { 0,5,1 });
         ap_connect_sent = true;
     });
 
-    ap->set_slot_connected_handler([this](const json& data) {
+    ap->set_slot_connected_handler([](const json& data) {
         ap_connected = true;
 
         if (data.find("DeathLink") != data.end() && data["DeathLink"].is_boolean())
@@ -161,22 +159,14 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
             levelUnlockStyle = static_cast<LevelUnlockStyle>(data["LevelUnlockStyle"].get<int>());
         else levelUnlockStyle = LevelUnlockStyle::VANILLA;
 
+        portalMap.clear();
         if (data.find("PortalMap") != data.end() && data["PortalMap"].is_array()) {
-            levelA1 = data["PortalMap"].get<std::vector<int>>()[0];
-            levelA2 = data["PortalMap"].get<std::vector<int>>()[1];
-            levelA3 = data["PortalMap"].get<std::vector<int>>()[2];
-            levelB1 = data["PortalMap"].get<std::vector<int>>()[3];
-            levelB2 = data["PortalMap"].get<std::vector<int>>()[4];
-            levelB3 = data["PortalMap"].get<std::vector<int>>()[5];
-            levelC1 = data["PortalMap"].get<std::vector<int>>()[6];
-            levelC2 = data["PortalMap"].get<std::vector<int>>()[7];
-            levelC3 = data["PortalMap"].get<std::vector<int>>()[8];
+            portalMap = data["PortalMap"].get<std::vector<int>>();
         }
 
+        bossMap.clear();
         if (data.find("BossMap") != data.end() && data["BossMap"].is_array()) {
-            levelA4 = data["BossMap"].get<std::vector<int>>()[0];
-            levelD4 = data["BossMap"].get<std::vector<int>>()[1];
-            levelC4 = data["BossMap"].get<std::vector<int>>()[2];
+            bossMap = data["BossMap"].get<std::vector<int>>();
         }
 
         if (data.find("DeathLink") != data.end() && data["DeathLink"].is_boolean())
@@ -199,12 +189,14 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 
         GameHandler::SetupOnConnect(ap->get_seed());
 
+        seed = ap->get_seed();
+            
         LoggerWindow::Log("Connected as " + ap->get_player_alias(ap->get_player_number()));
 
         SetAPStatus("Connected", 0);
     });
 
-    ap->set_slot_disconnected_handler([login, this]() {
+    ap->set_slot_disconnected_handler([login]() {
         login->SetMessage("");
         LoggerWindow::Log("Disconnected");
         SetAPStatus("Disconnected", 1);
@@ -214,6 +206,30 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
             GameHandler::SetLoadActive(false);
         else
             GameState::forceMainMenu();
+    });
+
+    ap->set_items_received_handler([](const std::list<APClient::NetworkItem>& items) {
+        if (!ap->is_data_package_valid()) {
+            if (!ap_sync_queued) ap->Sync();
+            ap_sync_queued = true;
+            return;
+        }
+        for (const auto& item : items) {
+            std::string itemname = ap->get_item_name(item.item);
+            std::string sender = ap->get_player_alias(item.player);
+            std::string location = ap->get_location_name(item.location);
+
+            /*
+            //Check if we should ignore this item
+            if (item.index < pLastReceivedIndex) {
+                continue;
+            }*/
+
+            //Add the item to the list of already received items, only for logging purpose
+            ItemHandler::HandleItem(item);
+            LoggerWindow::Log(itemname + " found at " + location + " in " + sender + "'s world");
+        }
+
     });
 }
 

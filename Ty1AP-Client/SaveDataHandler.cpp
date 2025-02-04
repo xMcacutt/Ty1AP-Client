@@ -1,47 +1,14 @@
 #include "SaveDataHandler.h"
 
-std::string GetSteamUserdataPath() {
-    HKEY hKey;
-    const char* regPath = "SOFTWARE\\Valve\\Steam";
-    char steamPath[MAX_PATH];
-    DWORD steamPathSize = sizeof(steamPath);
-
-    if (RegOpenKeyExA(HKEY_CURRENT_USER, regPath, 0, KEY_QUERY_VALUE, &hKey) == ERROR_SUCCESS) {
-        if (RegQueryValueExA(hKey, "SteamPath", nullptr, nullptr, (LPBYTE)steamPath, &steamPathSize) == ERROR_SUCCESS) {
-            RegCloseKey(hKey);
-            return std::string(steamPath) + "\\userdata\\";
-        }
-        RegCloseKey(hKey);
-    }
-
-    return "";
-}
-
-std::string GetSteamUserID() {
-    HKEY hKey;
-    const char* regPath = "SOFTWARE\\Valve\\Steam\\ActiveProcess";
-    DWORD activeUserID;
-    DWORD size = sizeof(activeUserID);
-
-    if (RegOpenKeyExA(HKEY_CURRENT_USER, regPath, 0, KEY_QUERY_VALUE, &hKey) == ERROR_SUCCESS) {
-        if (RegQueryValueExA(hKey, "ActiveUser", nullptr, nullptr, (LPBYTE)&activeUserID, &size) == ERROR_SUCCESS) {
-            RegCloseKey(hKey);
-            return std::to_string(activeUserID);
-        }
-        RegCloseKey(hKey);
-    }
-    return "";
-}
-
 bool fileExists(const std::string& filePath) {
     std::ifstream file(filePath);
     return file.good();
 }
 
-bool saveToFile(const std::string& filePath, const ExtendedSaveData saveData) {
+bool saveToFile(const std::string& filePath) {
     std::ofstream file(filePath, std::ios::binary);
     if (file.is_open()) {
-        file.write(reinterpret_cast<const char*>(&saveData), sizeof(ExtendedSaveData));
+        file.write(reinterpret_cast<const char*>(&SaveDataHandler::saveData), sizeof(ExtendedSaveData));
         file.close();
         return true;
     }
@@ -49,10 +16,10 @@ bool saveToFile(const std::string& filePath, const ExtendedSaveData saveData) {
     return false;
 }
 
-bool loadFromFile(const std::string& filePath, ExtendedSaveData saveData) {
+bool loadFromFile(const std::string& filePath) {
     std::ifstream file(filePath, std::ios::binary);
     if (file.is_open()) {
-        file.read(reinterpret_cast<char*>(&saveData), sizeof(ExtendedSaveData));
+        file.read(reinterpret_cast<char*>(&SaveDataHandler::saveData), sizeof(ExtendedSaveData));
         file.close();
         return true;
     }
@@ -66,12 +33,10 @@ void createDirectoriesIfNeeded(const std::string& filepath) {
 
 bool SaveDataHandler::LoadSaveData(std::string seed)
 {
-    auto& ap = ArchipelagoHandler::get();
     auto filePath = "./Saves/" + seed;
     createDirectoriesIfNeeded(filePath);
-    ExtendedSaveData saveData = {};
     if (fileExists(filePath)) {
-        if (loadFromFile(filePath, saveData))
+        if (loadFromFile(filePath))
             LoggerWindow::Log("Save loaded successfully!");
         else {
             LoggerWindow::Log("Error: Unable to read save.");
@@ -84,11 +49,13 @@ bool SaveDataHandler::LoadSaveData(std::string seed)
         saveData.Magic = 0x701EE;
         saveData.AttributeData.GotBoomerang = true;
         saveData.ProgressiveRang = 1;
-        if (!ap.startWithBoom) {
+        if (!ArchipelagoHandler::startWithBoom) {
             saveData.ProgressiveRang--;
         }
+        saveData.SavedLevel = LevelCode::A1;
+        saveData.CurrentLevel = LevelCode::A1;
         saveData.PortalOpen[4] = true;
-        if (ap.levelUnlockStyle == LevelUnlockStyle::VANILLA) {
+        if (ArchipelagoHandler::levelUnlockStyle == LevelUnlockStyle::VANILLA) {
             saveData.PortalOpen[5] = true;
             saveData.PortalOpen[6] = true;
             saveData.PortalOpen[8] = true;
@@ -99,17 +66,14 @@ bool SaveDataHandler::LoadSaveData(std::string seed)
             saveData.PortalOpen[14] = true;
             saveData.PortalOpen[21] = true;
         }
-        saveToFile(filePath, saveData);
+        saveToFile(filePath);
         LoggerWindow::Log("Save file created");
     }
-    auto steamUserDataPath = GetSteamUserdataPath();
-    auto steamUserID = GetSteamUserID();
-    auto savePath = steamUserDataPath + "\\" + steamUserID + "\\" + "411960" + "\\" + "remote\\Game 3";
-    std::filesystem::copy_file(filePath, savePath, std::filesystem::copy_options::overwrite_existing);
-    SaveDataHandler::saveData = saveData;
     return true;
 }
 
-bool RedirectSaveData() {
-
+void SaveDataHandler::SaveGame()
+{
+    auto filePath = "./Saves/" + ArchipelagoHandler::seed;
+    saveToFile(filePath);
 }

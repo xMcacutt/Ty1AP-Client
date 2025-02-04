@@ -25,8 +25,7 @@ private:
 	static void OnEnterLevel();
 	static void OnMainMenu();
 	static void OnLoadSaves();
-	static void __stdcall LevelInitHook();
-	static void __stdcall LoadSavesHook();
 	static void __stdcall MainMenuHook();
+	static void WatchMemory();
 };
 
