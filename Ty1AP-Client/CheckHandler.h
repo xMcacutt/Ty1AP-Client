@@ -56,10 +56,22 @@ public:
     static void __stdcall CollectBilbyHook();
     static void __stdcall CollectFrameHook();
     static void __stdcall CollectFrameHook2();
+    static void __stdcall CollectTalismanHook();
+    static void __stdcall CollectDiveHook();
+    static void __stdcall CollectSwimHook();
+    static void __stdcall CollectSecondRangHook();
+    static void __stdcall CollectLifePawHook();
+    static void __stdcall CollectRangHook();
 	static void SetupHooks();
 	static void OnCollectThegg(int theggIndex);
     static void OnCollectCog(int cogIndex);
     static void OnCollectBilby(int bilbyIndex);
     static void OnCollectFrame(int frameIndex);
+    static void OnCollectTalisman(int talismanIndex);
+    static void OnCollectDive();
+    static void OnCollectSwim();
+    static void OnCollectSecondRang();
+    static void OnCollectLifePaw();
+    static void OnCollectRang(int rangId);
 };
 

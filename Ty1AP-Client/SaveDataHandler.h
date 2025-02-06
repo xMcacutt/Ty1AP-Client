@@ -47,6 +47,7 @@ struct ExtendedSaveData {
 	bool PortalOpen[24];
 	char ProgressiveRang;
 	char ProgressiveLevel;
+	int LastItemIndex;
 };
 
 class SaveDataHandler

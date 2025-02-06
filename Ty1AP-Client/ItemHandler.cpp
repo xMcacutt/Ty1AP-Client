@@ -10,53 +10,61 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 		return;
 	}
 
+	if (item.index < SaveDataHandler::saveData.LastItemIndex)
+		return;
+	
+	SaveDataHandler::saveData.LastItemIndex++;
+
 	std::string itemname = ArchipelagoHandler::GetItemName(item.item);
 	std::string sender = ArchipelagoHandler::GetPlayerAlias(item.player);
 	std::string location = ArchipelagoHandler::GetLocationName(item.location);
-	LoggerWindow::Log(itemname + " found at " + location + " in " + sender + "'s world");
+	LoggerWindow::Log(itemname + " [color=AAAAAAFF]found at [color=FFFFFFFF]" + location + " [color=AAAAAAFF]in [color=FFFFFFFF]" + sender + "'s world");
 
 	if (item.item == 0x8750000) {
 		SaveDataHandler::saveData.FireThunderEggCount++;
-		return;
+		if (ArchipelagoHandler::levelUnlockStyle != LevelUnlockStyle::CHECKS &&
+			SaveDataHandler::saveData.FireThunderEggCount >= ArchipelagoHandler::hubTheggCounts) {
+			SaveDataHandler::saveData.PortalOpen[7] = true;
+		}
 	}
-	if (item.item == 0x8750001) {
+	else if (item.item == 0x8750001) {
 		SaveDataHandler::saveData.IceThunderEggCount++;
-		return;
+		if (ArchipelagoHandler::levelUnlockStyle != LevelUnlockStyle::CHECKS &&
+			SaveDataHandler::saveData.IceThunderEggCount >= ArchipelagoHandler::hubTheggCounts) {
+			SaveDataHandler::saveData.PortalOpen[9] = true;
+		}
 	}
-	if (item.item == 0x8750002) {
+	else if (item.item == 0x8750002) {
 		SaveDataHandler::saveData.AirThunderEggCount++;
-		return;
+		if (ArchipelagoHandler::levelUnlockStyle != LevelUnlockStyle::CHECKS &&
+			SaveDataHandler::saveData.AirThunderEggCount >= ArchipelagoHandler::hubTheggCounts) {
+			SaveDataHandler::saveData.PortalOpen[15] = true;
+		}
 	}
-	if (item.item == 0x8750003) {
+	else if (item.item == 0x8750003) {
 		SaveDataHandler::saveData.GoldenCogCount++;
-		return;
 	}
-	if (item.item == 0x8750071) {
+	else if (item.item == 0x8750071) {
 		SaveDataHandler::saveData.ProgressiveLevel++;
 		HandleProgressiveLevel();
-		return;
 	}
-	if (item.item >= 0x8750030 && item.item < 0x8750040) {
+	else if (item.item >= 0x8750030 && item.item < 0x8750040) {
 		HandleIndividualLevel(item.item - 0x8750030);
-		return;
 	}
-	if (item.item == 0x8750070) {
+	else if (item.item == 0x8750070) {
 		SaveDataHandler::saveData.ProgressiveRang++;
 		HandleProgressiveRang();
-		return;
 	}
-	if (item.item >= 0x8750010 && item.item < 0x8750020) {
+	else if (item.item >= 0x8750010 && item.item < 0x8750020) {
 		HandleIndividualRang(item.item - 0x8750010);
-		return;
 	}
-	if (item.item >= 0x8750040 && item.item < 0x8750050) {
+	else if (item.item >= 0x8750040 && item.item < 0x8750050) {
 		SaveDataHandler::saveData.StopwatchesActive[item.item - 0x8750040] = true;
 		if ((int)Level::getCurrentLevel() == item.item - 0x8750040)
 			if (*(int*)(Core::moduleBase + 0x27041C) != 0)
 				*(int*)(*(int*)(Core::moduleBase + 0x270420) + 0x68) = 0x2;
-		return;
 	}
-	if (item.item >= 0x8750020 && item.item < 0x8750030) {
+	else if (item.item >= 0x8750020 && item.item < 0x8750030) {
 		SaveDataHandler::saveData.BilbyCount[item.item - 0x8750020]++;
 		if (SaveDataHandler::saveData.BilbyCount[item.item - 0x8750020] == 5) {
 			auto level = item.item - 0x8750020;
@@ -64,14 +72,12 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 			adjustedLevel -= (adjustedLevel > 3) + (adjustedLevel > 7);
 			ArchipelagoHandler::Check(0x8750270 + adjustedLevel);
 		}
-		return;
 	}
-	if (item.item >= 0x8750050 && item.item < 0x8750060) {
+	else if (item.item >= 0x8750050 && item.item < 0x8750060) {
 		SaveDataHandler::saveData.Talismans[item.item - 0x8750050] = true;
 		SaveDataHandler::saveData.TalismansPlaced[item.item - 0x8750050] = true;
-		return;
 	}
-	if (item.item == 0x8750082) {
+	else if (item.item == 0x8750082) {
 		// EXTRA LIFE
 		Sound::PlayTySoundByIndex(0x1BC);
 		auto objAddr = Core::moduleBase + 0x2888AC;
@@ -80,15 +86,17 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 			mov ecx, objAddr
 			call incrementLives
 		}
-		return;
 	}
-	if (item.item == 0x8750083) {
-		// TODO TRIGGER OPAL MAGNET
-		return;
+	else if (item.item == 0x8750083) {
+		auto objAddr = Core::moduleBase + 0x270D34;
+		void (*giveOpalMagnet)() = reinterpret_cast<void(*)()>(Core::moduleBase + 0x162000);
+		__asm {
+			mov ecx, objAddr
+			call giveOpalMagnet
+		}
 	}
-	//if (item.item == 0x8750084) {
-		// TODO TRIGGER CHARGE BITE POWERUP
-	//}
+
+	SaveDataHandler::SaveGame();
 }
 
 void ItemHandler::HandleStoredItems()

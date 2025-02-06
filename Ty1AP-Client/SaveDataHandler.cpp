@@ -52,8 +52,7 @@ bool SaveDataHandler::LoadSaveData(std::string seed)
         if (!ArchipelagoHandler::startWithBoom) {
             saveData.ProgressiveRang--;
         }
-        saveData.SavedLevel = LevelCode::A1;
-        saveData.CurrentLevel = LevelCode::A1;
+        saveData.LevelData[0].TimesEntered = 1;
         saveData.PortalOpen[4] = true;
         if (ArchipelagoHandler::levelUnlockStyle == LevelUnlockStyle::VANILLA) {
             saveData.PortalOpen[5] = true;

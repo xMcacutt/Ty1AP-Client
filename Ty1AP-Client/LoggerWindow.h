@@ -19,5 +19,6 @@ private:
 		std::chrono::steady_clock::time_point timestamp;
 	};
 	std::vector<LogMessage> logMessages;
+	void RenderFormattedText(ImDrawList* draw_list, const char* text, ImVec2 pos);
 };
 

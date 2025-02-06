@@ -12,6 +12,8 @@
 #include <filesystem>
 #include <memory>
 #include "windows.h"
+#include <vector>
+#include "hero.h"
 
 class GameHandler
 {
@@ -25,7 +27,8 @@ private:
 	static void OnEnterLevel();
 	static void OnMainMenu();
 	static void OnLoadSaves();
+	static void OnSpawnpointSet();
 	static void __stdcall MainMenuHook();
+	static void __stdcall SpawnpointHook();
 	static void WatchMemory();
 };
-

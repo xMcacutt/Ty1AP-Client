@@ -228,13 +228,6 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
             return;
         }
         for (const auto& item : items) {
-
-            /*
-            //Check if we should ignore this item
-            if (item.index < pLastReceivedIndex) {
-                continue;
-            }*/
-
             ItemHandler::HandleItem(item);
         }
 
