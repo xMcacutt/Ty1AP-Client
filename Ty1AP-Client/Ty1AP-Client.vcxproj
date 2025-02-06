@@ -201,6 +201,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="D:\Ty\APIs\minhook\dll_resources\MinHook.def" />
+    <None Include="README.md" />
     <None Include="Source.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -160,5 +160,6 @@
     <None Include="D:\Ty\APIs\minhook\dll_resources\MinHook.def">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="README.md" />
   </ItemGroup>
 </Project>
