@@ -224,13 +224,13 @@ void ItemHandler::HandleProgressiveRang() {
 		SaveDataHandler::saveData.AttributeData.GotBoomerang = true;
 		LoggerWindow::Log("You were given the Boomerang.");
 	}
-	if (SaveDataHandler::saveData.ProgressiveRang >= 2) {
-		SaveDataHandler::saveData.AttributeData.LearntToSwim = true;
-		LoggerWindow::Log("You learnt how to Swim.");
-	}
 	if (SaveDataHandler::saveData.ProgressiveRang >= 3) {
 		SaveDataHandler::saveData.AttributeData.GotSecondRang = true;
 		LoggerWindow::Log("You found a Second Rang.");
+	}
+	if (SaveDataHandler::saveData.ProgressiveRang >= 3) {
+		SaveDataHandler::saveData.AttributeData.LearntToSwim = true;
+		LoggerWindow::Log("You learnt how to Swim.");
 	}
 	if (SaveDataHandler::saveData.ProgressiveRang >= 4) {
 		SaveDataHandler::saveData.AttributeData.GotAquarang = true;
