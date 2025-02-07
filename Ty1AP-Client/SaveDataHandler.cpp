@@ -48,6 +48,7 @@ bool SaveDataHandler::LoadSaveData(std::string seed)
         saveData.Size = sizeof(ExtendedSaveData);
         saveData.Magic = 0x701EE;
         saveData.AttributeData.GotBoomerang = true;
+        saveData.PlayTimeSeconds = 0xFF000000;
         saveData.ProgressiveRang = 1;
         if (!ArchipelagoHandler::startWithBoom) {
             saveData.ProgressiveRang--;

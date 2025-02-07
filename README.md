@@ -58,7 +58,63 @@ If attributesanity is set to skip_elementals, you will not be given a check for 
 
 ### Items
 
-TO BE COMPLETED
+Receiving items in an ap world will not lead to items being collected in the Ty world. Instead, it will give an item which is saved separately into the save data. These items can be tracked using the built in tracker which is opened whilst not on the main menu using F4. 
+
+#### Rangs
+
+If progressive rang (progressive elemental) is turned on in the yaml, you will receive progressive rang items instead of the rangs directly for the following rangs in order:
+
+Second Rang -> Swim -> Aqua -> Dive -> Flame -> Frosty -> Zappy -> Doom
+
+If you also have start with boomerang set to false, an additional progressive rang is added to the item pool and the first progressive rang item you get will unlock the boomerang. The remaining progressives will then unlock in the order listed above.
+
+The technorangs will be unlocked via checks separately so you might be given the item "Infrarang" at some point for example.
+
+If progressive rang is turned off, then all of the rangs and abilities will be given as checks.
+
+#### Levels
+
+The first portal (in Two Up vanilla location) is always open regardless of settings. If you have level shuffle turned on, the 9 core levels are randomised. Boss shuffle will randomise the first 3 bosses too. 
+
+If you have level unlock style set to vanilla or vanilla bosses then you will need to obtain the amount of thunder eggs set in the yaml under "hub te counts" for a given hub to unlock that boss' portal. The portal will appear automatically once you do this.
+
+If you have level unlock style set to checks or vanilla bosses, the 9 core levels (except the one in Two Up vanilla position) will need to be unlocked via checks.
+
+With progressive level on, the portals will be unlocked in standard game order, otherwise, the order may be random.
+
+#### Talisman
+
+On being given a talisman, you unlock the ability to obtain a check on the elemental rangs. The conditions for the check are:
+
+- Boss for the hub is defeated
+
+- Talisman is obtained
+
+- Thunder egg count for that hub is greater than 17 (may need adjusting)
+
+- Return to Rainbow Cliffs
+
+#### Thunder Eggs
+
+When being given a thunder egg (thegg), the thegg will be either a Fire Thunder Egg, Ice Thunder Egg, or Air Thunder Egg for hub 1, 2, and 3 respectively.
+
+These thunder eggs are saved separately into the save data and can be tracked with the in game tracker. These are used to determine if the boss portal is spawned in Vanilla and Vanilla Bosses level unlock style.
+
+You will need to find or be given all 72 to complete the goals completion and all thunder eggs.
+
+#### Golden Cogs
+
+Golden cogs are stored similarly to thunder eggs. They can be redeemed for technorang checks in Julius' lab in Rainbow Cliffs.
+
+Currently, in order for you to redeem a later rang check, you must have both checked the earlier rang checks and also received the rang for each earlier check.
+
+#### Bilbies
+
+When you receive a bilby, it will be named Bilby - LEVEL NAME. This will save a bilby to the save data separately from the normal save data. Once you have found or been given 5 bilbies for a level, you will automatically be given a thunder egg matching that level's vanilla hub type.
+
+#### Stopwatches
+
+Stopwatches are also added to the item pool by default. They unlock the time attack for their corresponding level.
 
 ## Known Issues
 
@@ -68,15 +124,21 @@ KNOWN CLIENT ISSUES
 
 KNOWN APWORLD ISSUES
 
-- Junk fill bad
-- Plenty of generation issues
-- (Might be worth switching Theggs to non progression if on goal Final Battle with progressive rang and checks on level unlock style)
+- Generation fails to add items to rang locations
 
 FEATURES TO ADD
 
 - Text colouring to show items more clearly
-- Overlay showing current totals since gameinfo is used to track checks
 - Option to turn opal checks off or make them filler
 - Add text to hard disk removed thing
-- Text guide explaining how rando works
 - Extended hint info
+
+SOLVED
+
+- Added in game overlay tracker to show items (F4)
+- Fixed issue with junk fill preventing multiple Ty copies playing nice in generation
+- Fixed itemclassification on cogs and thunder eggs
+- Added location info handler to print info about items found for other worlds
+- Fixed impossible two up generation on non progressive level
+- Fixed crash on specific picture frame in Rainbow Cliffs
+- Fixed BotRT logic to separate main area beyond broken bridge for standard logic

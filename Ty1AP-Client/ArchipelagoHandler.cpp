@@ -1,3 +1,4 @@
+#pragma once
 #include "ArchipelagoHandler.h"
 #include "apuuid.hpp"
 #include <stdio.h>
@@ -230,6 +231,18 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
             ItemHandler::HandleItem(item);
         }
 
+    });
+
+    ap->set_location_info_handler([](const std::list<APClient::NetworkItem>& items) {
+        auto me = ap->get_player_number();
+        for (auto& item : items) {
+            if (item.player != me) {
+                std::string itemname = GetItemName(item.item);
+                std::string recipient = GetPlayerAlias(item.player);
+                std::string location = GetLocationName(item.location);
+                LoggerWindow::Log("[color=FF3377FF]" + recipient + "'s [color=FFFFFFFF]" + itemname + " [color=AAAAAAFF]found at [color=FFFFFFFF]" + location);
+            }
+        }
     });
 }
 

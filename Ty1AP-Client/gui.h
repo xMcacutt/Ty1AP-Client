@@ -12,6 +12,11 @@
 #include "imgui_impl_win32.h"
 #include "LoggerWindow.h"
 #include "LoginWindow.h"
+#include "TrackerWindow.h"
+#include <gl/GL.h>
+#include <gl/GLU.h>
+#include "resource.h"
+#include "include/TyNumberFont.hpp"
 
 
 class GUI
@@ -24,4 +29,8 @@ public:
 	static void DrawUI();
 	static bool ImGuiWantCaptureMouse();
 	static bool WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	static std::map<std::string, GLuint> icons;
+private:
+	static bool LoadIcons();
+	static GLuint LoadTextureFromResource(int resource_id);
 };

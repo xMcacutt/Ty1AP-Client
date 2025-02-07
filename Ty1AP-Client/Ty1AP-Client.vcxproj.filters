@@ -87,6 +87,15 @@
     <ClInclude Include="CheckHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TyNumberFont.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TrackerWindow.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -152,6 +161,9 @@
     <ClCompile Include="CheckHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TrackerWindow.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Source.def">
@@ -161,5 +173,33 @@
       <Filter>Source Files</Filter>
     </None>
     <None Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resource\Level.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\Stopwatch.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\Bilby.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\Cog.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\Rang.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\Talisman.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\TE.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

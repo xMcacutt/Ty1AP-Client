@@ -98,7 +98,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>C:\Users\admin\source\repos\Ty1AP-Client\Ty1AP-Client\include\ImGui;C:\Users\admin\source\repos\Ty1AP-Client\Ty1AP-Client\include\ImGui\backends;C:\Users\admin\source\repos\Ty1AP-Client\Ty1AP-Client\include\TygerFramework;D:\Ty\APIs\TygerMemory;D:\Ty\APIs\AP\json\include\include;D:\Ty\APIs\AP\wswrap\include;D:\Ty\APIs\AP\websocketpp;D:\Ty\APIs\AP\ap-soeclient\subprojects\asio\include;C:\Users\admin\source\repos\Ty1AP-Client\Ty1AP-Client\include\apclientpp;D:\Ty\APIs\AP\OpenSSL-Win32\include;D:\Ty\APIs\minhook\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\admin\source\repos\Ty1AP-Client\Ty1AP-Client\include\ImGui;C:\Users\admin\source\repos\Ty1AP-Client\Ty1AP-Client\include\ImGui\backends;C:\Users\admin\source\repos\Ty1AP-Client\Ty1AP-Client\include\TygerFramework;D:\Ty\APIs\TygerMemory;D:\Ty\APIs\AP\json\include\include;D:\Ty\APIs\AP\wswrap\include;D:\Ty\APIs\AP\websocketpp;D:\Ty\APIs\AP\ap-soeclient\subprojects\asio\include;C:\Users\admin\source\repos\Ty1AP-Client\Ty1AP-Client\include\apclientpp;D:\Ty\APIs\AP\OpenSSL-Win32\include;D:\Ty\APIs\minhook\include;C:\Users\admin\source\repos\Ty1AP-Client\Ty1AP-Client\include\stb_image;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -110,7 +110,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>C:\Users\admin\source\repos\Ty1AP-Client\Ty1AP-Client\libs;D:\Ty\APIs\AP\OpenSSL-Win32\lib\VC\x86\MT;D:\Ty\APIs\TygerMemory;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>TygerMemory.lib;libssl.lib;libcrypto.lib;crypt32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>TygerMemory.lib;libssl.lib;libcrypto.lib;crypt32.lib;ws2_32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /Y /F "C:\Users\admin\source\repos\Ty1AP-Client\Release\Ty1AP-Client.dll" "C:\Users\admin\Documents\Mul-Ty-Player\Game\Plugins\Ty1AP-Client.dll"</Command>
@@ -163,10 +163,13 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="GameHandler.h" />
     <ClInclude Include="gui.h" />
+    <ClInclude Include="TrackerWindow.h" />
+    <ClInclude Include="include\TyNumberFont.hpp" />
     <ClInclude Include="ItemHandler.h" />
     <ClInclude Include="LoggerWindow.h" />
     <ClInclude Include="LoginWindow.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SaveDataHandler.h" />
     <ClInclude Include="uuid.h" />
     <ClInclude Include="Window.h" />
@@ -198,11 +201,24 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SaveDataHandler.cpp" />
+    <ClCompile Include="TrackerWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="D:\Ty\APIs\minhook\dll_resources\MinHook.def" />
     <None Include="README.md" />
     <None Include="Source.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resource\Bilby.png" />
+    <Image Include="resource\Cog.png" />
+    <Image Include="resource\Level.png" />
+    <Image Include="resource\Rang.png" />
+    <Image Include="resource\Stopwatch.png" />
+    <Image Include="resource\Talisman.png" />
+    <Image Include="resource\TE.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
