@@ -26,6 +26,13 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 			SaveDataHandler::saveData.FireThunderEggCount >= ArchipelagoHandler::hubTheggCounts) {
 			SaveDataHandler::saveData.PortalOpen[7] = true;
 		}
+		if (ArchipelagoHandler::goal == Goal::ALL_THEGGS && 
+			SaveDataHandler::saveData.FireThunderEggCount == 24
+			&& SaveDataHandler::saveData.IceThunderEggCount == 24
+			&& SaveDataHandler::saveData.AirThunderEggCount == 24)
+			ArchipelagoHandler::Release();
+		if (ArchipelagoHandler::goal == Goal::COMPLETION && CheckCompletion())
+			ArchipelagoHandler::Release();
 	}
 	else if (item.item == 0x8750001) {
 		SaveDataHandler::saveData.IceThunderEggCount++;
@@ -33,6 +40,13 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 			SaveDataHandler::saveData.IceThunderEggCount >= ArchipelagoHandler::hubTheggCounts) {
 			SaveDataHandler::saveData.PortalOpen[9] = true;
 		}
+		if (ArchipelagoHandler::goal == Goal::ALL_THEGGS &&
+			SaveDataHandler::saveData.FireThunderEggCount == 24
+			&& SaveDataHandler::saveData.IceThunderEggCount == 24
+			&& SaveDataHandler::saveData.AirThunderEggCount == 24)
+			ArchipelagoHandler::Release();
+		if (ArchipelagoHandler::goal == Goal::COMPLETION && CheckCompletion())
+			ArchipelagoHandler::Release();
 	}
 	else if (item.item == 0x8750002) {
 		SaveDataHandler::saveData.AirThunderEggCount++;
@@ -40,9 +54,18 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 			SaveDataHandler::saveData.AirThunderEggCount >= ArchipelagoHandler::hubTheggCounts) {
 			SaveDataHandler::saveData.PortalOpen[15] = true;
 		}
+		if (ArchipelagoHandler::goal == Goal::ALL_THEGGS &&
+			SaveDataHandler::saveData.FireThunderEggCount == 24
+			&& SaveDataHandler::saveData.IceThunderEggCount == 24
+			&& SaveDataHandler::saveData.AirThunderEggCount == 24)
+			ArchipelagoHandler::Release();
+		if (ArchipelagoHandler::goal == Goal::COMPLETION && CheckCompletion())
+			ArchipelagoHandler::Release();
 	}
 	else if (item.item == 0x8750003) {
 		SaveDataHandler::saveData.GoldenCogCount++;
+		if (ArchipelagoHandler::goal == Goal::COMPLETION && CheckCompletion())
+			ArchipelagoHandler::Release();
 	}
 	else if (item.item == 0x8750071) {
 		SaveDataHandler::saveData.ProgressiveLevel++;
@@ -75,7 +98,8 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 	}
 	else if (item.item >= 0x8750050 && item.item < 0x8750060) {
 		SaveDataHandler::saveData.Talismans[item.item - 0x8750050] = true;
-		SaveDataHandler::saveData.TalismansPlaced[item.item - 0x8750050] = true;
+		if (ArchipelagoHandler::goal == Goal::COMPLETION && CheckCompletion())
+			ArchipelagoHandler::Release();
 	}
 	else if (item.item == 0x8750082) {
 		// EXTRA LIFE
@@ -198,30 +222,39 @@ void ItemHandler::HandleIndividualLevel(int code) {
 void ItemHandler::HandleProgressiveRang() {
 	if (SaveDataHandler::saveData.ProgressiveRang >= 1) {
 		SaveDataHandler::saveData.AttributeData.GotBoomerang = true;
+		LoggerWindow::Log("You were given the Boomerang.");
 	}
 	if (SaveDataHandler::saveData.ProgressiveRang >= 2) {
 		SaveDataHandler::saveData.AttributeData.LearntToSwim = true;
+		LoggerWindow::Log("You learnt how to Swim.");
 	}
 	if (SaveDataHandler::saveData.ProgressiveRang >= 3) {
 		SaveDataHandler::saveData.AttributeData.GotSecondRang = true;
+		LoggerWindow::Log("You found a Second Rang.");
 	}
 	if (SaveDataHandler::saveData.ProgressiveRang >= 4) {
 		SaveDataHandler::saveData.AttributeData.GotAquarang = true;
+		LoggerWindow::Log("Rangs but underwater.");
 	}
 	if (SaveDataHandler::saveData.ProgressiveRang >= 5) {
 		SaveDataHandler::saveData.AttributeData.LearntToDive = true;
+		LoggerWindow::Log("You can Dive.");
 	}
 	if (SaveDataHandler::saveData.ProgressiveRang >= 6) {
 		SaveDataHandler::saveData.AttributeData.GotFlamerang = true;
+		LoggerWindow::Log("Hot Boomerangs in your area.");
 	}
 	if (SaveDataHandler::saveData.ProgressiveRang >= 7) {
 		SaveDataHandler::saveData.AttributeData.GotFrostyrang = true;
+		LoggerWindow::Log("Water but cold.");
 	}
 	if (SaveDataHandler::saveData.ProgressiveRang >= 8) {
 		SaveDataHandler::saveData.AttributeData.GotZappyrang = true;
+		LoggerWindow::Log("BZZZT!");
 	}
 	if (SaveDataHandler::saveData.ProgressiveRang >= 9) {
 		SaveDataHandler::saveData.AttributeData.GotDoomerang = true;
+		LoggerWindow::Log("This Boomerang spinny.");
 	}
 }
 
@@ -273,4 +306,13 @@ void ItemHandler::HandleIndividualRang(int code) {
 		SaveDataHandler::saveData.AttributeData.GotDoomerang = true;
 		break;
 	}
+}
+
+bool ItemHandler::CheckCompletion() {
+	return std::count(SaveDataHandler::saveData.TalismansPlaced,
+		SaveDataHandler::saveData.TalismansPlaced + 5, true) == 5
+		&& SaveDataHandler::saveData.FireThunderEggCount == 24
+		&& SaveDataHandler::saveData.IceThunderEggCount == 24
+		&& SaveDataHandler::saveData.AirThunderEggCount == 24
+		&& SaveDataHandler::saveData.GoldenCogCount == 90;
 }

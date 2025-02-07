@@ -1,5 +1,7 @@
 #include "GameHandler.h"
 
+bool isTyShutdown = false;
+
 std::unordered_map<int, std::vector<float>> spawnpointMap{
 	{ 4, {-521.0f, 2372.0f, 11286.0f, 1.530f} },
 	{ 5, {-792.0f, 2372.0f, 12520.0f, 1.400f} },
@@ -21,9 +23,24 @@ MainMenuFunctionType mainMenuOrigin = nullptr;
 typedef void(__stdcall* SpawnpointFunctionType)(void);
 SpawnpointFunctionType spawnpointOrigin = nullptr;
 
+typedef void(__stdcall* StopwatchFunctionType)(void);
+StopwatchFunctionType stopwatchOrigin = nullptr;
+
 void __stdcall GameHandler::MainMenuHook() {
 	GameHandler::OnMainMenu();
 	mainMenuOrigin();
+}
+
+uintptr_t stopwatchJmpAddr;
+uintptr_t stopwatchOriginAddr;
+__declspec(naked) void __stdcall GameHandler::StopwatchHook() {
+	__asm {
+		cmp eax, 0x2
+		je skip
+		mov[esi + 0x68], eax 
+	skip :
+		jmp[stopwatchOriginAddr]
+	}
 }
 
 uintptr_t spawnpointOriginAddr;
@@ -45,9 +62,6 @@ void GameHandler::Setup()
 	DWORD oldProtect; 
 	VirtualProtect(addr, 5, PAGE_EXECUTE_READWRITE, &oldProtect);
 	memset(addr, 0x90, 5);
-	addr = (char*)(Core::moduleBase + 0x15A07E);
-	VirtualProtect(addr, 3, PAGE_EXECUTE_READWRITE, &oldProtect);
-	memset(addr, 0x90, 3);
 
 	// ONE RANG SWAP
 	addr = (char*)(Core::moduleBase + 0x162B9C);
@@ -61,40 +75,51 @@ void GameHandler::Setup()
 	addr[0] = 0xA1;
 	*(uintptr_t*)(addr + 1) = goldenCogAddr;
 	memset(addr + 5, 0x90, 5);
+	addr = (char*)(Core::moduleBase + 0xD8A85);
+	VirtualProtect(addr, 10, PAGE_EXECUTE_READWRITE, &oldProtect);
+	goldenCogAddr = (uintptr_t)&SaveDataHandler::saveData.GoldenCogCount;
+	addr[0] = 0xA1;
+	*(uintptr_t*)(addr + 1) = goldenCogAddr;
+	memset(addr + 5, 0x90, 5);
 	addr = (char*)(Core::moduleBase + 0xD8ABC);
 	VirtualProtect(addr, 10, PAGE_EXECUTE_READWRITE, &oldProtect);
-	uintptr_t goldenCogAddr = (uintptr_t)&SaveDataHandler::saveData.GoldenCogCount;
+	goldenCogAddr = (uintptr_t)&SaveDataHandler::saveData.GoldenCogCount;
 	addr[0] = 0xA1;
 	*(uintptr_t*)(addr + 1) = goldenCogAddr;
 	memset(addr + 5, 0x90, 5);
 	addr = (char*)(Core::moduleBase + 0xD8AF3);
 	VirtualProtect(addr, 10, PAGE_EXECUTE_READWRITE, &oldProtect);
-	uintptr_t goldenCogAddr = (uintptr_t)&SaveDataHandler::saveData.GoldenCogCount;
+	goldenCogAddr = (uintptr_t)&SaveDataHandler::saveData.GoldenCogCount;
 	addr[0] = 0xA1;
 	*(uintptr_t*)(addr + 1) = goldenCogAddr;
 	memset(addr + 5, 0x90, 5);
 	addr = (char*)(Core::moduleBase + 0xD8B2A);
 	VirtualProtect(addr, 10, PAGE_EXECUTE_READWRITE, &oldProtect);
-	uintptr_t goldenCogAddr = (uintptr_t)&SaveDataHandler::saveData.GoldenCogCount;
+	goldenCogAddr = (uintptr_t)&SaveDataHandler::saveData.GoldenCogCount;
 	addr[0] = 0xA1;
 	*(uintptr_t*)(addr + 1) = goldenCogAddr;
 	memset(addr + 5, 0x90, 5);
-	addr = (char*)(Core::moduleBase + 0xD8A61);
+	addr = (char*)(Core::moduleBase + 0xD8B61);
 	VirtualProtect(addr, 10, PAGE_EXECUTE_READWRITE, &oldProtect);
-	uintptr_t goldenCogAddr = (uintptr_t)&SaveDataHandler::saveData.GoldenCogCount;
+	goldenCogAddr = (uintptr_t)&SaveDataHandler::saveData.GoldenCogCount;
 	addr[0] = 0xA1;
 	*(uintptr_t*)(addr + 1) = goldenCogAddr;
 	memset(addr + 5, 0x90, 5);
 
 	MH_Uninitialize();
 	MH_Initialize();
-	addr = (char*)(Core::moduleBase + 0xE018C);  // Target address
+	addr = (char*)(Core::moduleBase + 0xE018C);
 	MH_CreateHook((LPVOID)addr, &MainMenuHook, reinterpret_cast<LPVOID*>(&mainMenuOrigin));
 
 	spawnpointOriginAddr = Core::moduleBase + 0x16929D;
 	loadEndTransitionFunc = reinterpret_cast<void(*)()>(Core::moduleBase + 0x192C20);
-	addr = (char*)(Core::moduleBase + 0x169298);  // Target address
+	addr = (char*)(Core::moduleBase + 0x169298);
 	MH_CreateHook((LPVOID)addr, &SpawnpointHook, reinterpret_cast<LPVOID*>(&spawnpointOrigin));
+
+	stopwatchJmpAddr = Core::moduleBase + 0x15A0BD;
+	stopwatchOriginAddr = Core::moduleBase + 0x15A081;
+	addr = (char*)(Core::moduleBase + 0x15A07C);
+	MH_CreateHook((LPVOID)addr, &StopwatchHook, reinterpret_cast<LPVOID*>(&stopwatchOrigin));
 
 	CheckHandler::SetupHooks();
 	MH_EnableHook(MH_ALL_HOOKS);
@@ -116,7 +141,7 @@ void GameHandler::WatchMemory() {
 	auto oldLoadValue = currentLoadValue;
 	auto currentMenuState = *(int*)(Core::moduleBase + 0x273F74);
 	auto oldMenuState = currentMenuState;
-	while (true) {
+	while (!isTyShutdown) {
 		currentLoadValue = *(int*)(Core::moduleBase + 0x27EBF0);
 		if (currentLoadValue != oldLoadValue) {
 			if (currentLoadValue != 0 && oldLoadValue == 0)
@@ -206,7 +231,7 @@ void GameHandler::OnEnterRainbowCliffs() {
 		if (portalDestination == 10)
 			*(int*)(portalAddr + 0xAC) = portalMap[5];
 		if (portalDestination == 19)
-			*(int*)(portalAddr + 0xAC) = bossMap[2];
+			*(int*)(portalAddr + 0xAC) = bossMap[1];
 		if (portalDestination == 12)
 			*(int*)(portalAddr + 0xAC) = portalMap[6];
 		if (portalDestination == 13)
@@ -214,7 +239,7 @@ void GameHandler::OnEnterRainbowCliffs() {
 		if (portalDestination == 14)
 			*(int*)(portalAddr + 0xAC) = portalMap[8];
 		if (portalDestination == 15)
-			*(int*)(portalAddr + 0xAC) = bossMap[3];
+			*(int*)(portalAddr + 0xAC) = bossMap[2];
 		portalAddr = *(int*)(portalAddr + 0x34);
 	}
 }

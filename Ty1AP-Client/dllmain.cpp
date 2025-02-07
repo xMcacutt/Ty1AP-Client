@@ -32,6 +32,12 @@ void OnTyInit() {
     GameHandler::Setup();
 }
 
+void OnTyBeginShutdown() {
+    ArchipelagoHandler::polling = false;
+    ArchipelagoHandler::DisconnectAP();
+    GameHandler::isTyShutdown = true;
+}
+
 extern "C" __declspec(dllexport) bool TygerFrameworkPluginInitialize(TygerFrameworkPluginInitializeParam * param) {
 
     if (!API::Initialize(param))
@@ -44,6 +50,7 @@ extern "C" __declspec(dllexport) bool TygerFrameworkPluginInitialize(TygerFramew
     API::AddPluginImGuiWantCaptureMouse((ImGuiWantCaptureMouseFunc)GUI::ImGuiWantCaptureMouse);
     API::AddTickBeforeGame(TickBeforeGame);
     API::AddOnTyInitialized(OnTyInit);
+    API::AddOnTyBeginShutdown(OnTyBeginShutdown);
 
     return true;
 }

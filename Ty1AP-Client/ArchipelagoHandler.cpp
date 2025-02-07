@@ -74,7 +74,7 @@ bool isEqual(double a, double b)
     return fabs(a - b) < std::numeric_limits<double>::epsilon() * fmax(fabs(a), fabs(b));
 }
 
-void ArchipelagoHandler::DisconnectAP(LoginWindow* login) {
+void ArchipelagoHandler::DisconnectAP() {
     LoggerWindow::Log("Disconnected");
     SetAPStatus("Disconnected", 1);
     polling = false;
@@ -199,7 +199,6 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 
         if (deathlink) ap->ConnectUpdate(false, 0b111, true, { "DeathLink" });
         ap->StatusUpdate(APClient::ClientStatus::PLAYING);
-
         GameHandler::SetupOnConnect(ap->get_seed());
 
         seed = ap->get_seed();
@@ -240,6 +239,11 @@ void ArchipelagoHandler::Check(int64_t locationId)
     check.push_back(locationId);
     ap->LocationScouts(check);
     ap->LocationChecks(check);
+}
+
+void ArchipelagoHandler::Release()
+{
+    ap->StatusUpdate(APClient::ClientStatus::GOAL);
 }
 
 std::string ArchipelagoHandler::GetItemName(int64_t itemId)

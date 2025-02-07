@@ -54,8 +54,9 @@ class ArchipelagoHandler
 public:
 	static void Poll();
 	static void ConnectAP(LoginWindow* login);
-	static void DisconnectAP(LoginWindow* login);
+	static void DisconnectAP();
 	static void Check(int64_t locationId);
+	static void Release();
 	static std::string GetItemName(int64_t itemId);
 	static std::string GetPlayerAlias(int64_t playerId);
 	static std::string GetLocationName(int64_t locId);

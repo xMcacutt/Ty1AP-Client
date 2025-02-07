@@ -22,6 +22,7 @@ public:
 	static void SetupOnConnect(std::string seed);
 	static void SetLoadActive(bool value);
 	static void HandleItemReceived(APClient::NetworkItem item);
+	static bool isTyShutdown;
 private:
 	static void OnEnterRainbowCliffs();
 	static void OnEnterLevel();
@@ -30,5 +31,6 @@ private:
 	static void OnSpawnpointSet();
 	static void __stdcall MainMenuHook();
 	static void __stdcall SpawnpointHook();
+	static void __stdcall StopwatchHook();
 	static void WatchMemory();
 };

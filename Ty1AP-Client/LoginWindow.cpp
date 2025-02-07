@@ -27,7 +27,7 @@ void LoginWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
     }
     else {
         if (ImGui::Button("Disconnect")) {
-            ArchipelagoHandler::DisconnectAP(this);
+            ArchipelagoHandler::DisconnectAP();
             SetMessage("");
         }
     }

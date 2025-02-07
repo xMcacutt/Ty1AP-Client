@@ -333,7 +333,7 @@ void CheckHandler::SetupHooks()
 }
 
 void CheckHandler::OnCollectThegg(int theggIndex) {
-	if (theggIndex == 3 && ArchipelagoHandler::bilbysanity == Bilbysanity::ALL_NO_THEGG)
+	if (theggIndex == 1 && ArchipelagoHandler::bilbysanity == Bilbysanity::ALL_NO_THEGG)
 		return;
 	int level = (int)Level::getCurrentLevel();
 	level -= 4;
@@ -398,7 +398,15 @@ void CheckHandler::OnCollectFrame(int frameIndex)
 }
 
 void CheckHandler::OnCollectTalisman(int talismanIndex) {
-	ArchipelagoHandler::Check(0x8750261 + static_cast<int64_t>(talismanIndex));
+	if (talismanIndex == 4 && ArchipelagoHandler::goal == Goal::BEAT_CASS)
+		ArchipelagoHandler::Release();
+	else if (ArchipelagoHandler::goal == Goal::ALL_BOSSES &&
+		std::count(SaveDataHandler::saveData.TalismansPlaced, 
+			SaveDataHandler::saveData.TalismansPlaced + 5, true) == 5) 
+		ArchipelagoHandler::Release();
+	else
+		ArchipelagoHandler::Check(0x8750261 + static_cast<int64_t>(talismanIndex));
+	SaveDataHandler::SaveGame();
 }
 
 void CheckHandler::OnCollectDive() {

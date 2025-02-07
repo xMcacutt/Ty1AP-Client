@@ -73,6 +73,14 @@ bool SaveDataHandler::LoadSaveData(std::string seed)
 
 void SaveDataHandler::SaveGame()
 {
+    auto objAddr = Core::moduleBase + 0x2888AC;
+    auto ediAddr = 0x7562A210;
+    void (*calcOpals)(intptr_t) = reinterpret_cast<void(*)(intptr_t)>(Core::moduleBase + 0xF73D0);
+    __asm {
+        push ediAddr
+        mov ecx, objAddr
+        call calcOpals
+    }
     auto filePath = "./Saves/" + ArchipelagoHandler::seed;
     saveToFile(filePath);
 }

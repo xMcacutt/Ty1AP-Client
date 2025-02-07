@@ -16,5 +16,7 @@ public:
 	static void HandleProgressiveRang();
 	static void HandleIndividualRang(int code);
 	static std::queue<APClient::NetworkItem> storedItems;
+private: 
+	static bool CheckCompletion();
 };
 
