@@ -1,6 +1,6 @@
 #include "GameHandler.h"
 
-bool isTyShutdown = false;
+bool GameHandler::isTyShutdown = false;
 
 std::unordered_map<int, std::vector<float>> spawnpointMap{
 	{ 4, {-521.0f, 2372.0f, 11286.0f, 1.530f} },
