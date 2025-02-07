@@ -3,6 +3,18 @@
 
 std::queue<APClient::NetworkItem> ItemHandler::storedItems;
 
+std::unordered_map<int, std::string> ItemHandler::boomerangMessages {
+	{1, "You were given the Boomerang."},
+	{2, "You found a Second Rang."},
+	{3, "You learnt how to Swim."},
+	{4, "Rangs but underwater."},
+	{5, "You can Dive."},
+	{6, "Hot Boomerangs in your area."},
+	{7, "Water but cold."},
+	{8, "BZZZT!"},
+	{9, "This Boomerang spinny."}
+};
+
 void ItemHandler::HandleItem(APClient::NetworkItem item)
 {
 	if (GameState::onLoadScreenOrMainMenu()) {
@@ -76,6 +88,8 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 	}
 	else if (item.item == 0x8750070) {
 		SaveDataHandler::saveData.ProgressiveRang++;
+		if (boomerangMessages.find(SaveDataHandler::saveData.ProgressiveRang) != boomerangMessages.end())
+			LoggerWindow::Log(boomerangMessages.at(SaveDataHandler::saveData.ProgressiveRang));
 		HandleProgressiveRang();
 	}
 	else if (item.item >= 0x8750010 && item.item < 0x8750020) {
@@ -222,39 +236,30 @@ void ItemHandler::HandleIndividualLevel(int code) {
 void ItemHandler::HandleProgressiveRang() {
 	if (SaveDataHandler::saveData.ProgressiveRang >= 1) {
 		SaveDataHandler::saveData.AttributeData.GotBoomerang = true;
-		LoggerWindow::Log("You were given the Boomerang.");
 	}
-	if (SaveDataHandler::saveData.ProgressiveRang >= 3) {
+	if (SaveDataHandler::saveData.ProgressiveRang >= 2) {
 		SaveDataHandler::saveData.AttributeData.GotSecondRang = true;
-		LoggerWindow::Log("You found a Second Rang.");
 	}
 	if (SaveDataHandler::saveData.ProgressiveRang >= 3) {
 		SaveDataHandler::saveData.AttributeData.LearntToSwim = true;
-		LoggerWindow::Log("You learnt how to Swim.");
 	}
 	if (SaveDataHandler::saveData.ProgressiveRang >= 4) {
 		SaveDataHandler::saveData.AttributeData.GotAquarang = true;
-		LoggerWindow::Log("Rangs but underwater.");
 	}
 	if (SaveDataHandler::saveData.ProgressiveRang >= 5) {
 		SaveDataHandler::saveData.AttributeData.LearntToDive = true;
-		LoggerWindow::Log("You can Dive.");
 	}
 	if (SaveDataHandler::saveData.ProgressiveRang >= 6) {
 		SaveDataHandler::saveData.AttributeData.GotFlamerang = true;
-		LoggerWindow::Log("Hot Boomerangs in your area.");
 	}
 	if (SaveDataHandler::saveData.ProgressiveRang >= 7) {
 		SaveDataHandler::saveData.AttributeData.GotFrostyrang = true;
-		LoggerWindow::Log("Water but cold.");
 	}
 	if (SaveDataHandler::saveData.ProgressiveRang >= 8) {
 		SaveDataHandler::saveData.AttributeData.GotZappyrang = true;
-		LoggerWindow::Log("BZZZT!");
 	}
 	if (SaveDataHandler::saveData.ProgressiveRang >= 9) {
 		SaveDataHandler::saveData.AttributeData.GotDoomerang = true;
-		LoggerWindow::Log("This Boomerang spinny.");
 	}
 }
 
