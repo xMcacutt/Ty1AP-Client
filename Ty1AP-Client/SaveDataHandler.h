@@ -20,7 +20,7 @@ struct ExtendedSaveData {
 	LevelCode PreviousLevel;
 	Zone CurrentZone;
 	Rang CurrentRang;
-	AttributeData AttributeData;
+	::AttributeData AttributeData;
 	bool Talismans[5];
 	bool TalismansPlaced[5];
 	short Unk3;
@@ -45,8 +45,9 @@ struct ExtendedSaveData {
 	char BilbyCount[24];
 	char FrameCount[24];
 	bool PortalOpen[24];
-	char ProgressiveRang;
-	char ProgressiveLevel;
+	short ProgressiveRang;
+	short ProgressiveLevel;
+	::AttributeData ArchAttributeData;
 	int LastItemIndex;
 };
 

@@ -10,7 +10,7 @@ void LoggerWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
 
     // Render the Logger window at the bottom-left
     ImGui::SetNextWindowPos(ImVec2(10, outerHeight - 500 - 10), ImGuiCond_Always);
-    ImGui::SetNextWindowSize(ImVec2(600, 500), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(700, 500), ImGuiCond_Always);
     ImGui::Begin(name.c_str(), nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar);
 
     // Iterate through the log messages and display them

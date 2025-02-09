@@ -190,125 +190,220 @@ void ItemHandler::HandleProgressiveLevel() {
 		SaveDataHandler::saveData.ProgressiveLevel >= 12 && bossesIncluded) {
 		SaveDataHandler::saveData.PortalOpen[20] = true;
 	}
+
+	if (Level::getCurrentLevel() != LevelCode::Z1)
+		return;
+	auto portalCount = *(int*)(Core::moduleBase + 0x267404);
+	auto portalAddr = *(int*)(Core::moduleBase + 0x267408);
+	for (auto portalIndex = 0; portalIndex < portalCount; portalIndex++) {
+		auto portalDestination = *(int*)(portalAddr + 0xAC);
+		if (SaveDataHandler::saveData.PortalOpen[portalDestination])
+			*(int*)(portalAddr + 0x9C) = 1;
+		else
+			*(int*)(portalAddr + 0x9C) = 3;
+		portalAddr = *(int*)(portalAddr + 0x34);
+	}
 }
 
 void ItemHandler::HandleIndividualLevel(int code) {
 	switch (code) {
+	case 0:
+	{
+		auto it = std::find(ArchipelagoHandler::portalMap.begin(), ArchipelagoHandler::portalMap.end(), 4);
+		int index = std::distance(ArchipelagoHandler::portalMap.begin(), it);
+		auto levelIndex = index + 4 + (index > 2) + (index > 5);
+		SaveDataHandler::saveData.PortalOpen[levelIndex] = true;
+	}
+		break;
 	case 1:
-		SaveDataHandler::saveData.PortalOpen[5] = true;
+	{
+		auto it = std::find(ArchipelagoHandler::portalMap.begin(), ArchipelagoHandler::portalMap.end(), 5);
+		int index = std::distance(ArchipelagoHandler::portalMap.begin(), it);
+		auto levelIndex = index + 4 + (index > 2) + (index > 5);
+		SaveDataHandler::saveData.PortalOpen[levelIndex] = true;
+	}
 		break;
 	case 2:
-		SaveDataHandler::saveData.PortalOpen[6] = true;
+	{
+		auto it = std::find(ArchipelagoHandler::portalMap.begin(), ArchipelagoHandler::portalMap.end(), 6);
+		int index = std::distance(ArchipelagoHandler::portalMap.begin(), it);
+		auto levelIndex = index + 4 + (index > 2) + (index > 5);
+		SaveDataHandler::saveData.PortalOpen[levelIndex] = true;
+	}
 		break;
 	case 3:
-		SaveDataHandler::saveData.PortalOpen[7] = true;
+	{
+		auto it = std::find(ArchipelagoHandler::bossMap.begin(), ArchipelagoHandler::bossMap.end(), 7);
+		int index = std::distance(ArchipelagoHandler::bossMap.begin(), it);
+		if (index == 0)
+			SaveDataHandler::saveData.PortalOpen[7] = true;
+		else if (index == 1)
+			SaveDataHandler::saveData.PortalOpen[19] = true;
+		else if (index == 2)
+			SaveDataHandler::saveData.PortalOpen[15] = true;
+	}
 		break;
 	case 4:
-		SaveDataHandler::saveData.PortalOpen[8] = true;
+	{
+		auto it = std::find(ArchipelagoHandler::portalMap.begin(), ArchipelagoHandler::portalMap.end(), 8);
+		int index = std::distance(ArchipelagoHandler::portalMap.begin(), it);
+		auto levelIndex = index + 4 + (index > 2) + (index > 5);
+		SaveDataHandler::saveData.PortalOpen[levelIndex] = true;
+	}
 		break;
 	case 5:
-		SaveDataHandler::saveData.PortalOpen[9] = true;
+	{
+		auto it = std::find(ArchipelagoHandler::portalMap.begin(), ArchipelagoHandler::portalMap.end(), 9);
+		int index = std::distance(ArchipelagoHandler::portalMap.begin(), it);
+		auto levelIndex = index + 4 + (index > 2) + (index > 5);
+		SaveDataHandler::saveData.PortalOpen[levelIndex] = true;
+	}
 		break;
 	case 6:
-		SaveDataHandler::saveData.PortalOpen[10] = true;
+	{
+		auto it = std::find(ArchipelagoHandler::portalMap.begin(), ArchipelagoHandler::portalMap.end(), 10);
+		int index = std::distance(ArchipelagoHandler::portalMap.begin(), it);
+		auto levelIndex = index + 4 + (index > 2) + (index > 5);
+		SaveDataHandler::saveData.PortalOpen[levelIndex] = true;
+	}
 		break;
 	case 7:
-		SaveDataHandler::saveData.PortalOpen[19] = true;
+	{
+		auto it = std::find(ArchipelagoHandler::bossMap.begin(), ArchipelagoHandler::bossMap.end(), 19);
+		int index = std::distance(ArchipelagoHandler::bossMap.begin(), it);
+		if (index == 0)
+			SaveDataHandler::saveData.PortalOpen[7] = true;
+		else if (index == 1)
+			SaveDataHandler::saveData.PortalOpen[19] = true;
+		else if (index == 2)
+			SaveDataHandler::saveData.PortalOpen[15] = true;
+	}
 		break;
 	case 8:
-		SaveDataHandler::saveData.PortalOpen[12] = true;
+	{
+		auto it = std::find(ArchipelagoHandler::portalMap.begin(), ArchipelagoHandler::portalMap.end(), 12);
+		int index = std::distance(ArchipelagoHandler::portalMap.begin(), it);
+		auto levelIndex = index + 4 + (index > 2) + (index > 5);
+		SaveDataHandler::saveData.PortalOpen[levelIndex] = true;
+	}
 		break;
 	case 9:
-		SaveDataHandler::saveData.PortalOpen[13] = true;
+	{
+		auto it = std::find(ArchipelagoHandler::portalMap.begin(), ArchipelagoHandler::portalMap.end(), 13);
+		int index = std::distance(ArchipelagoHandler::portalMap.begin(), it);
+		auto levelIndex = index + 4 + (index > 2) + (index > 5);
+		SaveDataHandler::saveData.PortalOpen[levelIndex] = true;
+	}
 		break;
-	case 10:
-		SaveDataHandler::saveData.PortalOpen[14] = true;
+	case 10: 
+	{
+		auto it = std::find(ArchipelagoHandler::portalMap.begin(), ArchipelagoHandler::portalMap.end(), 14);
+		int index = std::distance(ArchipelagoHandler::portalMap.begin(), it);
+		auto levelIndex = index + 4 + (index > 2) + (index > 5);
+		SaveDataHandler::saveData.PortalOpen[levelIndex] = true;
+	}
 		break;
 	case 11:
-		SaveDataHandler::saveData.PortalOpen[15] = true;
+	{
+		auto it = std::find(ArchipelagoHandler::bossMap.begin(), ArchipelagoHandler::bossMap.end(), 15);
+		int index = std::distance(ArchipelagoHandler::bossMap.begin(), it);
+		if (index == 0)
+			SaveDataHandler::saveData.PortalOpen[7] = true;
+		else if (index == 1)
+			SaveDataHandler::saveData.PortalOpen[19] = true;
+		else if (index == 2)
+			SaveDataHandler::saveData.PortalOpen[15] = true;
+	}
 		break;
 	case 12:
 		SaveDataHandler::saveData.PortalOpen[20] = true;
 		break;
 	}
+
+	if (Level::getCurrentLevel() != LevelCode::Z1)
+		return;
+	auto portalCount = *(int*)(Core::moduleBase + 0x267404);
+	auto portalAddr = *(int*)(Core::moduleBase + 0x267408);
+	for (auto portalIndex = 0; portalIndex < portalCount; portalIndex++) {
+		auto portalDestination = *(int*)(portalAddr + 0xAC);
+		if (SaveDataHandler::saveData.PortalOpen[portalDestination])
+			*(int*)(portalAddr + 0x9C) = 1;
+		else
+			*(int*)(portalAddr + 0x9C) = 3;
+		portalAddr = *(int*)(portalAddr + 0x34);
+	}
 }
 
 void ItemHandler::HandleProgressiveRang() {
-	if (SaveDataHandler::saveData.ProgressiveRang >= 1) {
-		SaveDataHandler::saveData.AttributeData.GotBoomerang = true;
-	}
-	if (SaveDataHandler::saveData.ProgressiveRang >= 2) {
-		SaveDataHandler::saveData.AttributeData.GotSecondRang = true;
-	}
-	if (SaveDataHandler::saveData.ProgressiveRang >= 3) {
-		SaveDataHandler::saveData.AttributeData.LearntToSwim = true;
-	}
-	if (SaveDataHandler::saveData.ProgressiveRang >= 4) {
-		SaveDataHandler::saveData.AttributeData.GotAquarang = true;
-	}
-	if (SaveDataHandler::saveData.ProgressiveRang >= 5) {
-		SaveDataHandler::saveData.AttributeData.LearntToDive = true;
-	}
-	if (SaveDataHandler::saveData.ProgressiveRang >= 6) {
-		SaveDataHandler::saveData.AttributeData.GotFlamerang = true;
-	}
-	if (SaveDataHandler::saveData.ProgressiveRang >= 7) {
-		SaveDataHandler::saveData.AttributeData.GotFrostyrang = true;
-	}
-	if (SaveDataHandler::saveData.ProgressiveRang >= 8) {
-		SaveDataHandler::saveData.AttributeData.GotZappyrang = true;
-	}
-	if (SaveDataHandler::saveData.ProgressiveRang >= 9) {
-		SaveDataHandler::saveData.AttributeData.GotDoomerang = true;
-	}
+	if (SaveDataHandler::saveData.ProgressiveRang >= 1)
+		SaveDataHandler::saveData.ArchAttributeData.GotBoomerang = true;
+	if (SaveDataHandler::saveData.ProgressiveRang >= 2)
+		SaveDataHandler::saveData.ArchAttributeData.GotSecondRang = true;
+	if (SaveDataHandler::saveData.ProgressiveRang >= 3)
+		SaveDataHandler::saveData.ArchAttributeData.LearntToSwim = true;
+	if (SaveDataHandler::saveData.ProgressiveRang >= 4)
+		SaveDataHandler::saveData.ArchAttributeData.GotAquarang = true;
+	if (SaveDataHandler::saveData.ProgressiveRang >= 5)
+		SaveDataHandler::saveData.ArchAttributeData.LearntToDive = true;
+	if (SaveDataHandler::saveData.ProgressiveRang >= 6)
+		SaveDataHandler::saveData.ArchAttributeData.GotFlamerang = true;
+	if (SaveDataHandler::saveData.ProgressiveRang >= 7)
+		SaveDataHandler::saveData.ArchAttributeData.GotFrostyrang = true;
+	if (SaveDataHandler::saveData.ProgressiveRang >= 8)
+		SaveDataHandler::saveData.ArchAttributeData.GotZappyrang = true;
+	if (SaveDataHandler::saveData.ProgressiveRang >= 9)
+		SaveDataHandler::saveData.ArchAttributeData.GotDoomerang = true;
 }
 
 void ItemHandler::HandleIndividualRang(int code) {
 	switch (code) {
 	case 0:
-		SaveDataHandler::saveData.AttributeData.LearntToSwim = true;
+		SaveDataHandler::saveData.ArchAttributeData.LearntToSwim = true;
 		break;
 	case 1:
-		SaveDataHandler::saveData.AttributeData.LearntToDive = true;
+		SaveDataHandler::saveData.ArchAttributeData.LearntToDive = true;
 		break;
 	case 2:
-		SaveDataHandler::saveData.AttributeData.GotSecondRang = true;
+		SaveDataHandler::saveData.ArchAttributeData.GotSecondRang = true;
 		break;
 	case 3:
-		SaveDataHandler::saveData.AttributeData.GotExtraHealth = true;
+		SaveDataHandler::saveData.ArchAttributeData.GotExtraHealth = true;
+		break;
+	case 4:
+		SaveDataHandler::saveData.ArchAttributeData.GotExtraHealth = true;
 		break;
 	case 5:
-		SaveDataHandler::saveData.AttributeData.GotFlamerang = true;
+		SaveDataHandler::saveData.ArchAttributeData.GotFlamerang = true;
 		break;
 	case 6:
-		SaveDataHandler::saveData.AttributeData.GotFrostyrang = true;
+		SaveDataHandler::saveData.ArchAttributeData.GotFrostyrang = true;
 		break;
 	case 7:
-		SaveDataHandler::saveData.AttributeData.GotZappyrang = true;
+		SaveDataHandler::saveData.ArchAttributeData.GotZappyrang = true;
 		break;
 	case 8:
-		SaveDataHandler::saveData.AttributeData.GotAquarang = true;
+		SaveDataHandler::saveData.ArchAttributeData.GotAquarang = true;
 		break;
 	case 9:
-		SaveDataHandler::saveData.AttributeData.GotZoomerang = true;
+		SaveDataHandler::saveData.ArchAttributeData.GotZoomerang = true;
 		break;
 	case 10:
-		SaveDataHandler::saveData.AttributeData.GotMultirang = true;
+		SaveDataHandler::saveData.ArchAttributeData.GotMultirang = true;
 		break;
 	case 11:
-		SaveDataHandler::saveData.AttributeData.GotInfrarang = true;
+		SaveDataHandler::saveData.ArchAttributeData.GotInfrarang = true;
 		break;
 	case 12:
-		SaveDataHandler::saveData.AttributeData.GotMegarang = true;
+		SaveDataHandler::saveData.ArchAttributeData.GotMegarang = true;
 		break;
 	case 13:
-		SaveDataHandler::saveData.AttributeData.GotKaboomerang = true;
+		SaveDataHandler::saveData.ArchAttributeData.GotKaboomerang = true;
 		break;
 	case 14:
-		SaveDataHandler::saveData.AttributeData.GotChronorang = true;
+		SaveDataHandler::saveData.ArchAttributeData.GotChronorang = true;
 		break;
 	case 15:
-		SaveDataHandler::saveData.AttributeData.GotDoomerang = true;
+		SaveDataHandler::saveData.ArchAttributeData.GotDoomerang = true;
 		break;
 	}
 }

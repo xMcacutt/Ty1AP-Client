@@ -26,9 +26,25 @@ SpawnpointFunctionType spawnpointOrigin = nullptr;
 typedef void(__stdcall* StopwatchFunctionType)(void);
 StopwatchFunctionType stopwatchOrigin = nullptr;
 
+typedef void(__stdcall* LoadGameFunctionType)(void);
+LoadGameFunctionType loadGameOrigin = nullptr;
+
+typedef void(__stdcall* MenuStateFunctionType)(void);
+MenuStateFunctionType menuStateOrigin = nullptr;
+
+
 void __stdcall GameHandler::MainMenuHook() {
 	GameHandler::OnMainMenu();
 	mainMenuOrigin();
+}
+
+void PatchRangMemory(std::vector<std::pair<uintptr_t, short>> patches) {
+	DWORD oldProtect;
+	for (const auto& patch : patches) {
+		char* addr = (char*)(Core::moduleBase + patch.first);
+		VirtualProtect(addr, 2, PAGE_EXECUTE_READWRITE, &oldProtect);
+		*(short*)addr = patch.second;
+	}
 }
 
 uintptr_t stopwatchJmpAddr;
@@ -36,6 +52,8 @@ uintptr_t stopwatchOriginAddr;
 __declspec(naked) void __stdcall GameHandler::StopwatchHook() {
 	__asm {
 		cmp eax, 0x2
+		je skip
+		cmp eax, 0x3
 		je skip
 		mov[esi + 0x68], eax 
 	skip :
@@ -55,11 +73,40 @@ __declspec(naked) void __stdcall GameHandler::SpawnpointHook() {
 	}
 }
 
+uintptr_t loadGameOriginAddr;
+__declspec(naked) void __stdcall GameHandler::LoadGameHook() {
+	__asm {
+		push eax
+		push ebx
+		push ecx
+		push edx
+		push esi
+		push edi
+		call GameHandler::OnLoadGame
+		pop edi
+		pop esi
+		pop edx
+		pop ecx
+		pop ebx
+		pop eax
+		jmp dword ptr[loadGameOriginAddr]
+	}
+}
+
+uintptr_t menuStateOriginAddr;
+uintptr_t menuStateAddr;
+__declspec(naked) void __stdcall GameHandler::MenuStateHook() {
+	__asm {
+		mov dword ptr[menuStateAddr], esi
+		jmp dword ptr[menuStateOriginAddr]
+	}
+}
+
 void GameHandler::Setup()
 {
 	// STOPWATCH
 	char* addr = (char*)(Core::moduleBase + 0xF8388);
-	DWORD oldProtect; 
+	DWORD oldProtect;
 	VirtualProtect(addr, 5, PAGE_EXECUTE_READWRITE, &oldProtect);
 	memset(addr, 0x90, 5);
 
@@ -121,10 +168,35 @@ void GameHandler::Setup()
 	addr = (char*)(Core::moduleBase + 0x15A07C);
 	MH_CreateHook((LPVOID)addr, &StopwatchHook, reinterpret_cast<LPVOID*>(&stopwatchOrigin));
 
+	// MENU STATE LOAD SLOT BYPASS
+	loadGameOriginAddr = Core::moduleBase + 0x170834;
+	addr = (char*)(Core::moduleBase + 0x17082A);
+	MH_CreateHook((LPVOID)addr, &LoadGameHook, reinterpret_cast<LPVOID*>(&loadGameOrigin));
+
+	menuStateOriginAddr = Core::moduleBase + 0xE4188;
+	menuStateAddr = Core::moduleBase + 0x286800;
+	addr = (char*)(Core::moduleBase + 0xE4182);
+	MH_CreateHook((LPVOID)addr, &MenuStateHook, reinterpret_cast<LPVOID*>(&menuStateOrigin));
+
 	CheckHandler::SetupHooks();
 	MH_EnableHook(MH_ALL_HOOKS);
 
 	GameState::setNoIdle(true);
+
+	// MOVE RANG CHECKS TO MY CUSTOM DATA
+	std::vector<std::pair<uintptr_t, short>> patches = {
+		{0x3ED9E, 0xBA8}, {0x3CA46, 0xBA8}, {0x3C9AC, 0xBA8}, {0x3F446, 0xBA8}, {0x3EEE7, 0xBA8},
+		{0x16C40F, 0xBA6}, {0x165B96, 0xBA6}, {0x162B97, 0xBA6}, {0x3F8E2, 0xBA6}, {0x3EF64, 0xBA6},
+		{0x2E61B, 0xBA6}, {0x2E5B9, 0xBA6}, {0x2E3FB, 0xBA6}, {0x25F75, 0xBA6}, {0x35723, 0xBA4},
+		{0x35754, 0xBA4}, {0x162EFD, 0xBA4}, {0x35781, 0xBA4}, {0x357AE, 0xBA4}, {0x34D0D, 0xBA4},
+		{0x34F32, 0xBA4}, {0x26B1E, 0xBA5}, {0xF8490, 0xBA7}, {0x14D231, 0xBA6}, {0xD50B1, 0xBA7}
+	};
+	PatchRangMemory(patches);
+
+	// DETATCH AQUAS FROM REQ SWIM
+	addr = (char*)(Core::moduleBase + 0x162F02);
+	VirtualProtect(addr, 1, PAGE_EXECUTE_READWRITE, &oldProtect);
+	memset(addr, 0xEB, 1);
 
 	auto menuAddr = *(int*)(Core::moduleBase + 0x286644);
 	*(char*)(menuAddr + 0x164) = 0x0;
@@ -147,12 +219,6 @@ void GameHandler::WatchMemory() {
 			if (currentLoadValue != 0 && oldLoadValue == 0)
 				OnEnterLevel();
 			oldLoadValue = currentLoadValue;
-		}
-		currentMenuState = *(int*)(Core::moduleBase + 0x273F74);
-		if (currentMenuState != oldMenuState) {
-			if (currentMenuState == 2 && oldMenuState != 2)
-				OnLoadSaves();
-			oldMenuState = currentMenuState;
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
@@ -258,7 +324,7 @@ void GameHandler::OnEnterLevel() {
 	SaveDataHandler::SaveGame();
 	
 	if (SaveDataHandler::saveData.ProgressiveRang == 0) 
-		SaveDataHandler::saveData.AttributeData.GotBoomerang = false;
+		SaveDataHandler::saveData.ArchAttributeData.GotBoomerang = false;
 
 	ItemHandler::HandleStoredItems();
 
@@ -281,18 +347,14 @@ void GameHandler::OnMainMenu() {
 	*(char*)(menuAddr + 0x168 + 0x165) = 0x0;
 }
 
-void GameHandler::OnLoadSaves() {
+void GameHandler::OnLoadGame() {
 	SaveDataHandler::LoadSaveData(ArchipelagoHandler::seed);
-	*(int*)(Core::moduleBase + 0x28E6C4) = 2;
-	*(int*)(Core::moduleBase + 0x52F2B8) = 2;
-	*(int*)(Core::moduleBase + 0x273838) = 2;
-	*(int*)(Core::moduleBase + 0x273840) = 2;
 	*(int*)(Core::moduleBase + 0x27383C) = 0;
 	*(int*)(Core::moduleBase + 0x52F2BC) = Core::moduleBase + 0x273844;
 	*(int*)(Core::moduleBase + 0x52F2A4) = 0x3;
-	*(int*)(Core::moduleBase + 0x273F74) = 0x9;
 	*(uintptr_t*)(Core::moduleBase + 0x2888D8) = reinterpret_cast<uintptr_t>(&SaveDataHandler::saveData);
 	*(uintptr_t*)(Core::moduleBase + 0x288730) = reinterpret_cast<uintptr_t>(&SaveDataHandler::saveData);
+	*(int*)(Core::moduleBase + 0x28DCA0) = 0x9;
 }
 
 void GameHandler::OnSpawnpointSet() {

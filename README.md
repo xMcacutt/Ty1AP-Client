@@ -120,25 +120,37 @@ Stopwatches are also added to the item pool by default. They unlock the time att
 
 KNOWN CLIENT ISSUES
 
-- Lifepaw crash
+- Hard disk removed screen displays when loading in (VISUAL BUG)
+
+- start_with_boom option set to false may crash the game
+
+- Deathlink is not fully implemented yet
+
+- Throwing the kaboomerang without having the second rang may crash the game
+
+- Saving the game manually does not work
 
 KNOWN APWORLD ISSUES
 
 - Generation fails to add items to rang locations
+- Needs overhaul to force certain checks preventing generation failures
+- Picture frames do not logically require infrarang in any logic setting
+- Patch to add archipelago branding
 
 FEATURES TO ADD
 
 - Text colouring to show items more clearly
-- Option to turn opal checks off or make them filler
-- Add text to hard disk removed thing
+- Option to make opal checks filler
 - Extended hint info
 
 SOLVED
 
-- Added in game overlay tracker to show items (F4)
-- Fixed issue with junk fill preventing multiple Ty copies playing nice in generation
-- Fixed itemclassification on cogs and thunder eggs
-- Added location info handler to print info about items found for other worlds
-- Fixed impossible two up generation on non progressive level
-- Fixed crash on specific picture frame in Rainbow Cliffs
-- Fixed BotRT logic to separate main area beyond broken bridge for standard logic
+- Tracker and logger windows made slightly bigger
+- Aquarangs no longer require having swim
+- Non progressive level items now spawn the correct portals
+- All attribute checks now trigger even if the attribute is in inventory
+- Fixed generation logic for starting with boomerang
+- Prevented accidental save slot loading
+- Fixed crash on lifepaw attribute check (25 rainbow scales)
+- Portals now spawn without needing reload in Rainbow Cliffs on item get
+- Time attack stopwatches no longer despawn after one use

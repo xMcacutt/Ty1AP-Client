@@ -244,6 +244,28 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
             }
         }
     });
+    ap->set_bounced_handler([](const json& cmd) {
+        if (deathlink) {
+            auto tagsIt = cmd.find("tags");
+            auto dataIt = cmd.find("data");
+            if (tagsIt != cmd.end() && tagsIt->is_array()
+                && std::find(tagsIt->begin(), tagsIt->end(), "DeathLink") != tagsIt->end())
+            {
+                if (dataIt != cmd.end() && dataIt->is_object()) {
+                    json data = *dataIt;
+                    if (data["source"].get<std::string>() != slot) {
+                        std::string source = data["source"].is_string() ? data["source"].get<std::string>().c_str() : "???";
+                        std::string cause = data["cause"].is_string() ? data["cause"].get<std::string>().c_str() : "???";
+                        LoggerWindow::Log("Died because of " + source + " : " + cause);
+                        Hero::kill();
+                    }
+                }
+                else {
+                    LoggerWindow::Log("Bad Deathlink");
+                }
+            }
+        }
+    });
 }
 
 void ArchipelagoHandler::Check(int64_t locationId)

@@ -176,6 +176,7 @@ __declspec(naked) void __stdcall CheckHandler::CollectTalismanHook() {
 uintptr_t collectDiveOriginAddr;
 __declspec(naked) void __stdcall CheckHandler::CollectDiveHook() {
 	__asm {
+		mov[edx + 0xAB5], al
 		push eax
 		push ebx
 		push ecx
@@ -196,6 +197,7 @@ __declspec(naked) void __stdcall CheckHandler::CollectDiveHook() {
 uintptr_t collectSwimOriginAddr;
 __declspec(naked) void __stdcall CheckHandler::CollectSwimHook() {
 	__asm {
+		mov[edx + 0xAB4], al
 		push eax
 		push ebx
 		push ecx
@@ -216,6 +218,7 @@ __declspec(naked) void __stdcall CheckHandler::CollectSwimHook() {
 uintptr_t collectSecondRangOriginAddr;
 __declspec(naked) void __stdcall CheckHandler::CollectSecondRangHook() {
 	__asm {
+		mov[edx + 0xAB6], al
 		push eax
 		push ebx
 		push ecx
@@ -236,6 +239,7 @@ __declspec(naked) void __stdcall CheckHandler::CollectSecondRangHook() {
 uintptr_t collectRangOriginAddr;
 __declspec(naked) void __stdcall CheckHandler::CollectRangHook() {
 	__asm {
+		mov [esi+eax+0xAB8],dl
 		push ebx
 		push ecx
 		push edx
@@ -256,33 +260,21 @@ __declspec(naked) void __stdcall CheckHandler::CollectRangHook() {
 uintptr_t collectLifePawOriginAddr;
 __declspec(naked) void __stdcall CheckHandler::CollectLifePawHook() {
 	__asm {
-		push ebp
-		mov ebp, esp
-		mov al, [ebp + 0x8]
-		push esi
-		mov esi, ecx
-		xor edx, edx
-
-		push eax
+		mov[esi + eax + 0xAB7], dl
 		push ebx
 		push ecx
 		push edx
 		push edi
 		push esi
+		push eax
 		call CheckHandler::OnCollectLifePaw
+		pop eax
 		pop esi
 		pop edi
 		pop edx
 		pop ecx
 		pop ebx
-		pop eax
-
-		inc edx
-		push edx
-		mov byte ptr[esi + 0x1], 01
-		pop esi
-		pop ebp
-		ret 0004
+		jmp dword ptr[collectLifePawOriginAddr]
 	}
 }
 
@@ -296,6 +288,7 @@ void CheckHandler::SetupHooks()
 	collectSwimOriginAddr = Core::moduleBase + 0xF80A3;
 	collectSecondRangOriginAddr = Core::moduleBase + 0xF7D0F;
 	collectRangOriginAddr = Core::moduleBase + 0xF8064;
+	collectLifePawOriginAddr = Core::moduleBase + 0xF7ED7;
 
 	auto addr = (char*)(Core::moduleBase + 0xF6E80);
 	MH_CreateHook((LPVOID)addr, &CollectTheggHook, reinterpret_cast<LPVOID*>(&collectTheggOrigin));
@@ -324,7 +317,7 @@ void CheckHandler::SetupHooks()
 	addr = (char*)(Core::moduleBase + 0xF7D09);
 	MH_CreateHook((LPVOID)addr, &CollectSecondRangHook, reinterpret_cast<LPVOID*>(&collectSecondRangOrigin));
 
-	addr = (char*)(Core::moduleBase + 0xF7EC0);
+	addr = (char*)(Core::moduleBase + 0xF7ED1);
 	MH_CreateHook((LPVOID)addr, &CollectLifePawHook, reinterpret_cast<LPVOID*>(&collectLifePawOrigin));
 
 	addr = (char*)(Core::moduleBase + 0xF805D);
