@@ -33,6 +33,5 @@ private:
 	static void __stdcall SpawnpointHook();
 	static void __stdcall StopwatchHook();
 	static void __stdcall LoadGameHook();
-	static void __stdcall MenuStateHook();
 	static void WatchMemory();
 };

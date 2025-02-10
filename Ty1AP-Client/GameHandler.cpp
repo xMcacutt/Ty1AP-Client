@@ -93,15 +93,6 @@ __declspec(naked) void __stdcall GameHandler::LoadGameHook() {
 	}
 }
 
-uintptr_t menuStateOriginAddr;
-uintptr_t menuStateAddr;
-__declspec(naked) void __stdcall GameHandler::MenuStateHook() {
-	__asm {
-		mov dword ptr[menuStateAddr], esi
-		jmp dword ptr[menuStateOriginAddr]
-	}
-}
-
 void GameHandler::Setup()
 {
 	// STOPWATCH
@@ -173,11 +164,6 @@ void GameHandler::Setup()
 	addr = (char*)(Core::moduleBase + 0x17082A);
 	MH_CreateHook((LPVOID)addr, &LoadGameHook, reinterpret_cast<LPVOID*>(&loadGameOrigin));
 
-	menuStateOriginAddr = Core::moduleBase + 0xE4188;
-	menuStateAddr = Core::moduleBase + 0x286800;
-	addr = (char*)(Core::moduleBase + 0xE4182);
-	MH_CreateHook((LPVOID)addr, &MenuStateHook, reinterpret_cast<LPVOID*>(&menuStateOrigin));
-
 	CheckHandler::SetupHooks();
 	MH_EnableHook(MH_ALL_HOOKS);
 
@@ -189,7 +175,8 @@ void GameHandler::Setup()
 		{0x16C40F, 0xBA6}, {0x165B96, 0xBA6}, {0x162B97, 0xBA6}, {0x3F8E2, 0xBA6}, {0x3EF64, 0xBA6},
 		{0x2E61B, 0xBA6}, {0x2E5B9, 0xBA6}, {0x2E3FB, 0xBA6}, {0x25F75, 0xBA6}, {0x35723, 0xBA4},
 		{0x35754, 0xBA4}, {0x162EFD, 0xBA4}, {0x35781, 0xBA4}, {0x357AE, 0xBA4}, {0x34D0D, 0xBA4},
-		{0x34F32, 0xBA4}, {0x26B1E, 0xBA5}, {0xF8490, 0xBA7}, {0x14D231, 0xBA6}, {0xD50B1, 0xBA7}
+		{0x34F32, 0xBA4}, {0x26B1E, 0xBA5}, {0xF8490, 0xBA7}, {0xD50B1, 0xBA7},
+		{0x3E32C, 0xBA8}, {0x3E02D, 0xBA8}, {0xF356A, 0xBA8}, {0xF330E, 0xBA8}, {0xF352E, 0xBA8}, {0xF356A, 0xBA8}
 	};
 	PatchRangMemory(patches);
 
@@ -307,6 +294,12 @@ void GameHandler::OnEnterRainbowCliffs() {
 		if (portalDestination == 15)
 			*(int*)(portalAddr + 0xAC) = bossMap[2];
 		portalAddr = *(int*)(portalAddr + 0x34);
+	}
+
+	if (SaveDataHandler::saveData.ArchAttributeData.GotSecondRang) {
+		auto gateAddr = *(uintptr_t*)(Core::moduleBase + 0x269C14);
+		gateAddr = *(uintptr_t*)(gateAddr + 0x78);
+		*(bool*)(gateAddr + 0x111) = true;
 	}
 }
 
