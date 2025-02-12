@@ -163,6 +163,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="GameHandler.h" />
     <ClInclude Include="gui.h" />
+    <ClInclude Include="TimeAttackHandler.h" />
     <ClInclude Include="TrackerWindow.h" />
     <ClInclude Include="include\TyNumberFont.hpp" />
     <ClInclude Include="ItemHandler.h" />
@@ -201,6 +202,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SaveDataHandler.cpp" />
+    <ClCompile Include="TimeAttackHandler.cpp" />
     <ClCompile Include="TrackerWindow.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -53,7 +53,7 @@ __declspec(naked) void __stdcall GameHandler::StopwatchHook() {
 	__asm {
 		cmp eax, 0x2
 		je skip
-		cmp eax, 0x3
+		cmp eax, 0x0
 		je skip
 		mov[esi + 0x68], eax 
 	skip :
@@ -106,43 +106,23 @@ void GameHandler::Setup()
 	VirtualProtect(addr, 6, PAGE_EXECUTE_READWRITE, &oldProtect);
 	memset(addr, 0x90, 6);
 
+	// BOOM FIX
+	addr = (char*)(Core::moduleBase + 0x3C9B1);
+	VirtualProtect(addr, 2, PAGE_EXECUTE_READWRITE, &oldProtect);
+	memset(addr, 0x90, 2);
+
 	// RANG COG REQ CHECKS
-	addr = (char*)(Core::moduleBase + 0xD8A4E);
-	VirtualProtect(addr, 10, PAGE_EXECUTE_READWRITE, &oldProtect);
 	uintptr_t goldenCogAddr = (uintptr_t)&SaveDataHandler::saveData.GoldenCogCount;
-	addr[0] = 0xA1;
-	*(uintptr_t*)(addr + 1) = goldenCogAddr;
-	memset(addr + 5, 0x90, 5);
-	addr = (char*)(Core::moduleBase + 0xD8A85);
-	VirtualProtect(addr, 10, PAGE_EXECUTE_READWRITE, &oldProtect);
-	goldenCogAddr = (uintptr_t)&SaveDataHandler::saveData.GoldenCogCount;
-	addr[0] = 0xA1;
-	*(uintptr_t*)(addr + 1) = goldenCogAddr;
-	memset(addr + 5, 0x90, 5);
-	addr = (char*)(Core::moduleBase + 0xD8ABC);
-	VirtualProtect(addr, 10, PAGE_EXECUTE_READWRITE, &oldProtect);
-	goldenCogAddr = (uintptr_t)&SaveDataHandler::saveData.GoldenCogCount;
-	addr[0] = 0xA1;
-	*(uintptr_t*)(addr + 1) = goldenCogAddr;
-	memset(addr + 5, 0x90, 5);
-	addr = (char*)(Core::moduleBase + 0xD8AF3);
-	VirtualProtect(addr, 10, PAGE_EXECUTE_READWRITE, &oldProtect);
-	goldenCogAddr = (uintptr_t)&SaveDataHandler::saveData.GoldenCogCount;
-	addr[0] = 0xA1;
-	*(uintptr_t*)(addr + 1) = goldenCogAddr;
-	memset(addr + 5, 0x90, 5);
-	addr = (char*)(Core::moduleBase + 0xD8B2A);
-	VirtualProtect(addr, 10, PAGE_EXECUTE_READWRITE, &oldProtect);
-	goldenCogAddr = (uintptr_t)&SaveDataHandler::saveData.GoldenCogCount;
-	addr[0] = 0xA1;
-	*(uintptr_t*)(addr + 1) = goldenCogAddr;
-	memset(addr + 5, 0x90, 5);
-	addr = (char*)(Core::moduleBase + 0xD8B61);
-	VirtualProtect(addr, 10, PAGE_EXECUTE_READWRITE, &oldProtect);
-	goldenCogAddr = (uintptr_t)&SaveDataHandler::saveData.GoldenCogCount;
-	addr[0] = 0xA1;
-	*(uintptr_t*)(addr + 1) = goldenCogAddr;
-	memset(addr + 5, 0x90, 5);
+	addr = (char*)(Core::moduleBase + 0xD8A4E);
+	for (int i = 0; i < 6; i++) {
+		VirtualProtect(addr, 0xC, PAGE_EXECUTE_READWRITE, &oldProtect);
+		addr[0] = 0xA1;
+		*(uintptr_t*)(addr + 1) = goldenCogAddr;
+		memset(addr + 5, 0x90, 5);
+		addr += 0xC;
+		*(char*)(addr) = (char)(ArchipelagoHandler::cogGating * i + 1);
+		addr += 0x37 - 0xC;
+	}
 
 	MH_Uninitialize();
 	MH_Initialize();
@@ -165,6 +145,7 @@ void GameHandler::Setup()
 	MH_CreateHook((LPVOID)addr, &LoadGameHook, reinterpret_cast<LPVOID*>(&loadGameOrigin));
 
 	CheckHandler::SetupHooks();
+	TimeAttackHandler::SetupHooks();
 	MH_EnableHook(MH_ALL_HOOKS);
 
 	GameState::setNoIdle(true);
@@ -310,6 +291,34 @@ void GameHandler::HandleItemReceived(APClient::NetworkItem item) {
 		ItemHandler::HandleItem(item);
 }
 
+void GameHandler::OnEnterCrest() {
+	int scriptCount = *(int*)(Core::moduleBase + 0x26F480 + 0x44);
+	int scriptAddr = *(uintptr_t*)(Core::moduleBase + 0x26F480 + 0x48);
+	for (int scriptIndex = 0; scriptIndex < scriptCount; scriptIndex++) {
+		int scriptId = *(int*)(scriptAddr + 0x14);
+		if (scriptId == 32) {
+			*(int*)(scriptAddr + 0x58) = 0;
+			break;
+		}
+		scriptAddr = *(uintptr_t*)(scriptAddr + 0x34);
+	}
+	bool canGoE4 = ((SaveDataHandler::saveData.TalismansPlaced[0]
+		&& SaveDataHandler::saveData.TalismansPlaced[1]
+		&& SaveDataHandler::saveData.TalismansPlaced[2]
+		&& SaveDataHandler::saveData.TalismansPlaced[3]) && ArchipelagoHandler::goalReqBosses)
+		|| (!ArchipelagoHandler::goalReqBosses && SaveDataHandler::saveData.TalismansPlaced[3]);
+	auto triggerCount = *(int*)(Core::moduleBase + 0x26DC20 + 0x44);
+	auto triggerAddr = *(uintptr_t*)(Core::moduleBase + 0x26DC20 + 0x48);
+	for (auto triggerIndex = 0; triggerIndex < triggerCount; triggerIndex++) {
+		auto triggerId = *(int*)(triggerAddr + 0x14);
+		if (triggerId == 3) {
+			memset((char*)(triggerAddr + 0x89), canGoE4, 6);
+			memset((char*)(triggerAddr + 0x85), canGoE4, 1);
+		}
+		triggerAddr = *(int*)(triggerAddr + 0x34);
+	}
+}
+
 void GameHandler::OnEnterLevel() {	
 	*(uintptr_t*)(Core::moduleBase + 0x2888D8) = reinterpret_cast<uintptr_t>(&SaveDataHandler::saveData);
 	*(uintptr_t*)(Core::moduleBase + 0x288730) = reinterpret_cast<uintptr_t>(&SaveDataHandler::saveData);
@@ -324,6 +333,8 @@ void GameHandler::OnEnterLevel() {
 	auto levelId = Level::getCurrentLevel();
 	if (levelId == LevelCode::Z1)
 		OnEnterRainbowCliffs();
+	if (levelId == LevelCode::E1)
+		OnEnterCrest();
 
 	if (*(int*)(Core::moduleBase + 0x27041C) != 0
 		&& SaveDataHandler::saveData.StopwatchesActive[(int)levelId] == 1)

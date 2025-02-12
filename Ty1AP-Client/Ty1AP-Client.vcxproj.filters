@@ -96,6 +96,9 @@
     <ClInclude Include="TrackerWindow.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
+    <ClInclude Include="TimeAttackHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -163,6 +166,9 @@
     </ClCompile>
     <ClCompile Include="TrackerWindow.cpp">
       <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeAttackHandler.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

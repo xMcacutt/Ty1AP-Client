@@ -62,6 +62,7 @@ public:
     static void __stdcall CollectSecondRangHook();
     static void __stdcall CollectLifePawHook();
     static void __stdcall CollectRangHook();
+    static void __stdcall CollectOpalHook();
 	static void SetupHooks();
 	static void OnCollectThegg(int theggIndex);
     static void OnCollectCog(int cogIndex);
@@ -73,5 +74,6 @@ public:
     static void OnCollectSecondRang();
     static void OnCollectLifePaw();
     static void OnCollectRang(int rangId);
+    static void OnCollectOpal(uintptr_t opalPtr);
 };
 

@@ -17,7 +17,6 @@ public:
 	static void HandleIndividualRang(int code);
 	static std::queue<APClient::NetworkItem> storedItems;
 private: 
-	static bool CheckCompletion();
 	static std::unordered_map<int, std::string> boomerangMessages;
 };
 

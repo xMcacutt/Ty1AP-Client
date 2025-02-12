@@ -1,11 +1,10 @@
 #include "ItemHandler.h"
 
-
 std::queue<APClient::NetworkItem> ItemHandler::storedItems;
 
 std::unordered_map<int, std::string> ItemHandler::boomerangMessages {
 	{1, "You were given the Boomerang."},
-	{2, "You found a Second Rang."},
+	{2, "Two are better than one."},
 	{3, "You learnt how to Swim."},
 	{4, "Rangs but underwater."},
 	{5, "You can Dive."},
@@ -35,49 +34,26 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 	if (item.item == 0x8750000) {
 		SaveDataHandler::saveData.FireThunderEggCount++;
 		if (ArchipelagoHandler::levelUnlockStyle != LevelUnlockStyle::CHECKS &&
-			SaveDataHandler::saveData.FireThunderEggCount >= ArchipelagoHandler::hubTheggCounts) {
-			SaveDataHandler::saveData.PortalOpen[7] = true;
+			SaveDataHandler::saveData.FireThunderEggCount >= ArchipelagoHandler::theggGating) {
+			SaveDataHandler::saveData.PortalOpen[static_cast<int>(LevelCode::A4)] = true;
 		}
-		if (ArchipelagoHandler::goal == Goal::ALL_THEGGS && 
-			SaveDataHandler::saveData.FireThunderEggCount == 24
-			&& SaveDataHandler::saveData.IceThunderEggCount == 24
-			&& SaveDataHandler::saveData.AirThunderEggCount == 24)
-			ArchipelagoHandler::Release();
-		if (ArchipelagoHandler::goal == Goal::COMPLETION && CheckCompletion())
-			ArchipelagoHandler::Release();
 	}
 	else if (item.item == 0x8750001) {
 		SaveDataHandler::saveData.IceThunderEggCount++;
 		if (ArchipelagoHandler::levelUnlockStyle != LevelUnlockStyle::CHECKS &&
-			SaveDataHandler::saveData.IceThunderEggCount >= ArchipelagoHandler::hubTheggCounts) {
-			SaveDataHandler::saveData.PortalOpen[9] = true;
+			SaveDataHandler::saveData.IceThunderEggCount >= ArchipelagoHandler::theggGating) {
+			SaveDataHandler::saveData.PortalOpen[static_cast<int>(LevelCode::D4)] = true;
 		}
-		if (ArchipelagoHandler::goal == Goal::ALL_THEGGS &&
-			SaveDataHandler::saveData.FireThunderEggCount == 24
-			&& SaveDataHandler::saveData.IceThunderEggCount == 24
-			&& SaveDataHandler::saveData.AirThunderEggCount == 24)
-			ArchipelagoHandler::Release();
-		if (ArchipelagoHandler::goal == Goal::COMPLETION && CheckCompletion())
-			ArchipelagoHandler::Release();
 	}
 	else if (item.item == 0x8750002) {
 		SaveDataHandler::saveData.AirThunderEggCount++;
 		if (ArchipelagoHandler::levelUnlockStyle != LevelUnlockStyle::CHECKS &&
-			SaveDataHandler::saveData.AirThunderEggCount >= ArchipelagoHandler::hubTheggCounts) {
-			SaveDataHandler::saveData.PortalOpen[15] = true;
+			SaveDataHandler::saveData.AirThunderEggCount >= ArchipelagoHandler::theggGating) {
+			SaveDataHandler::saveData.PortalOpen[static_cast<int>(LevelCode::C4)] = true;
 		}
-		if (ArchipelagoHandler::goal == Goal::ALL_THEGGS &&
-			SaveDataHandler::saveData.FireThunderEggCount == 24
-			&& SaveDataHandler::saveData.IceThunderEggCount == 24
-			&& SaveDataHandler::saveData.AirThunderEggCount == 24)
-			ArchipelagoHandler::Release();
-		if (ArchipelagoHandler::goal == Goal::COMPLETION && CheckCompletion())
-			ArchipelagoHandler::Release();
 	}
 	else if (item.item == 0x8750003) {
 		SaveDataHandler::saveData.GoldenCogCount++;
-		if (ArchipelagoHandler::goal == Goal::COMPLETION && CheckCompletion())
-			ArchipelagoHandler::Release();
 	}
 	else if (item.item == 0x8750071) {
 		SaveDataHandler::saveData.ProgressiveLevel++;
@@ -112,8 +88,8 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 	}
 	else if (item.item >= 0x8750050 && item.item < 0x8750060) {
 		SaveDataHandler::saveData.Talismans[item.item - 0x8750050] = true;
-		if (ArchipelagoHandler::goal == Goal::COMPLETION && CheckCompletion())
-			ArchipelagoHandler::Release();
+		if (item.item - 0x8750050 < 3)
+			SaveDataHandler::saveData.ZoneData[item.item - 0x8750050].Complete = true;
 	}
 	else if (item.item == 0x8750082) {
 		// EXTRA LIFE
@@ -148,47 +124,47 @@ void ItemHandler::HandleStoredItems()
 void ItemHandler::HandleProgressiveLevel() {
 	bool bossesIncluded = ArchipelagoHandler::levelUnlockStyle == LevelUnlockStyle::CHECKS;
 	if (SaveDataHandler::saveData.ProgressiveLevel >= 1) {
-		SaveDataHandler::saveData.PortalOpen[5] = true;
+		SaveDataHandler::saveData.PortalOpen[static_cast<int>(LevelCode::A2)] = true;
 	}
 	if (SaveDataHandler::saveData.ProgressiveLevel >= 2) {
-		SaveDataHandler::saveData.PortalOpen[6] = true;
+		SaveDataHandler::saveData.PortalOpen[static_cast<int>(LevelCode::A3)] = true;
 	}
 	if (SaveDataHandler::saveData.ProgressiveLevel >= 3 && bossesIncluded) {
-		SaveDataHandler::saveData.PortalOpen[7] = true;
+		SaveDataHandler::saveData.PortalOpen[static_cast<int>(LevelCode::A4)] = true;
 	}
 	if (SaveDataHandler::saveData.ProgressiveLevel >= 3 && !bossesIncluded ||
 		SaveDataHandler::saveData.ProgressiveLevel >= 4 && bossesIncluded) {
-		SaveDataHandler::saveData.PortalOpen[8] = true;
+		SaveDataHandler::saveData.PortalOpen[static_cast<int>(LevelCode::B1)] = true;
 	}
 	if (SaveDataHandler::saveData.ProgressiveLevel >= 4 && !bossesIncluded ||
 		SaveDataHandler::saveData.ProgressiveLevel >= 5 && bossesIncluded) {
-		SaveDataHandler::saveData.PortalOpen[9] = true;
+		SaveDataHandler::saveData.PortalOpen[static_cast<int>(LevelCode::B2)] = true;
 	}
 	if (SaveDataHandler::saveData.ProgressiveLevel >= 5 && !bossesIncluded ||
 		SaveDataHandler::saveData.ProgressiveLevel >= 6 && bossesIncluded) {
-		SaveDataHandler::saveData.PortalOpen[10] = true;
+		SaveDataHandler::saveData.PortalOpen[static_cast<int>(LevelCode::B3)] = true;
 	}
 	if (SaveDataHandler::saveData.ProgressiveLevel >= 7 && bossesIncluded) {
-		SaveDataHandler::saveData.PortalOpen[19] = true;
+		SaveDataHandler::saveData.PortalOpen[static_cast<int>(LevelCode::D4)] = true;
 	}
 	if (SaveDataHandler::saveData.ProgressiveLevel >= 6 && !bossesIncluded ||
 		SaveDataHandler::saveData.ProgressiveLevel >= 8 && bossesIncluded) {
-		SaveDataHandler::saveData.PortalOpen[12] = true;
+		SaveDataHandler::saveData.PortalOpen[static_cast<int>(LevelCode::C1)] = true;
 	}
 	if (SaveDataHandler::saveData.ProgressiveLevel >= 7 && !bossesIncluded ||
 		SaveDataHandler::saveData.ProgressiveLevel >= 9 && bossesIncluded) {
-		SaveDataHandler::saveData.PortalOpen[13] = true;
+		SaveDataHandler::saveData.PortalOpen[static_cast<int>(LevelCode::C2)] = true;
 	}
 	if (SaveDataHandler::saveData.ProgressiveLevel >= 8 && !bossesIncluded ||
 		SaveDataHandler::saveData.ProgressiveLevel >= 10 && bossesIncluded) {
-		SaveDataHandler::saveData.PortalOpen[14] = true;
+		SaveDataHandler::saveData.PortalOpen[static_cast<int>(LevelCode::C3)] = true;
 	}
 	if (SaveDataHandler::saveData.ProgressiveLevel >= 11 && bossesIncluded) {
-		SaveDataHandler::saveData.PortalOpen[15] = true;
+		SaveDataHandler::saveData.PortalOpen[static_cast<int>(LevelCode::C4)] = true;
 	}
 	if (SaveDataHandler::saveData.ProgressiveLevel >= 9 && !bossesIncluded ||
 		SaveDataHandler::saveData.ProgressiveLevel >= 12 && bossesIncluded) {
-		SaveDataHandler::saveData.PortalOpen[20] = true;
+		SaveDataHandler::saveData.PortalOpen[static_cast<int>(LevelCode::E1)] = true;
 	}
 
 	if (Level::getCurrentLevel() != LevelCode::Z1)
@@ -406,13 +382,4 @@ void ItemHandler::HandleIndividualRang(int code) {
 		SaveDataHandler::saveData.ArchAttributeData.GotDoomerang = true;
 		break;
 	}
-}
-
-bool ItemHandler::CheckCompletion() {
-	return std::count(SaveDataHandler::saveData.TalismansPlaced,
-		SaveDataHandler::saveData.TalismansPlaced + 5, true) == 5
-		&& SaveDataHandler::saveData.FireThunderEggCount == 24
-		&& SaveDataHandler::saveData.IceThunderEggCount == 24
-		&& SaveDataHandler::saveData.AirThunderEggCount == 24
-		&& SaveDataHandler::saveData.GoldenCogCount == 90;
 }

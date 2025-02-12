@@ -47,24 +47,27 @@ bool SaveDataHandler::LoadSaveData(std::string seed)
         LoggerWindow::Log("Creating a new save file.");
         saveData.Size = sizeof(ExtendedSaveData);
         saveData.Magic = 0x701EE;
-        saveData.ArchAttributeData.GotBoomerang = true;
         saveData.PlayTimeSeconds = 0xFF000000;
         saveData.ProgressiveRang = 1;
         if (!ArchipelagoHandler::startWithBoom) {
             saveData.ProgressiveRang--;
         }
+        else {
+            saveData.ArchAttributeData.GotBoomerang = true;
+            saveData.AttributeData.GotBoomerang = true;
+        }
         saveData.LevelData[0].TimesEntered = 1;
-        saveData.PortalOpen[4] = true;
+        saveData.PortalOpen[static_cast<int>(LevelCode::A1)] = true;
         if (ArchipelagoHandler::levelUnlockStyle == LevelUnlockStyle::VANILLA) {
-            saveData.PortalOpen[5] = true;
-            saveData.PortalOpen[6] = true;
-            saveData.PortalOpen[8] = true;
-            saveData.PortalOpen[9] = true;
-            saveData.PortalOpen[10] = true;
-            saveData.PortalOpen[12] = true;
-            saveData.PortalOpen[13] = true;
-            saveData.PortalOpen[14] = true;
-            saveData.PortalOpen[21] = true;
+            saveData.PortalOpen[static_cast<int>(LevelCode::A2)] = true;
+            saveData.PortalOpen[static_cast<int>(LevelCode::A3)] = true;
+            saveData.PortalOpen[static_cast<int>(LevelCode::B1)] = true;
+            saveData.PortalOpen[static_cast<int>(LevelCode::B2)] = true;
+            saveData.PortalOpen[static_cast<int>(LevelCode::B3)] = true;
+            saveData.PortalOpen[static_cast<int>(LevelCode::C1)] = true;
+            saveData.PortalOpen[static_cast<int>(LevelCode::C2)] = true;
+            saveData.PortalOpen[static_cast<int>(LevelCode::C3)] = true;
+            saveData.PortalOpen[static_cast<int>(LevelCode::E1)] = true;
         }
         saveToFile(filePath);
         LoggerWindow::Log("Save file created");

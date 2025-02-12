@@ -2,6 +2,7 @@
 #include "ArchipelagoHandler.h"
 #include "CheckHandler.h"
 #include "ItemHandler.h"
+#include "TimeAttackHandler.h"
 #include "core.h"
 #include "gameobject.h"
 #include "TygerFrameworkAPI.hpp"
@@ -25,6 +26,7 @@ public:
 	static bool isTyShutdown;
 private:
 	static void OnEnterRainbowCliffs();
+	static void OnEnterCrest();
 	static void OnEnterLevel();
 	static void OnMainMenu();
 	static void OnLoadGame();

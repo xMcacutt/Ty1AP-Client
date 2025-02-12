@@ -33,6 +33,9 @@ CollectRangFunctionType collectRangOrigin = nullptr;
 typedef void(__stdcall* CollectLifePawFunctionType)();
 CollectLifePawFunctionType collectLifePawOrigin = nullptr;
 
+typedef void(__stdcall* CollectOpalFunctionType)();
+CollectOpalFunctionType collectOpalOrigin = nullptr;
+
 __declspec(naked) void __stdcall CheckHandler::CollectTheggHook() {
 	__asm {
 		push ebp
@@ -278,6 +281,27 @@ __declspec(naked) void __stdcall CheckHandler::CollectLifePawHook() {
 	}
 }
 
+uintptr_t collectOpalOriginAddr;
+__declspec(naked) void __stdcall CheckHandler::CollectOpalHook() {
+	__asm {
+		mov[esi + 0x78], 0x3
+		push ebx
+		push ecx
+		push edx
+		push edi
+		push eax
+		push esi
+		call CheckHandler::OnCollectOpal
+		pop esi
+		pop eax
+		pop edi
+		pop edx
+		pop ecx
+		pop ebx
+		jmp dword ptr[collectOpalOriginAddr]
+	}
+}
+
 void CheckHandler::SetupHooks()
 {
 	collectBilbyOriginAddr = Core::moduleBase + 0xF7AF7 + 5;
@@ -289,6 +313,7 @@ void CheckHandler::SetupHooks()
 	collectSecondRangOriginAddr = Core::moduleBase + 0xF7D0F;
 	collectRangOriginAddr = Core::moduleBase + 0xF8064;
 	collectLifePawOriginAddr = Core::moduleBase + 0xF7ED7;
+	collectOpalOriginAddr = Core::moduleBase + 0x12DD13;
 
 	auto addr = (char*)(Core::moduleBase + 0xF6E80);
 	MH_CreateHook((LPVOID)addr, &CollectTheggHook, reinterpret_cast<LPVOID*>(&collectTheggOrigin));
@@ -323,44 +348,39 @@ void CheckHandler::SetupHooks()
 	addr = (char*)(Core::moduleBase + 0xF805D);
 	MH_CreateHook((LPVOID)addr, &CollectRangHook, reinterpret_cast<LPVOID*>(&collectRangOrigin));
 
+	addr = (char*)(Core::moduleBase + 0x12DD0C);
+	MH_CreateHook((LPVOID)addr, &CollectOpalHook, reinterpret_cast<LPVOID*>(&collectOpalOrigin));
+
 }
 
 void CheckHandler::OnCollectThegg(int theggIndex) {
-	if (theggIndex == 1 && ArchipelagoHandler::bilbysanity == Bilbysanity::ALL_NO_THEGG)
-		return;
 	int level = (int)Level::getCurrentLevel();
 	level -= 4;
 	level -= (level > 3) + (level > 7);
 	ArchipelagoHandler::Check(0x8750100 + static_cast<int64_t>(level) * 0x8 + static_cast<int64_t>(theggIndex));
+	if (theggIndex == 3 && !ArchipelagoHandler::gateTimeAttacks) {
+		SaveDataHandler::saveData.StopwatchesActive[level] = true;
+		if (*(int*)(Core::moduleBase + 0x27041C) != 0)
+			*(int*)(*(int*)(Core::moduleBase + 0x270420) + 0x68) = 0x2;
+	}
 	SaveDataHandler::SaveGame();
 }
 
 void CheckHandler::OnCollectCog(int cogIndex) {
-	if (ArchipelagoHandler::cogsanity == Cogsanity::NONE) {
-		SaveDataHandler::SaveGame();
-		return;
-	}
 	int level = (int)Level::getCurrentLevel();
 	auto adjustedLevel = level - 4;
 	adjustedLevel -= (adjustedLevel > 3) + (adjustedLevel > 7);
-	if (ArchipelagoHandler::cogsanity == Cogsanity::PER_LEVEL) {
-		auto levelCogCount = std::count(
-			SaveDataHandler::saveData.LevelData[level].GoldenCogs, 
-			SaveDataHandler::saveData.LevelData[level].GoldenCogs + 10, true
-		);
-		if (levelCogCount == 10) 
-			ArchipelagoHandler::Check(0x87501A2 + static_cast<int64_t>(adjustedLevel));
-	}
-	else
-		ArchipelagoHandler::Check(0x8750148 + static_cast<int64_t>(adjustedLevel) * 0xA + static_cast<int64_t>(cogIndex));
+	ArchipelagoHandler::Check(0x8750148 + static_cast<int64_t>(adjustedLevel) * 0xA + static_cast<int64_t>(cogIndex));
+	auto levelCogCount = std::count(
+		SaveDataHandler::saveData.LevelData[level].GoldenCogs, 
+		SaveDataHandler::saveData.LevelData[level].GoldenCogs + 10, true
+	);
+	if (levelCogCount == 10) 
+		ArchipelagoHandler::Check(0x87501A2 + static_cast<int64_t>(adjustedLevel));
 	SaveDataHandler::SaveGame();
 }
 
 void CheckHandler::OnCollectBilby(int bilbyIndex) {
-	if (ArchipelagoHandler::bilbysanity == Bilbysanity::NONE) {
-		SaveDataHandler::SaveGame();
-		return;
-	}
 	int level = (int)Level::getCurrentLevel();
 	auto adjustedLevel = level - 4;
 	adjustedLevel -= (adjustedLevel > 3) + (adjustedLevel > 7);
@@ -391,50 +411,68 @@ void CheckHandler::OnCollectFrame(int frameIndex)
 }
 
 void CheckHandler::OnCollectTalisman(int talismanIndex) {
+	ArchipelagoHandler::Check(0x8750261 + static_cast<int64_t>(talismanIndex));
+	bool canGoE4 = ((SaveDataHandler::saveData.TalismansPlaced[0]
+		&& SaveDataHandler::saveData.TalismansPlaced[1]
+		&& SaveDataHandler::saveData.TalismansPlaced[2]
+		&& SaveDataHandler::saveData.TalismansPlaced[3]) && ArchipelagoHandler::goalReqBosses)
+		|| (!ArchipelagoHandler::goalReqBosses && SaveDataHandler::saveData.TalismansPlaced[3]);
+	if (talismanIndex == 3 && canGoE4) {
+		auto triggerCount = *(int*)(Core::moduleBase + 0x26DC20 + 0x44);
+		auto triggerAddr = *(uintptr_t*)(Core::moduleBase + 0x26DC20 + 0x48);
+		for (auto triggerIndex = 0; triggerIndex < triggerCount; triggerIndex++) {
+			auto triggerId = *(int*)(triggerAddr + 0x14);
+			if (triggerId == 3) {
+				memset((char*)(triggerAddr + 0x89), 0x1, 6);
+				memset((char*)(triggerAddr + 0x85), 0x1, 1);
+			}
+			triggerAddr = *(int*)(triggerAddr + 0x34);
+		}
+	}
+	if (canGoE4) {
+		LoggerWindow::Log("Final Battle is now accessible.");
+	}
 	if (talismanIndex == 4 && ArchipelagoHandler::goal == Goal::BEAT_CASS)
 		ArchipelagoHandler::Release();
-	else if (ArchipelagoHandler::goal == Goal::ALL_BOSSES &&
-		std::count(SaveDataHandler::saveData.TalismansPlaced, 
-			SaveDataHandler::saveData.TalismansPlaced + 5, true) == 5) 
-		ArchipelagoHandler::Release();
-	else
-		ArchipelagoHandler::Check(0x8750261 + static_cast<int64_t>(talismanIndex));
 	SaveDataHandler::SaveGame();
 }
 
 void CheckHandler::OnCollectDive() {
-	if (ArchipelagoHandler::attributesanity == Attributesanity::NONE)
-		return;
 	if (Level::getCurrentLevel() != LevelCode::B1)
 		return;
 	ArchipelagoHandler::Check(0x08750311);
+	SaveDataHandler::SaveGame();
 }
 
 void CheckHandler::OnCollectSwim() {
-	if (ArchipelagoHandler::attributesanity == Attributesanity::NONE)
-		return;
 	if (Level::getCurrentLevel() != LevelCode::A3)
 		return;
 	ArchipelagoHandler::Check(0x08750310);
+	SaveDataHandler::SaveGame();
 }
 
 void CheckHandler::OnCollectSecondRang() {
-	if (ArchipelagoHandler::attributesanity == Attributesanity::NONE)
-		return;
 	ArchipelagoHandler::Check(0x08750312);
+	SaveDataHandler::SaveGame();
 }
 
 void CheckHandler::OnCollectLifePaw() {
-	if (ArchipelagoHandler::attributesanity == Attributesanity::NONE)
+	if (!ArchipelagoHandler::scalesanity)
 		return;
 	ArchipelagoHandler::Check(0x08750313);
+	SaveDataHandler::SaveGame();
 }
 
 void CheckHandler::OnCollectRang(int rangId) {
-	if (ArchipelagoHandler::attributesanity == Attributesanity::NONE)
-		return;
-	if (ArchipelagoHandler::attributesanity == Attributesanity::SKIP_ELEMENTALS)
-		if (rangId == 1 || rangId == 2 || rangId == 8) 
-			return;
 	ArchipelagoHandler::Check(0x08750314 + static_cast<int64_t>(rangId));
+	SaveDataHandler::SaveGame();
+}
+
+void CheckHandler::OnCollectOpal(uintptr_t opalPtr) {
+	if (Level::getCurrentLevel() != LevelCode::Z1 || !ArchipelagoHandler::scalesanity) 
+		return;
+	uintptr_t baseOpalAddr = *(uintptr_t*)(Core::moduleBase + 0x269818 + 0x48);
+	int opalIndex = (opalPtr - baseOpalAddr) / 0x114;
+	ArchipelagoHandler::Check(0x8750320 + static_cast<int64_t>(opalIndex));
+	SaveDataHandler::SaveGame();
 }

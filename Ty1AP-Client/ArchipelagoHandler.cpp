@@ -57,14 +57,16 @@ Goal ArchipelagoHandler::goal = Goal::BEAT_CASS;
 bool ArchipelagoHandler::deathlink = false;
 bool ArchipelagoHandler::startWithBoom = true;
 LevelUnlockStyle ArchipelagoHandler::levelUnlockStyle = LevelUnlockStyle::VANILLA;
-int ArchipelagoHandler::hubTheggCounts = 17;
+int ArchipelagoHandler::theggGating = 17;
+int ArchipelagoHandler::cogGating = 10;
 double ArchipelagoHandler::deathtime = -1;
-Cogsanity ArchipelagoHandler::cogsanity = Cogsanity::EACH_COG;
-Bilbysanity ArchipelagoHandler::bilbysanity = Bilbysanity::ALL_NO_THEGG;
-Attributesanity ArchipelagoHandler::attributesanity = Attributesanity::SKIP_ELEMENTALS;
 Framesanity ArchipelagoHandler::framesanity = Framesanity::NONE;
+bool ArchipelagoHandler::scalesanity = false;
 bool ArchipelagoHandler::progressiveRang = false;
 bool ArchipelagoHandler::progressiveLevel = false;
+bool ArchipelagoHandler::gateTimeAttacks = false;
+bool ArchipelagoHandler::goalReqBosses = false;
+bool ArchipelagoHandler::advancedLogic = false;
 std::vector<int> ArchipelagoHandler::portalMap;
 std::vector<int> ArchipelagoHandler::bossMap;
 std::unique_ptr<APClient> ArchipelagoHandler::ap;
@@ -150,9 +152,6 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
     ap->set_slot_connected_handler([](const json& data) {
         ap_connected = true;
 
-        if (data.find("DeathLink") != data.end() && data["DeathLink"].is_boolean())
-            deathlink = data["DeathLink"].get<bool>();
-
         if (data.find("Goal") != data.end() && data["Goal"].is_number_integer())
             goal = static_cast<Goal>(data["Goal"].get<int>());
 
@@ -161,42 +160,45 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
         else levelUnlockStyle = LevelUnlockStyle::VANILLA;
 
         portalMap.clear();
-        if (data.find("PortalMap") != data.end() && data["PortalMap"].is_array()) {
+        if (data.find("PortalMap") != data.end() && data["PortalMap"].is_array()) 
             portalMap = data["PortalMap"].get<std::vector<int>>();
-        }
-
+        
         bossMap.clear();
-        if (data.find("BossMap") != data.end() && data["BossMap"].is_array()) {
+        if (data.find("BossMap") != data.end() && data["BossMap"].is_array()) 
             bossMap = data["BossMap"].get<std::vector<int>>();
-        }
 
-        if (data.find("DeathLink") != data.end() && data["DeathLink"].is_boolean())
-            deathlink = data["DeathLink"].get<bool>();
+        if (data.find("DeathLink") != data.end())
+            deathlink = data["DeathLink"].get<int>() == 1;;
 
-        if (data.find("ProgressiveLevel") != data.end() && data["ProgressiveLevel"].is_boolean())
-            progressiveLevel = data["ProgressiveLevel"].get<bool>();
+        if (data.find("ProgressiveLevel") != data.end())
+            progressiveLevel = data["ProgressiveLevel"].get<int>() == 1;;
 
-        if (data.find("ProgressiveElementals") != data.end() && data["ProgressiveElementals"].is_boolean())
-            progressiveRang = data["ProgressiveElementals"].get<bool>();
-        if (data.find("StartWithBoom") != data.end() && data["StartWithBoom"].is_boolean())
-            startWithBoom = data["StartWithBoom"].get<bool>();
+        if (data.find("ProgressiveElementals") != data.end())
+            progressiveRang = data["ProgressiveElementals"].get<int>() == 1;;
+        if (data.find("StartWithBoom") != data.end())
+            startWithBoom = data["StartWithBoom"].get<int>() == 1;;
         startWithBoom = !(progressiveRang && !startWithBoom);
 
-        if (data.find("HubTheggCounts") != data.end() && data["HubTheggCounts"].is_number_integer())
-            hubTheggCounts = data["HubTheggCounts"].get<int>();
+        if (data.find("TheggGating") != data.end() && data["TheggGating"].is_number_integer())
+            theggGating = data["TheggGating"].get<int>();
 
-        if (data.find("Cogsanity") != data.end() && data["Cogsanity"].is_number_integer()) {
-            cogsanity = (Cogsanity)data["Cogsanity"].get<int>();
-        }
-        if (data.find("Bilbysanity") != data.end() && data["Bilbysanity"].is_number_integer()) {
-            bilbysanity = (Bilbysanity)data["Bilbysanity"].get<int>();
-        }
-        if (data.find("Attributesanity") != data.end() && data["Attributesanity"].is_number_integer()) {
-            attributesanity = (Attributesanity)data["Attributesanity"].get<int>();
-        }
-        if (data.find("Framesanity") != data.end() && data["Framesanity"].is_number_integer()) {
+        if (data.find("CogGating") != data.end() && data["CogGating"].is_number_integer())
+            cogGating = data["CogGating"].get<int>();
+
+        if (data.find("GateTimeAttacks") != data.end())
+            gateTimeAttacks = data["GateTimeAttacks"].get<int>() == 1;;
+        
+        if (data.find("ReqBosses") != data.end())
+            goalReqBosses = data["ReqBosses"].get<int>() == 1;
+
+        if (data.find("Framesanity") != data.end() && data["Framesanity"].is_number_integer()) 
             framesanity = (Framesanity)data["Framesanity"].get<int>();
-        }
+
+        if (data.find("Scalesanity") != data.end())
+            scalesanity = data["Scalesanity"].get<int>() == 1;
+
+        if (data.find("AdvancedLogic") != data.end() && data["AdvancedLogic"].is_number_integer())
+            advancedLogic = data["AdvancedLogic"].get<int>() == 1;
 
         if (deathlink) ap->ConnectUpdate(false, 0b111, true, { "DeathLink" });
         ap->StatusUpdate(APClient::ClientStatus::PLAYING);

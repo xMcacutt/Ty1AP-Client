@@ -18,27 +18,6 @@ enum class LevelUnlockStyle {
 
 enum class Goal{
 	BEAT_CASS,
-	ALL_BOSSES,
-	ALL_THEGGS,
-	COMPLETION
-};
-
-enum class Cogsanity {
-	EACH_COG,
-	PER_LEVEL,
-	NONE
-};
-
-enum class Bilbysanity {
-	ALL_NO_THEGG,
-	ALL_WITH_THEGG,
-	NONE
-};
-
-enum class Attributesanity {
-	SKIP_ELEMENTALS,
-	ALL,
-	NONE
 };
 
 enum class Framesanity {
@@ -67,16 +46,18 @@ public:
 	static LevelUnlockStyle levelUnlockStyle;
 	static std::vector<int> portalMap;
 	static std::vector<int> bossMap;
-	static int hubTheggCounts;
+	static int theggGating;
+	static int cogGating;
+	static bool goalReqBosses;
+	static bool gateTimeAttacks;
 	static double deathtime;
-	static Cogsanity cogsanity;
-	static Bilbysanity bilbysanity;
-	static Attributesanity attributesanity;
 	static Framesanity framesanity;
+	static bool scalesanity;
 	static bool progressiveRang;
 	static bool progressiveLevel;
 	static bool ap_sync_queued;
 	static bool ap_connected;
+	static bool advancedLogic;
 	static std::string seed;
 private:
 	static std::unique_ptr<APClient> ap;
