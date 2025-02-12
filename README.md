@@ -32,29 +32,27 @@ In Ty-AP the following locations are considered checks by default
 
 - All 72 Thunder Eggs
 
+- All 90 Golden Cogs
+
+- Cog completion for each level (find all 10 cogs)
+
+- All 45 Bilbies
+
+- Bilby completion for finding each level's 5 bilbies throughout the world
+
+- All 13 Rangs / Abilities
+
 - All 5 Talismans
-
-#### Cogs
-
-There are 90 golden cogs in the game. These can be enabled as checks through cogsanity. If cogsanity is set to all, then all 90 cogs will be checks. If cogsanity is set to per_level, then once you collect all 10 cogs in a level, you will be granted a check.
-
-#### Bilbies
-
-There are 45 bilbies in the game. These can be enabled as checks through bilbysanity. If bilbysanity is set to all_no_te then the thunder egg for collecting all 5 bilbies in a level will not trigger a check to avoid a double check on thunder egg collection. all_with_te allows the double check.
 
 #### Picture Frames
 
 There are 373 picture frames in the game. Only 127 of these can be activated as checks. All of the bonus world picture frames are excluded since they are postgame content. The remaining frames can be enabled as checks through framesanity. If framesanity is set to all, then all 127 frames will be checks. If it is set to per_level then collecting all of the picture frames in a level will grant a single check. 
 
-It is recommended to leave picture frames on "all" due to generation failures from lack of locations.
-
 #### Attributes
 
 There are 15 attributes in the game. These are the rangs and abillities that can be unlocked for Ty including swim, dive, second rang, extra health paw, etc. 
 
-For each attribute its unlock to grant the check varies. For extra health paw, you must collect all 25 rainbow scales in Rainbow Cliffs. Swim and Dive are split such that speaking to Rex in Ship Rex grants Swim while speaking to Rex in Bridge on the River Ty grants the Dive check. On getting an attribute check, you will not receive the attribute.
-
-If attributesanity is set to skip_elementals, you will not be given a check for the flamerang, frostyrang, or zappyrang. This avoids a double check due to the boss completion talisman check.
+For each attribute its unlock to grant the check varies. Using scalesanity, you can get the extra health paw and its corresponding check. To get the check, you must collect all 25 rainbow scales in Rainbow Cliffs. Swim and Dive are split such that speaking to Rex in Ship Rex grants the Swim check, while speaking to Rex in Bridge on the River Ty grants the Dive check. On getting an attribute check, you will not receive the attribute.
 
 ### Items
 
@@ -76,7 +74,7 @@ If progressive rang is turned off, then all of the rangs and abilities will be g
 
 The first portal (in Two Up vanilla location) is always open regardless of settings. If you have level shuffle turned on, the 9 core levels are randomised. Boss shuffle will randomise the first 3 bosses too. 
 
-If you have level unlock style set to vanilla or vanilla bosses then you will need to obtain the amount of thunder eggs set in the yaml under "hub te counts" for a given hub to unlock that boss' portal. The portal will appear automatically once you do this.
+If you have level unlock style set to "vanilla" or "checks no bosses" then you will need to obtain the amount of thunder eggs set in the yaml under "theggGating" for a given hub to unlock that boss' portal. The portal will appear automatically once you do this.
 
 If you have level unlock style set to checks or vanilla bosses, the 9 core levels (except the one in Two Up vanilla position) will need to be unlocked via checks.
 
@@ -90,7 +88,7 @@ On being given a talisman, you unlock the ability to obtain a check on the eleme
 
 - Talisman is obtained
 
-- Thunder egg count for that hub is greater than 17 (may need adjusting)
+- Thunder egg count for that hub is greater than the count set by "theggGating"
 
 - Return to Rainbow Cliffs
 
@@ -98,15 +96,11 @@ On being given a talisman, you unlock the ability to obtain a check on the eleme
 
 When being given a thunder egg (thegg), the thegg will be either a Fire Thunder Egg, Ice Thunder Egg, or Air Thunder Egg for hub 1, 2, and 3 respectively.
 
-These thunder eggs are saved separately into the save data and can be tracked with the in game tracker. These are used to determine if the boss portal is spawned in Vanilla and Vanilla Bosses level unlock style.
-
-You will need to find or be given all 72 to complete the goals completion and all thunder eggs.
+These thunder eggs are saved separately into the save data and can be tracked with the in game tracker. These are used to determine if the boss portal is spawned in Vanilla and "Checks - No Bosses" level unlock style.
 
 #### Golden Cogs
 
-Golden cogs are stored similarly to thunder eggs. They can be redeemed for technorang checks in Julius' lab in Rainbow Cliffs.
-
-Currently, in order for you to redeem a later rang check, you must have both checked the earlier rang checks and also received the rang for each earlier check.
+Golden cogs are stored similarly to thunder eggs. They can be redeemed for technorang checks in Julius' lab in Rainbow Cliffs. You will need to redeem multiple times if you have a high enough cog count. The amount of cogs required for each stage is set using "Cog Gating".
 
 #### Bilbies
 
@@ -114,7 +108,7 @@ When you receive a bilby, it will be named Bilby - LEVEL NAME. This will save a 
 
 #### Stopwatches
 
-Stopwatches are also added to the item pool by default. They unlock the time attack for their corresponding level.
+Stopwatches can be added to the pool using "Gate Time Attacks". They unlock the time attack for their corresponding level and add a harder time attack challenge check to each level. The time attack challenge can be completed on the same attempt as obtaining the time attack thunder egg check but you will only see the time you are trying to beat after obtaining the thunder egg.
 
 ## Known Issues
 
@@ -122,35 +116,32 @@ KNOWN CLIENT ISSUES
 
 - Hard disk removed screen displays when loading in (VISUAL BUG)
 
-- start_with_boom option set to false may crash the game
-
 - Deathlink is not fully implemented yet
 
 - Throwing the kaboomerang without having the second rang may crash the game
 
 - Saving the game manually does not work
 
-KNOWN APWORLD ISSUES
-
-- Generation fails to add items to rang locations
-- Needs overhaul to force certain checks preventing generation failures
-- Picture frames do not logically require infrarang in any logic setting
 - Patch to add archipelago branding
+
+KNOWN APWORLD ISSUES
 
 FEATURES TO ADD
 
 - Text colouring to show items more clearly
-- Option to make opal checks filler
+- Option to make opal thunder egg checks filler
 - Extended hint info
 
 SOLVED
 
-- Tracker and logger windows made slightly bigger
-- Aquarangs no longer require having swim
-- Non progressive level items now spawn the correct portals
-- All attribute checks now trigger even if the attribute is in inventory
-- Fixed generation logic for starting with boomerang
-- Prevented accidental save slot loading
-- Fixed crash on lifepaw attribute check (25 rainbow scales)
-- Portals now spawn without needing reload in Rainbow Cliffs on item get
-- Time attack stopwatches no longer despawn after one use
+- Complete revamp to settings and generation logic (no more failures)
+- Fixed no boom crash
+- Added time attack challenge checks
+- Added scalesanity
+- Fixed incorrect boolean values read from slot data
+- Fixed thunder egg requirements
+- Fixed cog requirements
+- Removed unnecessary goals
+- Balanced items and locations to be equal
+- Locked Final Battle behind go mode
+- Added option to require framesanity to logically require infrarang
