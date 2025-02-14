@@ -48,14 +48,14 @@ bool is_wss = false;
 bool is_ws = false; 
 unsigned connect_error_count = 0;
 bool awaiting_password = false;
-std::string slot = "Player";
+std::string ArchipelagoHandler::slot = "Tyrone";
 int nextCheckToGet = 0;
 bool ArchipelagoHandler::ap_sync_queued = false;
 bool ArchipelagoHandler::ap_connected = false;
 bool ArchipelagoHandler::polling = false;
 Goal ArchipelagoHandler::goal = Goal::BEAT_CASS;
 bool ArchipelagoHandler::deathlink = false;
-bool ArchipelagoHandler::startWithBoom = true;
+bool ArchipelagoHandler::someoneElseDied = false;
 LevelUnlockStyle ArchipelagoHandler::levelUnlockStyle = LevelUnlockStyle::VANILLA;
 int ArchipelagoHandler::theggGating = 17;
 int ArchipelagoHandler::cogGating = 10;
@@ -175,9 +175,6 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 
         if (data.find("ProgressiveElementals") != data.end())
             progressiveRang = data["ProgressiveElementals"].get<int>() == 1;;
-        if (data.find("StartWithBoom") != data.end())
-            startWithBoom = data["StartWithBoom"].get<int>() == 1;;
-        startWithBoom = !(progressiveRang && !startWithBoom);
 
         if (data.find("TheggGating") != data.end() && data["TheggGating"].is_number_integer())
             theggGating = data["TheggGating"].get<int>();
@@ -202,9 +199,13 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 
         if (deathlink) ap->ConnectUpdate(false, 0b111, true, { "DeathLink" });
         ap->StatusUpdate(APClient::ClientStatus::PLAYING);
-        GameHandler::SetupOnConnect(ap->get_seed());
-
         seed = ap->get_seed();
+        slot = ap->get_slot();
+        if (ArchipelagoHandler::LoadSaveData()) {
+            GameHandler::SetLoadActive(true);
+        }
+        GameHandler::SetupOnConnect();
+
             
         LoggerWindow::Log("Connected as " + ap->get_player_alias(ap->get_player_number()));
 
@@ -242,7 +243,7 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
                 std::string itemname = GetItemName(item.item);
                 std::string recipient = GetPlayerAlias(item.player);
                 std::string location = GetLocationName(item.location);
-                LoggerWindow::Log("[color=FF3377FF]" + recipient + "'s [color=FFFFFFFF]" + itemname + " [color=AAAAAAFF]found at [color=FFFFFFFF]" + location);
+                LoggerWindow::Log("[color=86F3CAFF]" + recipient + "'s [color=FFFFFFFF]" + itemname + " [color=AAAAAAFF]found at [color=FFFFFFFF]" + location);
             }
         }
     });
@@ -258,7 +259,8 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
                     if (data["source"].get<std::string>() != slot) {
                         std::string source = data["source"].is_string() ? data["source"].get<std::string>().c_str() : "???";
                         std::string cause = data["cause"].is_string() ? data["cause"].get<std::string>().c_str() : "???";
-                        LoggerWindow::Log("Died because of " + source + " : " + cause);
+                        LoggerWindow::Log("[color=86F3CAFF]" + source + " [color=FFFFFFFF]" + cause);
+                        someoneElseDied = true;
                         Hero::kill();
                     }
                 }
@@ -270,31 +272,26 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
     });
 }
 
-void ArchipelagoHandler::Check(int64_t locationId)
-{
+void ArchipelagoHandler::Check(int64_t locationId) {
     std::list<int64_t> check;
     check.push_back(locationId);
     ap->LocationScouts(check);
     ap->LocationChecks(check);
 }
 
-void ArchipelagoHandler::Release()
-{
+void ArchipelagoHandler::Release() {
     ap->StatusUpdate(APClient::ClientStatus::GOAL);
 }
 
-std::string ArchipelagoHandler::GetItemName(int64_t itemId)
-{
+std::string ArchipelagoHandler::GetItemName(int64_t itemId) {
     return ap->get_item_name(itemId);
 }
 
-std::string ArchipelagoHandler::GetPlayerAlias(int64_t playerId)
-{
+std::string ArchipelagoHandler::GetPlayerAlias(int64_t playerId) {
     return ap->get_player_alias(playerId);
 }
 
-std::string ArchipelagoHandler::GetLocationName(int64_t locId)
-{
+std::string ArchipelagoHandler::GetLocationName(int64_t locId) {
     return ap->get_location_name(locId);
 }
 
@@ -306,4 +303,58 @@ void ArchipelagoHandler::Poll() {
 void ArchipelagoHandler::SetAPStatus(std::string status, char important) {
     API::LogPluginMessage("AP status: " + status);
     //apLastStatusUpdate = important ? 0 : time(NULL);
+}
+
+bool ArchipelagoHandler::LoadSaveData() {
+    return SaveDataHandler::LoadSaveData(seed, slot);
+}
+
+
+const std::vector<std::string> deathCauses{
+    "didn't catch the boomerang",
+    "bit off more than they could chew",
+    "turned into a tasmanian fossil",
+    "forgot to wear gloves",
+    "had trouble in the outhouse",
+    "couldn't hold their breath",
+    "listened to Lenny",
+    "was crushed by an icicle",
+    "forgot how to glide",
+    "bit the ground too hard",
+    "fell over",
+    "was a little too Australian",
+    "didn't wear sunblock",
+    "didn't listen to Lenny",
+    "ate too much pie",
+    "hugged a crocodile",
+    "got lost in the outback",
+    "died",
+    "forgot eels were electric",
+    "got too confident with the didgeridoo",
+    "tried to ride a stingray",
+    "told a dingo it wasn’t that scary",
+    "got dropkicked by a kangaroo",
+    "... Boonie",
+    "miscounted the multirangs",
+    "licked a toad for science",
+    "ran out of ‘she’ll be right’ energy mid-jump",
+    "tried to code an AP game"
+};
+
+std::string GetRandomCause() {
+    if (deathCauses.empty()) return ""; // Handle empty list case
+    std::random_device rd;  // Obtain a random seed
+    std::mt19937 gen(rd()); // Mersenne Twister PRNG
+    std::uniform_int_distribution<int> dist(0, deathCauses.size() - 1);
+    return deathCauses[dist(gen)];
+}
+
+void ArchipelagoHandler::SendDeath() {
+    LoggerWindow::Log("Death Sent");
+    json data{
+        {"time", ap->get_server_time()},
+        {"cause", GetRandomCause()},
+        {"source", slot},
+    };
+    ap->Bounce(data, {}, {}, { "DeathLink" });
 }

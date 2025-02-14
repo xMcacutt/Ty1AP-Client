@@ -32,6 +32,9 @@ LoadGameFunctionType loadGameOrigin = nullptr;
 typedef void(__stdcall* MenuStateFunctionType)(void);
 MenuStateFunctionType menuStateOrigin = nullptr;
 
+typedef void(__stdcall* DeathFunctionType)(void);
+DeathFunctionType deathOrigin = nullptr;
+
 
 void __stdcall GameHandler::MainMenuHook() {
 	GameHandler::OnMainMenu();
@@ -93,6 +96,19 @@ __declspec(naked) void __stdcall GameHandler::LoadGameHook() {
 	}
 }
 
+uintptr_t deathOriginAddr;
+__declspec(naked) void __stdcall GameHandler::DeathHook() {
+	__asm {
+		pushad
+		pushfd
+		call GameHandler::OnDeath
+		popfd
+		popad
+		mov [edx+0xAD0],ax
+		jmp dword ptr[deathOriginAddr]
+	}
+}
+
 void GameHandler::Setup()
 {
 	// STOPWATCH
@@ -106,10 +122,7 @@ void GameHandler::Setup()
 	VirtualProtect(addr, 6, PAGE_EXECUTE_READWRITE, &oldProtect);
 	memset(addr, 0x90, 6);
 
-	// BOOM FIX
-	addr = (char*)(Core::moduleBase + 0x3C9B1);
-	VirtualProtect(addr, 2, PAGE_EXECUTE_READWRITE, &oldProtect);
-	memset(addr, 0x90, 2);
+	*(uintptr_t*)(Core::moduleBase + 0x528210) = *(uintptr_t*)&hardDiskMessage;
 
 	// RANG COG REQ CHECKS
 	uintptr_t goldenCogAddr = (uintptr_t)&SaveDataHandler::saveData.GoldenCogCount;
@@ -144,6 +157,10 @@ void GameHandler::Setup()
 	addr = (char*)(Core::moduleBase + 0x17082A);
 	MH_CreateHook((LPVOID)addr, &LoadGameHook, reinterpret_cast<LPVOID*>(&loadGameOrigin));
 
+	deathOriginAddr = Core::moduleBase + 0xF7A1A;
+	addr = (char*)(Core::moduleBase + 0xF7A13);
+	MH_CreateHook((LPVOID)addr, &DeathHook, reinterpret_cast<LPVOID*>(&deathOrigin));
+
 	CheckHandler::SetupHooks();
 	TimeAttackHandler::SetupHooks();
 	MH_EnableHook(MH_ALL_HOOKS);
@@ -152,7 +169,7 @@ void GameHandler::Setup()
 
 	// MOVE RANG CHECKS TO MY CUSTOM DATA
 	std::vector<std::pair<uintptr_t, short>> patches = {
-		{0x3ED9E, 0xBA8}, {0x3CA46, 0xBA8}, {0x3C9AC, 0xBA8}, {0x3F446, 0xBA8}, {0x3EEE7, 0xBA8},
+		{0x3ED9E, 0xBA8}, {0x3CA46, 0xBA8}, {0x3C9AC, 0xBA8}, {0x14D2E1, 0xBB1}, {0x3F446, 0xBA8}, {0x3EEE7, 0xBA8},
 		{0x16C40F, 0xBA6}, {0x165B96, 0xBA6}, {0x162B97, 0xBA6}, {0x3F8E2, 0xBA6}, {0x3EF64, 0xBA6},
 		{0x2E61B, 0xBA6}, {0x2E5B9, 0xBA6}, {0x2E3FB, 0xBA6}, {0x25F75, 0xBA6}, {0x35723, 0xBA4},
 		{0x35754, 0xBA4}, {0x162EFD, 0xBA4}, {0x35781, 0xBA4}, {0x357AE, 0xBA4}, {0x34D0D, 0xBA4},
@@ -192,9 +209,18 @@ void GameHandler::WatchMemory() {
 	}
 }
 
-void GameHandler::SetupOnConnect(std::string seed) {
-	if (SaveDataHandler::LoadSaveData(seed)) {
-		SetLoadActive(true);
+void GameHandler::SetupOnConnect() {
+	uintptr_t goldenCogAddr = (uintptr_t)&SaveDataHandler::saveData.GoldenCogCount;
+	auto addr = (char*)(Core::moduleBase + 0xD8A4E);
+	DWORD oldProtect;
+	for (int i = 0; i < 6; i++) {
+		VirtualProtect(addr, 0xC, PAGE_EXECUTE_READWRITE, &oldProtect);
+		addr[0] = 0xA1;
+		*(uintptr_t*)(addr + 1) = goldenCogAddr;
+		memset(addr + 5, 0x90, 5);
+		addr += 0xC;
+		*(char*)(addr) = (char)(ArchipelagoHandler::cogGating * (i + 1));
+		addr += 0x37 - 0xC;
 	}
 }
 
@@ -218,7 +244,7 @@ void GameHandler::OnEnterRainbowCliffs() {
 	for (auto triggerIndex = 0; triggerIndex < triggerCount; triggerIndex++) {
 		auto targetMessage = *(int*)(triggerAddr + 0xA0);
 		if (targetMessage == 47) {
-			memset((char*)(triggerAddr + 0x89), 0x0, 6);
+			memset((char*)(triggerAddr + 0x88), 0x0, 7);
 			memset((char*)(triggerAddr + 0x85), 0x0, 1);
 		}
 		triggerAddr = *(int*)(triggerAddr + 0x34);
@@ -226,7 +252,7 @@ void GameHandler::OnEnterRainbowCliffs() {
 	auto counterCount = *(int*)(Core::moduleBase + 0x26BCB8 + 0x44);
 	auto counterAddr = *(uintptr_t*)(Core::moduleBase + 0x26BCB8 + 0x48);
 	for (auto counterIndex = 0; counterIndex < counterCount; counterIndex++) {
-		memset((char*)(counterAddr + 0xA0), 0x0, 6);
+		memset((char*)(counterAddr + 0xA0), 0x0, 1);
 		memset((char*)(counterAddr + 0x48), 0x0, 1);
 		counterAddr = *(int*)(counterAddr + 0x34);
 	}
@@ -276,7 +302,6 @@ void GameHandler::OnEnterRainbowCliffs() {
 			*(int*)(portalAddr + 0xAC) = bossMap[2];
 		portalAddr = *(int*)(portalAddr + 0x34);
 	}
-
 	if (SaveDataHandler::saveData.ArchAttributeData.GotSecondRang) {
 		auto gateAddr = *(uintptr_t*)(Core::moduleBase + 0x269C14);
 		gateAddr = *(uintptr_t*)(gateAddr + 0x78);
@@ -296,6 +321,7 @@ void GameHandler::OnEnterCrest() {
 	int scriptAddr = *(uintptr_t*)(Core::moduleBase + 0x26F480 + 0x48);
 	for (int scriptIndex = 0; scriptIndex < scriptCount; scriptIndex++) {
 		int scriptId = *(int*)(scriptAddr + 0x14);
+		API::LogPluginMessage(std::to_string(scriptId));
 		if (scriptId == 32) {
 			*(int*)(scriptAddr + 0x58) = 0;
 			break;
@@ -312,7 +338,7 @@ void GameHandler::OnEnterCrest() {
 	for (auto triggerIndex = 0; triggerIndex < triggerCount; triggerIndex++) {
 		auto triggerId = *(int*)(triggerAddr + 0x14);
 		if (triggerId == 3) {
-			memset((char*)(triggerAddr + 0x89), canGoE4, 6);
+			memset((char*)(triggerAddr + 0x88), canGoE4, 7);
 			memset((char*)(triggerAddr + 0x85), canGoE4, 1);
 		}
 		triggerAddr = *(int*)(triggerAddr + 0x34);
@@ -324,16 +350,13 @@ void GameHandler::OnEnterLevel() {
 	*(uintptr_t*)(Core::moduleBase + 0x288730) = reinterpret_cast<uintptr_t>(&SaveDataHandler::saveData);
 
 	SaveDataHandler::SaveGame();
-	
-	if (SaveDataHandler::saveData.ProgressiveRang == 0) 
-		SaveDataHandler::saveData.ArchAttributeData.GotBoomerang = false;
 
 	ItemHandler::HandleStoredItems();
 
 	auto levelId = Level::getCurrentLevel();
 	if (levelId == LevelCode::Z1)
 		OnEnterRainbowCliffs();
-	if (levelId == LevelCode::E1)
+	if (levelId == LevelCode::D2)
 		OnEnterCrest();
 
 	if (*(int*)(Core::moduleBase + 0x27041C) != 0
@@ -352,7 +375,7 @@ void GameHandler::OnMainMenu() {
 }
 
 void GameHandler::OnLoadGame() {
-	SaveDataHandler::LoadSaveData(ArchipelagoHandler::seed);
+	ArchipelagoHandler::LoadSaveData();
 	*(int*)(Core::moduleBase + 0x27383C) = 0;
 	*(int*)(Core::moduleBase + 0x52F2BC) = Core::moduleBase + 0x273844;
 	*(int*)(Core::moduleBase + 0x52F2A4) = 0x3;
@@ -407,10 +430,18 @@ void GameHandler::OnSpawnpointSet() {
 	}
 }
 
-void GameHandler::SetLoadActive(bool value)
-{
+void GameHandler::SetLoadActive(bool value) {
 	if (!GameState::onLoadScreenOrMainMenu())
 		return;
 	auto menuAddr = *(int*)(Core::moduleBase + 0x286644);
 	*(bool*)(menuAddr + 0x164) = value;
+}
+
+
+void GameHandler::OnDeath() {
+	if (ArchipelagoHandler::someoneElseDied) {
+		ArchipelagoHandler::someoneElseDied = false;
+		return;
+	}
+	ArchipelagoHandler::SendDeath();
 }

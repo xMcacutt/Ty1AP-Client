@@ -24,8 +24,8 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 }
 
 void TickBeforeGame(float deltaSeconds) {
-    GUI::DrawUI();
     ArchipelagoHandler::Poll();
+    GUI::DrawUI();
 }
 
 void OnTyInit() {

@@ -55,6 +55,6 @@ class SaveDataHandler
 {
 public:
 	static inline ExtendedSaveData saveData;
-	static bool LoadSaveData(std::string seed);
+	static bool LoadSaveData(std::string seed, std::string slot);
 	static void SaveGame();
 };

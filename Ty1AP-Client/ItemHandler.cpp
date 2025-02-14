@@ -3,15 +3,14 @@
 std::queue<APClient::NetworkItem> ItemHandler::storedItems;
 
 std::unordered_map<int, std::string> ItemHandler::boomerangMessages {
-	{1, "You were given the Boomerang."},
-	{2, "Two are better than one."},
-	{3, "You learnt how to Swim."},
-	{4, "Rangs but underwater."},
-	{5, "You can Dive."},
-	{6, "Hot Boomerangs in your area."},
-	{7, "Water but cold."},
-	{8, "BZZZT!"},
-	{9, "This Boomerang spinny."}
+	{1, "Two is better than one."},
+	{2, "You learnt how to Swim."},
+	{3, "Rangs but underwater."},
+	{4, "You can Dive."},
+	{5, "Hot Boomerangs in your area."},
+	{6, "Water but cold."},
+	{7, "BZZZT!"},
+	{8, "This Boomerang spinny."}
 };
 
 void ItemHandler::HandleItem(APClient::NetworkItem item)
@@ -92,7 +91,6 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 			SaveDataHandler::saveData.ZoneData[item.item - 0x8750050].Complete = true;
 	}
 	else if (item.item == 0x8750082) {
-		// EXTRA LIFE
 		Sound::PlayTySoundByIndex(0x1BC);
 		auto objAddr = Core::moduleBase + 0x2888AC;
 		void (*incrementLives)() = reinterpret_cast<void(*)()>(Core::moduleBase + 0xF6A80);
@@ -102,11 +100,14 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 		}
 	}
 	else if (item.item == 0x8750083) {
-		auto objAddr = Core::moduleBase + 0x270D34;
-		void (*giveOpalMagnet)() = reinterpret_cast<void(*)()>(Core::moduleBase + 0x162000);
-		__asm {
-			mov ecx, objAddr
-			call giveOpalMagnet
+		if (Level::getCurrentLevel() != LevelCode::Z1)
+		{
+			auto objAddr = Core::moduleBase + 0x270D34;
+			void (*giveOpalMagnet)() = reinterpret_cast<void(*)()>(Core::moduleBase + 0x162000);
+			__asm {
+				mov ecx, objAddr
+				call giveOpalMagnet
+			}
 		}
 	}
 
@@ -312,22 +313,20 @@ void ItemHandler::HandleIndividualLevel(int code) {
 
 void ItemHandler::HandleProgressiveRang() {
 	if (SaveDataHandler::saveData.ProgressiveRang >= 1)
-		SaveDataHandler::saveData.ArchAttributeData.GotBoomerang = true;
-	if (SaveDataHandler::saveData.ProgressiveRang >= 2)
 		SaveDataHandler::saveData.ArchAttributeData.GotSecondRang = true;
-	if (SaveDataHandler::saveData.ProgressiveRang >= 3)
+	if (SaveDataHandler::saveData.ProgressiveRang >= 2)
 		SaveDataHandler::saveData.ArchAttributeData.LearntToSwim = true;
-	if (SaveDataHandler::saveData.ProgressiveRang >= 4)
+	if (SaveDataHandler::saveData.ProgressiveRang >= 3)
 		SaveDataHandler::saveData.ArchAttributeData.GotAquarang = true;
-	if (SaveDataHandler::saveData.ProgressiveRang >= 5)
+	if (SaveDataHandler::saveData.ProgressiveRang >= 4)
 		SaveDataHandler::saveData.ArchAttributeData.LearntToDive = true;
-	if (SaveDataHandler::saveData.ProgressiveRang >= 6)
+	if (SaveDataHandler::saveData.ProgressiveRang >= 5)
 		SaveDataHandler::saveData.ArchAttributeData.GotFlamerang = true;
-	if (SaveDataHandler::saveData.ProgressiveRang >= 7)
+	if (SaveDataHandler::saveData.ProgressiveRang >= 6)
 		SaveDataHandler::saveData.ArchAttributeData.GotFrostyrang = true;
-	if (SaveDataHandler::saveData.ProgressiveRang >= 8)
+	if (SaveDataHandler::saveData.ProgressiveRang >= 7)
 		SaveDataHandler::saveData.ArchAttributeData.GotZappyrang = true;
-	if (SaveDataHandler::saveData.ProgressiveRang >= 9)
+	if (SaveDataHandler::saveData.ProgressiveRang >= 8)
 		SaveDataHandler::saveData.ArchAttributeData.GotDoomerang = true;
 }
 
@@ -346,7 +345,7 @@ void ItemHandler::HandleIndividualRang(int code) {
 		SaveDataHandler::saveData.ArchAttributeData.GotExtraHealth = true;
 		break;
 	case 4:
-		SaveDataHandler::saveData.ArchAttributeData.GotExtraHealth = true;
+		SaveDataHandler::saveData.ArchAttributeData.GotBoomerang = true;
 		break;
 	case 5:
 		SaveDataHandler::saveData.ArchAttributeData.GotFlamerang = true;

@@ -31,9 +31,8 @@ void createDirectoriesIfNeeded(const std::string& filepath) {
     std::filesystem::create_directories(path.parent_path());
 }
 
-bool SaveDataHandler::LoadSaveData(std::string seed)
-{
-    auto filePath = "./Saves/" + seed;
+bool SaveDataHandler::LoadSaveData(std::string seed, std::string slot) {
+    auto filePath = "./Saves/" + seed + slot;
     createDirectoriesIfNeeded(filePath);
     if (fileExists(filePath)) {
         if (loadFromFile(filePath))
@@ -48,14 +47,8 @@ bool SaveDataHandler::LoadSaveData(std::string seed)
         saveData.Size = sizeof(ExtendedSaveData);
         saveData.Magic = 0x701EE;
         saveData.PlayTimeSeconds = 0xFF000000;
-        saveData.ProgressiveRang = 1;
-        if (!ArchipelagoHandler::startWithBoom) {
-            saveData.ProgressiveRang--;
-        }
-        else {
-            saveData.ArchAttributeData.GotBoomerang = true;
-            saveData.AttributeData.GotBoomerang = true;
-        }
+        saveData.ArchAttributeData.GotBoomerang = true;
+        saveData.AttributeData.GotBoomerang = true;
         saveData.LevelData[0].TimesEntered = 1;
         saveData.PortalOpen[static_cast<int>(LevelCode::A1)] = true;
         if (ArchipelagoHandler::levelUnlockStyle == LevelUnlockStyle::VANILLA) {
@@ -85,6 +78,6 @@ void SaveDataHandler::SaveGame()
         mov ecx, objAddr
         call calcOpals
     }
-    auto filePath = "./Saves/" + ArchipelagoHandler::seed;
+    auto filePath = "./Saves/" + ArchipelagoHandler::seed + ArchipelagoHandler::slot;
     saveToFile(filePath);
 }

@@ -157,21 +157,10 @@ __declspec(naked) void __stdcall CheckHandler::CollectFrameHook2()
 uintptr_t collectTalismanOriginAddr;
 __declspec(naked) void __stdcall CheckHandler::CollectTalismanHook() {
 	__asm {
-		mov edx, [edi + 0x2C]
-		mov ecx, edi
-		push ebx
-		push ecx
-		push edx
-		push edi
-		push esi
+		mov byte ptr[eax+ecx+0xAC9],01
 		push eax
 		call CheckHandler::OnCollectTalisman
 		pop eax
-		pop esi
-		pop edi
-		pop edx
-		pop ecx
-		pop ebx
 		jmp dword ptr[collectTalismanOriginAddr]
 	}
 }
@@ -307,7 +296,7 @@ void CheckHandler::SetupHooks()
 	collectBilbyOriginAddr = Core::moduleBase + 0xF7AF7 + 5;
 	collectFrameOriginAddr = Core::moduleBase + 0xF7F00 + 5;
 	collectFrameOrigin2Addr = Core::moduleBase + 0xF7F72 + 5;
-	collectTalismanOriginAddr = Core::moduleBase + 0xF7CCE;
+	collectTalismanOriginAddr = Core::moduleBase + 0xF7CF7;
 	collectDiveOriginAddr = Core::moduleBase + 0xF807F;
 	collectSwimOriginAddr = Core::moduleBase + 0xF80A3;
 	collectSecondRangOriginAddr = Core::moduleBase + 0xF7D0F;
@@ -330,7 +319,7 @@ void CheckHandler::SetupHooks()
 	addr = (char*)(Core::moduleBase + 0xF7F72);
 	MH_CreateHook((LPVOID)addr, &CollectFrameHook2, reinterpret_cast<LPVOID*>(&collectFrameOrigin2));
 
-	addr = (char*)(Core::moduleBase + 0xF7CC6);
+	addr = (char*)(Core::moduleBase + 0xF7CEF);
 	MH_CreateHook((LPVOID)addr, &CollectTalismanHook, reinterpret_cast<LPVOID*>(&collectTalismanOrigin));
 
 	addr = (char*)(Core::moduleBase + 0xF8079);
@@ -417,14 +406,14 @@ void CheckHandler::OnCollectTalisman(int talismanIndex) {
 		&& SaveDataHandler::saveData.TalismansPlaced[2]
 		&& SaveDataHandler::saveData.TalismansPlaced[3]) && ArchipelagoHandler::goalReqBosses)
 		|| (!ArchipelagoHandler::goalReqBosses && SaveDataHandler::saveData.TalismansPlaced[3]);
-	if (talismanIndex == 3 && canGoE4) {
+	if (talismanIndex == 3) {
 		auto triggerCount = *(int*)(Core::moduleBase + 0x26DC20 + 0x44);
 		auto triggerAddr = *(uintptr_t*)(Core::moduleBase + 0x26DC20 + 0x48);
 		for (auto triggerIndex = 0; triggerIndex < triggerCount; triggerIndex++) {
 			auto triggerId = *(int*)(triggerAddr + 0x14);
 			if (triggerId == 3) {
-				memset((char*)(triggerAddr + 0x89), 0x1, 6);
-				memset((char*)(triggerAddr + 0x85), 0x1, 1);
+				memset((char*)(triggerAddr + 0x88), canGoE4, 7);
+				memset((char*)(triggerAddr + 0x85), canGoE4, 1);
 			}
 			triggerAddr = *(int*)(triggerAddr + 0x34);
 		}

@@ -11,6 +11,7 @@ public:
 	LoggerWindow() : Window("Logger") {};
 	void ToggleVisibility() override;
 	void Draw(int outerWidth, int outerHeight, float uiScale) override;
+	std::string RemoveColorTags(const std::string& text);
 	void AddLogMessage(const std::string& message);
 	static void Log(const std::string& message);
 private:

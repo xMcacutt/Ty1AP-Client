@@ -16,6 +16,8 @@ Next, you'll need to add the Ty1 AP Client dll to your plugins directory that sh
 
 Once you launch the game, the client should be up and running.
 
+Optionally, you can place the Patch_PC.rkv from the releases page into your Ty folder to have some extra Archipelago branding.
+
 ## Connecting
 
 To open and close the AP client windows you can press F2. If you wish to hide the connection window but keep the item log in the bottom left, simply press F3.
@@ -114,34 +116,46 @@ Stopwatches can be added to the pool using "Gate Time Attacks". They unlock the 
 
 KNOWN CLIENT ISSUES
 
-- Hard disk removed screen displays when loading in (VISUAL BUG)
-
-- Deathlink is not fully implemented yet
+- Extra health check during scalesanity may be broken (needs extra research)
 
 - Throwing the kaboomerang without having the second rang may crash the game
 
 - Saving the game manually does not work
 
-- Patch to add archipelago branding
-
 KNOWN APWORLD ISSUES
+
+- Logic for frostyrang allowing entry into rest of ship rex needs adding
 
 FEATURES TO ADD
 
-- Text colouring to show items more clearly
-- Option to make opal thunder egg checks filler
 - Extended hint info
+- Entrance randomiser
+- Traps
 
 SOLVED
 
-- Complete revamp to settings and generation logic (no more failures)
-- Fixed no boom crash
-- Added time attack challenge checks
-- Added scalesanity
-- Fixed incorrect boolean values read from slot data
-- Fixed thunder egg requirements
-- Fixed cog requirements
-- Removed unnecessary goals
-- Balanced items and locations to be equal
-- Locked Final Battle behind go mode
-- Added option to require framesanity to logically require infrarang
+- Opal magnet no longer given in Rainbow Cliffs (logic breaking)
+
+- Swim removed as req for pontoon scale in advanced logic
+
+- Archipelago patch added
+
+- Deathlink sending and receiving fixed
+
+- Slot name added to seed in save file name to allow multiple slots on the same seed
+
+- Colouring added to text to highlight keywords in the logger
+
+- Text wrapping added to the logger to avoid truncation
+
+- Start With Boom option removed fixing all rang weirdness
+
+- Hard disk removed message changed
+
+- Connection data saved on connecting
+
+- APWorld works on Linux now
+
+- Fixed Aquarang check opening gate
+
+- Fixed "Final Battle is now accessible" message

@@ -43,6 +43,7 @@ void GUI::Initialize() {
     API::SetImGuiFont(ImGui::GetIO().Fonts);
     ImGuiIO& io = ImGui::GetIO();
     io.FontGlobalScale = 1.3f;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
     HWND tyWindowHandle = API::GetTyWindowHandle();
     if (tyWindowHandle == 0) {
