@@ -8,16 +8,19 @@ void TrackerWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
     if (!isVisible)
         return;
 
-    if (GameState::onLoadScreenOrMainMenu())
-        return;
+    //if (GameState::onLoadScreenOrMainMenu())
+        //return;
 
     auto windowWidth = 690 * uiScale;
     auto windowHeight = 340 * uiScale;
     auto iconSize = 48 * uiScale;
-    ImGui::SetNextWindowPos(ImVec2(outerWidth - 10 - windowWidth, outerHeight - 10 - windowHeight), ImGuiCond_Always);
+    auto padding = 10 * uiScale;
+    ImGui::SetNextWindowPos(ImVec2(outerWidth - padding - windowWidth, outerHeight - padding - windowHeight), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(windowWidth, windowHeight), ImGuiCond_Always);
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0.5));
-    ImGui::Begin(name.c_str(), nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar);
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(6.0f * uiScale, 4.5 * uiScale));
+    ImGui::Begin(name.c_str(), nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
+    ImGui::SetWindowFontScale(uiScale + 0.3f);
 
     ImVec2 cursorPos = ImGui::GetCursorScreenPos();
     ImVec4 tintColor = ImVec4(0.5, 0, 0, 1.0f);
@@ -93,7 +96,7 @@ void TrackerWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
 
     ImGui::NewLine();
 
-    constexpr std::array<int, 13> levelIndices = { 5, 6, 7, 8, 9, 10, 19, 12, 13, 14, 15, 20 };
+    constexpr std::array<int, 12> levelIndices = { 5, 6, 7, 8, 9, 10, 19, 12, 13, 14, 15, 20 };
 
     for (int i : levelIndices) {
         auto b = SaveDataHandler::saveData.PortalOpen[i];
@@ -193,5 +196,6 @@ void TrackerWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
 
 
     ImGui::End();
+    ImGui::PopStyleVar();
     ImGui::PopStyleColor();
 }

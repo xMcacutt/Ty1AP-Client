@@ -46,7 +46,6 @@ public:
 	static bool deathlink;
 	static LevelUnlockStyle levelUnlockStyle;
 	static std::vector<int> portalMap;
-	static std::vector<int> bossMap;
 	static int theggGating;
 	static int cogGating;
 	static bool someoneElseDied;

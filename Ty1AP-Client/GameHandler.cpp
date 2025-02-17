@@ -35,20 +35,9 @@ MenuStateFunctionType menuStateOrigin = nullptr;
 typedef void(__stdcall* DeathFunctionType)(void);
 DeathFunctionType deathOrigin = nullptr;
 
+typedef void(__stdcall* EnterLevelFunctionType)(void);
+EnterLevelFunctionType enterLevelOrigin = nullptr;
 
-void __stdcall GameHandler::MainMenuHook() {
-	GameHandler::OnMainMenu();
-	mainMenuOrigin();
-}
-
-void PatchRangMemory(std::vector<std::pair<uintptr_t, short>> patches) {
-	DWORD oldProtect;
-	for (const auto& patch : patches) {
-		char* addr = (char*)(Core::moduleBase + patch.first);
-		VirtualProtect(addr, 2, PAGE_EXECUTE_READWRITE, &oldProtect);
-		*(short*)addr = patch.second;
-	}
-}
 
 uintptr_t stopwatchJmpAddr;
 uintptr_t stopwatchOriginAddr;
@@ -109,6 +98,34 @@ __declspec(naked) void __stdcall GameHandler::DeathHook() {
 	}
 }
 
+void __stdcall GameHandler::MainMenuHook() {
+	GameHandler::OnMainMenu();
+	mainMenuOrigin();
+}
+
+/*
+uintptr_t enterLevelOriginAddr;
+__declspec(naked) void __stdcall GameHandler::EnterLevelHook() {
+	__asm {
+		pushad
+		pushfd
+		call GameHandler::OnEnterLevel
+		popfd
+		popad
+		mov[edx + 0xAD0], ax
+		jmp dword ptr[deathOriginAddr]
+	}
+}*/
+
+void PatchRangMemory(std::vector<std::pair<uintptr_t, short>> patches) {
+	DWORD oldProtect;
+	for (const auto& patch : patches) {
+		char* addr = (char*)(Core::moduleBase + patch.first);
+		VirtualProtect(addr, 2, PAGE_EXECUTE_READWRITE, &oldProtect);
+		*(short*)addr = patch.second;
+	}
+}
+
 void GameHandler::Setup()
 {
 	// STOPWATCH
@@ -121,6 +138,11 @@ void GameHandler::Setup()
 	addr = (char*)(Core::moduleBase + 0x162B9C);
 	VirtualProtect(addr, 6, PAGE_EXECUTE_READWRITE, &oldProtect);
 	memset(addr, 0x90, 6);
+
+	// REMOVE SAVE GAME
+	addr = (char*)(Core::moduleBase + 0xE4334);
+	VirtualProtect(addr, 1, PAGE_EXECUTE_READWRITE, &oldProtect);
+	memset(addr, 0xEB, 1);
 
 	*(uintptr_t*)(Core::moduleBase + 0x528210) = *(uintptr_t*)&hardDiskMessage;
 
@@ -173,11 +195,11 @@ void GameHandler::Setup()
 		{0x16C40F, 0xBA6}, {0x165B96, 0xBA6}, {0x162B97, 0xBA6}, {0x3F8E2, 0xBA6}, {0x3EF64, 0xBA6},
 		{0x2E61B, 0xBA6}, {0x2E5B9, 0xBA6}, {0x2E3FB, 0xBA6}, {0x25F75, 0xBA6}, {0x35723, 0xBA4},
 		{0x35754, 0xBA4}, {0x162EFD, 0xBA4}, {0x35781, 0xBA4}, {0x357AE, 0xBA4}, {0x34D0D, 0xBA4},
-		{0x34F32, 0xBA4}, {0x26B1E, 0xBA5}, {0xF8490, 0xBA7}, {0xD50B1, 0xBA7},
+		{0x34F32, 0xBA4}, {0x26B1E, 0xBA5}, {0xF8490, 0xBA7}, /*{0xD50B1, 0xBA7},*/
 		{0x3E32C, 0xBA8}, {0x3E02D, 0xBA8}, {0xF356A, 0xBA8}, {0xF330E, 0xBA8}, {0xF352E, 0xBA8}, {0xF356A, 0xBA8}
 	};
 	PatchRangMemory(patches);
-
+	 
 	// DETATCH AQUAS FROM REQ SWIM
 	addr = (char*)(Core::moduleBase + 0x162F02);
 	VirtualProtect(addr, 1, PAGE_EXECUTE_READWRITE, &oldProtect);
@@ -196,8 +218,6 @@ void GameHandler::Setup()
 void GameHandler::WatchMemory() {
 	auto currentLoadValue = *(int*)(Core::moduleBase + 0x27EBF0);
 	auto oldLoadValue = currentLoadValue;
-	auto currentMenuState = *(int*)(Core::moduleBase + 0x273F74);
-	auto oldMenuState = currentMenuState;
 	while (!isTyShutdown) {
 		currentLoadValue = *(int*)(Core::moduleBase + 0x27EBF0);
 		if (currentLoadValue != oldLoadValue) {
@@ -265,13 +285,12 @@ void GameHandler::OnEnterRainbowCliffs() {
 			if (SaveDataHandler::saveData.PortalOpen[portalDestination])
 				*(int*)(portalAddr + 0x9C) = 1;
 			else
-				*(int*)(portalAddr + 0x9C) = 3;
+				*(int*)(portalAddr + 0x9C) = 0;
 			portalAddr = *(int*)(portalAddr + 0x34);
 		}
 	}
 
 	auto& portalMap = ArchipelagoHandler::portalMap; 
-	auto& bossMap = ArchipelagoHandler::bossMap;
 	auto portalCount = *(int*)(Core::moduleBase + 0x267404);
 	auto portalAddr = *(int*)(Core::moduleBase + 0x267408);
 	for (auto portalIndex = 0; portalIndex < portalCount; portalIndex++) {
@@ -282,24 +301,18 @@ void GameHandler::OnEnterRainbowCliffs() {
 			*(int*)(portalAddr + 0xAC) = portalMap[1];
 		if (portalDestination == 6)
 			*(int*)(portalAddr + 0xAC) = portalMap[2];
-		if (portalDestination == 7)
-			*(int*)(portalAddr + 0xAC) = bossMap[0];
 		if (portalDestination == 8)
 			*(int*)(portalAddr + 0xAC) = portalMap[3];
 		if (portalDestination == 9)
 			*(int*)(portalAddr + 0xAC) = portalMap[4];
 		if (portalDestination == 10)
 			*(int*)(portalAddr + 0xAC) = portalMap[5];
-		if (portalDestination == 19)
-			*(int*)(portalAddr + 0xAC) = bossMap[1];
 		if (portalDestination == 12)
 			*(int*)(portalAddr + 0xAC) = portalMap[6];
 		if (portalDestination == 13)
 			*(int*)(portalAddr + 0xAC) = portalMap[7];
 		if (portalDestination == 14)
 			*(int*)(portalAddr + 0xAC) = portalMap[8];
-		if (portalDestination == 15)
-			*(int*)(portalAddr + 0xAC) = bossMap[2];
 		portalAddr = *(int*)(portalAddr + 0x34);
 	}
 	if (SaveDataHandler::saveData.ArchAttributeData.GotSecondRang) {
@@ -345,6 +358,49 @@ void GameHandler::OnEnterCrest() {
 	}
 }
 
+void GameHandler::OnEnterShipRex() {
+	if (!SaveDataHandler::saveData.AttributeData.GotAquarang &&
+		SaveDataHandler::saveData.ArchAttributeData.GotAquarang) {
+		auto triggerCount = *(int*)(Core::moduleBase + 0x26DBD4);
+		auto triggerAddr = *(uintptr_t*)(Core::moduleBase + 0x26DBD8);
+		for (auto triggerIndex = 0; triggerIndex < triggerCount; triggerIndex++) {
+			auto triggerId = *(int*)(triggerAddr + 0x14);
+			if (triggerId == 2063) {
+				memset((char*)(triggerAddr + 0x88), 0x0, 7);
+				memset((char*)(triggerAddr + 0x85), 0x0, 1);
+			}
+			else if (triggerId == 113) {
+				memset((char*)(triggerAddr + 0x88), 0x1, 7);
+				memset((char*)(triggerAddr + 0x85), 0x1, 1);
+			}
+			triggerAddr = *(int*)(triggerAddr + 0x34);
+		}
+		auto scriptCount = *(int*)(Core::moduleBase + 0x26F480 + 0x44);
+		auto scriptAddr = *(uintptr_t*)(Core::moduleBase + 0x26F480 + 0x48);
+		for (auto scriptIndex = 0; scriptIndex < scriptCount; scriptIndex++) {
+			auto scriptId = *(int*)(scriptAddr + 0x14);
+			if (scriptId == 109) {
+				memset((char*)(scriptAddr + 0x4E), 0x1, 1);
+			}
+			scriptAddr = *(int*)(scriptAddr + 0x34);
+		}
+		triggerCount = *(int*)(Core::moduleBase + 0x26DC20 + 0x44);
+		triggerAddr = *(uintptr_t*)(Core::moduleBase + 0x26DC20 + 0x48);
+		for (auto triggerIndex = 0; triggerIndex < triggerCount; triggerIndex++) {
+			auto triggerId = *(int*)(triggerAddr + 0x14);
+			if (triggerId == 1) {
+				memset((char*)(triggerAddr + 0x88), 1, 7);
+				memset((char*)(triggerAddr + 0x85), 1, 1);
+			}
+			triggerAddr = *(int*)(triggerAddr + 0x34);
+		}
+		auto aquaAddr = *(uintptr_t*)(Core::moduleBase + 0x267578 + 0x48);
+		memset((char*)(aquaAddr + 0x60), 0x1, 1);
+		aquaAddr = *(int*)(aquaAddr + 0x34);
+		memset((char*)(aquaAddr + 0x60), 0x1, 1);
+	}
+}
+
 void GameHandler::OnEnterLevel() {	
 	*(uintptr_t*)(Core::moduleBase + 0x2888D8) = reinterpret_cast<uintptr_t>(&SaveDataHandler::saveData);
 	*(uintptr_t*)(Core::moduleBase + 0x288730) = reinterpret_cast<uintptr_t>(&SaveDataHandler::saveData);
@@ -356,6 +412,8 @@ void GameHandler::OnEnterLevel() {
 	auto levelId = Level::getCurrentLevel();
 	if (levelId == LevelCode::Z1)
 		OnEnterRainbowCliffs();
+	if (levelId == LevelCode::A3)
+		OnEnterShipRex();
 	if (levelId == LevelCode::D2)
 		OnEnterCrest();
 
@@ -406,28 +464,6 @@ void GameHandler::OnSpawnpointSet() {
 			}
 		}
 	}
-	if (prevLevel == 7 || prevLevel == 19 || prevLevel == 15) {
-		auto it = std::find(ArchipelagoHandler::bossMap.begin(), ArchipelagoHandler::bossMap.end(), prevLevel);
-		if (it != ArchipelagoHandler::bossMap.end()) {
-			auto prevLevelPortalIndex = std::distance(ArchipelagoHandler::bossMap.begin(), it);
-			int pseudoPrevLevel;
-			if (prevLevelPortalIndex == 0)
-				pseudoPrevLevel = 7;
-			if (prevLevelPortalIndex == 1)
-				pseudoPrevLevel = 19;
-			if (prevLevelPortalIndex == 2)
-				pseudoPrevLevel = 15;
-			if (spawnpointMap.find(pseudoPrevLevel) != spawnpointMap.end()) {
-				auto& posData = spawnpointMap.at(pseudoPrevLevel);
-				Vector3f posVector;
-				posVector.x = posData[0];
-				posVector.y = posData[1];
-				posVector.z = posData[2];
-				Hero::setPosition(posVector);
-				*(float*)(Core::moduleBase + 0x271C20) = posData[3];
-			}
-		}
-	}
 }
 
 void GameHandler::SetLoadActive(bool value) {
@@ -437,11 +473,11 @@ void GameHandler::SetLoadActive(bool value) {
 	*(bool*)(menuAddr + 0x164) = value;
 }
 
-
 void GameHandler::OnDeath() {
 	if (ArchipelagoHandler::someoneElseDied) {
 		ArchipelagoHandler::someoneElseDied = false;
 		return;
 	}
-	ArchipelagoHandler::SendDeath();
+	if (ArchipelagoHandler::deathlink)
+		ArchipelagoHandler::SendDeath();
 }

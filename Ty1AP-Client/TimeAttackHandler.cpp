@@ -20,7 +20,7 @@ std::map<LevelCode, int> TimeAttackHandler::advTimes = {
 	{LevelCode::B2, 11200},
 	{LevelCode::B3, 9900},
 	{LevelCode::C1, 2700},
-	{LevelCode::C2, 8050},
+	{LevelCode::C2, 8200},
 	{LevelCode::C3, 7850},
 };
 

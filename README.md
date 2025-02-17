@@ -116,46 +116,60 @@ Stopwatches can be added to the pool using "Gate Time Attacks". They unlock the 
 
 KNOWN CLIENT ISSUES
 
-- Extra health check during scalesanity may be broken (needs extra research)
+- Portals sometimes fail to spawn - fixed on reload into level
+
+- Portals sometimes fail to despawn - fatal but fixed on reload
 
 - Throwing the kaboomerang without having the second rang may crash the game
 
-- Saving the game manually does not work
-
 KNOWN APWORLD ISSUES
 
-- Logic for frostyrang allowing entry into rest of ship rex needs adding
+- Logic for frostyrang allowing entry into rest of ship rex need to be added
 
 FEATURES TO ADD
 
-- Extended hint info
-- Entrance randomiser
+- More log text colouring
+
 - Traps
+
+- Pop tracker
 
 SOLVED
 
-- Opal magnet no longer given in Rainbow Cliffs (logic breaking)
+- Logic issues surrounding Rainbow Scales on advanced logic fixed
 
-- Swim removed as req for pontoon scale in advanced logic
+- Cable car logic no longer causes generation errors
 
-- Archipelago patch added
+- Beyond gate in Lyre region removed
 
-- Deathlink sending and receiving fixed
+- Death Link text should now dislpay name
 
-- Slot name added to seed in save file name to allow multiple slots on the same seed
+- Death Link no longer sends if disabled in yaml
 
-- Colouring added to text to highlight keywords in the logger
+- Default options in yaml have been adjusted to be more accurate
 
-- Text wrapping added to the logger to avoid truncation
+- Options have been reorganised
 
-- Start With Boom option removed fixing all rang weirdness
+- Autobalancing added to reduce extra theggs and cogs if extreme values are given in the yaml
 
-- Hard disk removed message changed
+- Second rang is now placed in early spheres if progressive rang is off
 
-- Connection data saved on connecting
+- Time increased on Stump Time Attack Challenge
 
-- APWorld works on Linux now
+- Logic fixed on Time Attack Challenges
 
-- Fixed Aquarang check opening gate
+- Extra Health check now triggers even with extra health item
 
-- Fixed "Final Battle is now accessible" message
+- Rainbow Scales save on collection
+
+- Rainbow Scale cutscene no longer plays after the Extra Health check
+
+- Aquarang and Swim checks re-enabled on entering Ship Rex with the aquarang
+
+- Save game option disabled to avoid accidental overwrites
+
+- Tracker scaling fixed to avoid options being cut off
+
+- Hint info now shows the portal which leads to the level containing the location
+
+- Spoiler log now displays the boss completion items required in the spheres

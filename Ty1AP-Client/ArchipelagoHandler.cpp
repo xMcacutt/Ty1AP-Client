@@ -68,7 +68,6 @@ bool ArchipelagoHandler::gateTimeAttacks = false;
 bool ArchipelagoHandler::goalReqBosses = false;
 bool ArchipelagoHandler::advancedLogic = false;
 std::vector<int> ArchipelagoHandler::portalMap;
-std::vector<int> ArchipelagoHandler::bossMap;
 std::unique_ptr<APClient> ArchipelagoHandler::ap;
 std::string ArchipelagoHandler::seed;
 
@@ -162,10 +161,6 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
         portalMap.clear();
         if (data.find("PortalMap") != data.end() && data["PortalMap"].is_array()) 
             portalMap = data["PortalMap"].get<std::vector<int>>();
-        
-        bossMap.clear();
-        if (data.find("BossMap") != data.end() && data["BossMap"].is_array()) 
-            bossMap = data["BossMap"].get<std::vector<int>>();
 
         if (data.find("DeathLink") != data.end())
             deathlink = data["DeathLink"].get<int>() == 1;;
@@ -354,7 +349,7 @@ void ArchipelagoHandler::SendDeath() {
     json data{
         {"time", ap->get_server_time()},
         {"cause", GetRandomCause()},
-        {"source", slot},
+        {"source", ap->get_slot()},
     };
     ap->Bounce(data, {}, {}, { "DeathLink" });
 }

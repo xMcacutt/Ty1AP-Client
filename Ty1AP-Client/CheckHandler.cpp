@@ -252,7 +252,7 @@ __declspec(naked) void __stdcall CheckHandler::CollectRangHook() {
 uintptr_t collectLifePawOriginAddr;
 __declspec(naked) void __stdcall CheckHandler::CollectLifePawHook() {
 	__asm {
-		mov[esi + eax + 0xAB7], dl
+		mov[edx + 0xAB7], dl
 		push ebx
 		push ecx
 		push edx
@@ -273,7 +273,7 @@ __declspec(naked) void __stdcall CheckHandler::CollectLifePawHook() {
 uintptr_t collectOpalOriginAddr;
 __declspec(naked) void __stdcall CheckHandler::CollectOpalHook() {
 	__asm {
-		mov[esi + 0x78], 0x3
+		mov[esi + 0x78], 0x4
 		push ebx
 		push ecx
 		push edx
@@ -302,7 +302,7 @@ void CheckHandler::SetupHooks()
 	collectSecondRangOriginAddr = Core::moduleBase + 0xF7D0F;
 	collectRangOriginAddr = Core::moduleBase + 0xF8064;
 	collectLifePawOriginAddr = Core::moduleBase + 0xF7ED7;
-	collectOpalOriginAddr = Core::moduleBase + 0x12DD13;
+	collectOpalOriginAddr = Core::moduleBase + 0x12DD72;
 
 	auto addr = (char*)(Core::moduleBase + 0xF6E80);
 	MH_CreateHook((LPVOID)addr, &CollectTheggHook, reinterpret_cast<LPVOID*>(&collectTheggOrigin));
@@ -337,7 +337,7 @@ void CheckHandler::SetupHooks()
 	addr = (char*)(Core::moduleBase + 0xF805D);
 	MH_CreateHook((LPVOID)addr, &CollectRangHook, reinterpret_cast<LPVOID*>(&collectRangOrigin));
 
-	addr = (char*)(Core::moduleBase + 0x12DD0C);
+	addr = (char*)(Core::moduleBase + 0x12DD6B);
 	MH_CreateHook((LPVOID)addr, &CollectOpalHook, reinterpret_cast<LPVOID*>(&collectOpalOrigin));
 
 }
@@ -462,6 +462,11 @@ void CheckHandler::OnCollectOpal(uintptr_t opalPtr) {
 		return;
 	uintptr_t baseOpalAddr = *(uintptr_t*)(Core::moduleBase + 0x269818 + 0x48);
 	int opalIndex = (opalPtr - baseOpalAddr) / 0x114;
+	auto byteIndex = opalIndex / 8;
+	auto bitIndex = opalIndex % 8;
+	auto b = SaveDataHandler::saveData.LevelData[(int)LevelCode::Z1].Opals[byteIndex];
+	b |= 1 << bitIndex;
+	SaveDataHandler::saveData.LevelData[(int)LevelCode::Z1].Opals[byteIndex] = b;
 	ArchipelagoHandler::Check(0x8750320 + static_cast<int64_t>(opalIndex));
 	SaveDataHandler::SaveGame();
 }

@@ -27,6 +27,7 @@ public:
 private:
 	static void OnEnterRainbowCliffs();
 	static void OnEnterCrest();
+	static void OnEnterShipRex();
 	static void OnEnterLevel();
 	static void OnMainMenu();
 	static void OnLoadGame();

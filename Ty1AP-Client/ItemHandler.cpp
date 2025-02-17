@@ -209,16 +209,7 @@ void ItemHandler::HandleIndividualLevel(int code) {
 	}
 		break;
 	case 3:
-	{
-		auto it = std::find(ArchipelagoHandler::bossMap.begin(), ArchipelagoHandler::bossMap.end(), 7);
-		int index = std::distance(ArchipelagoHandler::bossMap.begin(), it);
-		if (index == 0)
-			SaveDataHandler::saveData.PortalOpen[7] = true;
-		else if (index == 1)
-			SaveDataHandler::saveData.PortalOpen[19] = true;
-		else if (index == 2)
-			SaveDataHandler::saveData.PortalOpen[15] = true;
-	}
+		SaveDataHandler::saveData.PortalOpen[7] = true;
 		break;
 	case 4:
 	{
@@ -245,16 +236,7 @@ void ItemHandler::HandleIndividualLevel(int code) {
 	}
 		break;
 	case 7:
-	{
-		auto it = std::find(ArchipelagoHandler::bossMap.begin(), ArchipelagoHandler::bossMap.end(), 19);
-		int index = std::distance(ArchipelagoHandler::bossMap.begin(), it);
-		if (index == 0)
-			SaveDataHandler::saveData.PortalOpen[7] = true;
-		else if (index == 1)
-			SaveDataHandler::saveData.PortalOpen[19] = true;
-		else if (index == 2)
-			SaveDataHandler::saveData.PortalOpen[15] = true;
-	}
+		SaveDataHandler::saveData.PortalOpen[19] = true;
 		break;
 	case 8:
 	{
@@ -281,16 +263,7 @@ void ItemHandler::HandleIndividualLevel(int code) {
 	}
 		break;
 	case 11:
-	{
-		auto it = std::find(ArchipelagoHandler::bossMap.begin(), ArchipelagoHandler::bossMap.end(), 15);
-		int index = std::distance(ArchipelagoHandler::bossMap.begin(), it);
-		if (index == 0)
-			SaveDataHandler::saveData.PortalOpen[7] = true;
-		else if (index == 1)
-			SaveDataHandler::saveData.PortalOpen[19] = true;
-		else if (index == 2)
-			SaveDataHandler::saveData.PortalOpen[15] = true;
-	}
+		SaveDataHandler::saveData.PortalOpen[15] = true;
 		break;
 	case 12:
 		SaveDataHandler::saveData.PortalOpen[20] = true;
