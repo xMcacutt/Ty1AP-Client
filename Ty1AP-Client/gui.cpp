@@ -29,6 +29,14 @@ bool GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
                 }
             }
         }
+        if (wParam == VK_F5) {
+            for (auto& window : windows) {
+                if (auto info = dynamic_cast<InfoWindow*>(window.get())) {
+                    info->ToggleVisibility();
+                    break;
+                }
+            }
+        }
     }
     if (API::DrawingGUI())
         if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
@@ -63,6 +71,7 @@ void GUI::Initialize() {
     windows.push_back(std::make_unique<LoginWindow>());
     windows.push_back(std::make_unique<LoggerWindow>());
     windows.push_back(std::make_unique<TrackerWindow>());
+    windows.push_back(std::make_unique<InfoWindow>());
     API::LogPluginMessage("Initialized ImGui successfully.");
     GUI::init = true;
 }

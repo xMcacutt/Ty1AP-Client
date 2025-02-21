@@ -103,20 +103,6 @@ void __stdcall GameHandler::MainMenuHook() {
 	mainMenuOrigin();
 }
 
-/*
-uintptr_t enterLevelOriginAddr;
-__declspec(naked) void __stdcall GameHandler::EnterLevelHook() {
-	__asm {
-		pushad
-		pushfd
-		call GameHandler::OnEnterLevel
-		popfd
-		popad
-		mov[edx + 0xAD0], ax
-		jmp dword ptr[deathOriginAddr]
-	}
-}*/
-
 void PatchRangMemory(std::vector<std::pair<uintptr_t, short>> patches) {
 	DWORD oldProtect;
 	for (const auto& patch : patches) {
@@ -315,6 +301,7 @@ void GameHandler::OnEnterRainbowCliffs() {
 			*(int*)(portalAddr + 0xAC) = portalMap[8];
 		portalAddr = *(int*)(portalAddr + 0x34);
 	}
+
 	if (SaveDataHandler::saveData.ArchAttributeData.GotSecondRang) {
 		auto gateAddr = *(uintptr_t*)(Core::moduleBase + 0x269C14);
 		gateAddr = *(uintptr_t*)(gateAddr + 0x78);
@@ -408,6 +395,7 @@ void GameHandler::OnEnterLevel() {
 	SaveDataHandler::SaveGame();
 
 	ItemHandler::HandleStoredItems();
+	LocationHandler::HandleStoredCheckedLocations();
 
 	auto levelId = Level::getCurrentLevel();
 	if (levelId == LevelCode::Z1)

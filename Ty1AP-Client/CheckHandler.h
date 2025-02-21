@@ -1,6 +1,7 @@
 #pragma once
 #include "ArchipelagoHandler.h"
 #include "GameHandler.h"
+#include "SaveDataHandler.h"
 #include <algorithm>
 
 const std::unordered_map<int, std::string> LEVEL_NAMES = {
@@ -48,6 +49,30 @@ const std::unordered_map<int, int> RUNNING_FRAME_COUNTS = {
     {14, 109}
 };
 
+const std::unordered_map<int, int> RUNNING_SIGN_COUNTS = {
+    {0, 0},
+    {4, 1},
+    {5, 16},
+    {8, 19},
+    {9, 21},
+    {13, 24},
+    {20, 25}
+};
+
+
+const std::unordered_map<int, int> RUNNING_LIFE_COUNTS = {
+    {0, 0},
+    {4, 1},
+    {5, 3},
+    {6, 4},
+    {10, 7},
+    {19, 10},
+    {14, 11},
+    {20, 13},
+    {17, 17}
+};
+
+
 class CheckHandler
 {
 public:
@@ -63,6 +88,8 @@ public:
     static void __stdcall CollectLifePawHook();
     static void __stdcall CollectRangHook();
     static void __stdcall CollectOpalHook();
+    static void __stdcall HitSignHook();
+    static void __stdcall PickupLifeHook();
 	static void SetupHooks();
 	static void OnCollectThegg(int theggIndex);
     static void OnCollectCog(int cogIndex);
@@ -75,5 +102,7 @@ public:
     static void OnCollectLifePaw();
     static void OnCollectRang(int rangId);
     static void OnCollectOpal(uintptr_t opalPtr);
+    static void OnPickupLife(uintptr_t lifePtr);
+    static void OnHitSign(uintptr_t signPtr);
 };
 

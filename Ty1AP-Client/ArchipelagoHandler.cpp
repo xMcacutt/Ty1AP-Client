@@ -62,6 +62,8 @@ int ArchipelagoHandler::cogGating = 10;
 double ArchipelagoHandler::deathtime = -1;
 Framesanity ArchipelagoHandler::framesanity = Framesanity::NONE;
 bool ArchipelagoHandler::scalesanity = false;
+bool ArchipelagoHandler::signsanity = false;
+bool ArchipelagoHandler::lifesanity = false;
 bool ArchipelagoHandler::progressiveRang = false;
 bool ArchipelagoHandler::progressiveLevel = false;
 bool ArchipelagoHandler::gateTimeAttacks = false;
@@ -189,6 +191,12 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
         if (data.find("Scalesanity") != data.end())
             scalesanity = data["Scalesanity"].get<int>() == 1;
 
+        if (data.find("Lifesanity") != data.end())
+            lifesanity = data["Lifesanity"].get<int>() == 1;
+
+        if (data.find("Signsanity") != data.end())
+            signsanity = data["Signsanity"].get<int>() == 1;
+
         if (data.find("AdvancedLogic") != data.end() && data["AdvancedLogic"].is_number_integer())
             advancedLogic = data["AdvancedLogic"].get<int>() == 1;
 
@@ -200,9 +208,6 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
             GameHandler::SetLoadActive(true);
         }
         GameHandler::SetupOnConnect();
-
-            
-        LoggerWindow::Log("Connected as " + ap->get_player_alias(ap->get_player_number()));
 
         SetAPStatus("Connected", 0);
     });
@@ -230,18 +235,17 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
         }
 
     });
-
-    ap->set_location_info_handler([](const std::list<APClient::NetworkItem>& items) {
-        auto me = ap->get_player_number();
-        for (auto& item : items) {
-            if (item.player != me) {
-                std::string itemname = GetItemName(item.item);
-                std::string recipient = GetPlayerAlias(item.player);
-                std::string location = GetLocationName(item.location);
-                LoggerWindow::Log("[color=86F3CAFF]" + recipient + "'s [color=FFFFFFFF]" + itemname + " [color=AAAAAAFF]found at [color=FFFFFFFF]" + location);
-            }
+    ap->set_location_checked_handler([](const std::list<int64_t> locations){
+        for (auto& location : locations) {
+            LocationHandler::HandleLocation(location);
         }
     });
+    ap->set_print_handler([](const std::string& msg) {
+        LoggerWindow::Log(msg);
+    });
+    ap->set_print_json_handler([](const std::list<APClient::TextNode>& msg) {
+        LoggerWindow::Log(ap->render_json(msg, APClient::RenderFormat::TEXT));
+     });
     ap->set_bounced_handler([](const json& cmd) {
         if (deathlink) {
             auto tagsIt = cmd.find("tags");
@@ -270,7 +274,6 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 void ArchipelagoHandler::Check(int64_t locationId) {
     std::list<int64_t> check;
     check.push_back(locationId);
-    ap->LocationScouts(check);
     ap->LocationChecks(check);
 }
 
@@ -303,7 +306,6 @@ void ArchipelagoHandler::SetAPStatus(std::string status, char important) {
 bool ArchipelagoHandler::LoadSaveData() {
     return SaveDataHandler::LoadSaveData(seed, slot);
 }
-
 
 const std::vector<std::string> deathCauses{
     "didn't catch the boomerang",
@@ -345,11 +347,12 @@ std::string GetRandomCause() {
 }
 
 void ArchipelagoHandler::SendDeath() {
-    LoggerWindow::Log("Death Sent");
+    std::string cause = GetRandomCause();
+    LoggerWindow::Log("Death Sent: You " + cause);
     json data{
         {"time", ap->get_server_time()},
-        {"cause", GetRandomCause()},
-        {"source", ap->get_slot()},
+        {"cause", slot + " " + GetRandomCause()},
+        {"source", slot},
     };
     ap->Bounce(data, {}, {}, { "DeathLink" });
 }

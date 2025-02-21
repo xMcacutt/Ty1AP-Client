@@ -36,6 +36,12 @@ CollectLifePawFunctionType collectLifePawOrigin = nullptr;
 typedef void(__stdcall* CollectOpalFunctionType)();
 CollectOpalFunctionType collectOpalOrigin = nullptr;
 
+typedef void(__stdcall* HitSignFunctionType)();
+HitSignFunctionType hitSignOrigin = nullptr;
+
+typedef void(__stdcall* PickupLifeFunctionType)();
+PickupLifeFunctionType pickupLifeOrigin = nullptr;
+
 __declspec(naked) void __stdcall CheckHandler::CollectTheggHook() {
 	__asm {
 		push ebp
@@ -69,6 +75,7 @@ __declspec(naked) void __stdcall CheckHandler::CollectCogHook() {
 		imul edx, [eax + 0xAA4], 0x70
 		add edx, eax
 		mov eax, [ebp + 0x8]
+		mov byte ptr[edx + eax + 0x40], 0x1
 		push edx
 		push esi
 		push eax
@@ -76,7 +83,6 @@ __declspec(naked) void __stdcall CheckHandler::CollectCogHook() {
 		pop eax
 		pop esi
 		pop edx
-		mov byte ptr[edx + eax + 0x40], 0x1
 		mov byte ptr[esi + 0x1], 0x1
 		mov ecx, esi
 		mov byte ptr[esi + 0x1], 0x1
@@ -291,6 +297,48 @@ __declspec(naked) void __stdcall CheckHandler::CollectOpalHook() {
 	}
 }
 
+uintptr_t hitSignOriginAddr;
+__declspec(naked) void __stdcall CheckHandler::HitSignHook() {
+	__asm {
+		mov[ecx + 0xA0], 0x2
+		push ebx
+		push edx
+		push edi
+		push eax
+		push esi
+		push ecx
+		call CheckHandler::OnHitSign
+		pop ecx
+		pop esi
+		pop eax
+		pop edi
+		pop edx
+		pop ebx
+		jmp dword ptr[hitSignOriginAddr]
+	}
+}
+
+uintptr_t pickupLifeOriginAddr;
+__declspec(naked) void __stdcall CheckHandler::PickupLifeHook() {
+	__asm {
+		push ebx
+		push edx
+		push edi
+		push eax
+		push ecx
+		push esi
+		call CheckHandler::OnPickupLife
+		pop esi
+		pop ecx
+		pop eax
+		pop edi
+		pop edx
+		pop ebx
+		cmp dword ptr[esi + 0x110], 0x4
+		jmp dword ptr[pickupLifeOriginAddr]
+	}
+}
+
 void CheckHandler::SetupHooks()
 {
 	collectBilbyOriginAddr = Core::moduleBase + 0xF7AF7 + 5;
@@ -303,6 +351,9 @@ void CheckHandler::SetupHooks()
 	collectRangOriginAddr = Core::moduleBase + 0xF8064;
 	collectLifePawOriginAddr = Core::moduleBase + 0xF7ED7;
 	collectOpalOriginAddr = Core::moduleBase + 0x12DD72;
+	hitSignOriginAddr = Core::moduleBase + 0x151EE4;
+	pickupLifeOriginAddr = Core::moduleBase + 0x11FB21;
+
 
 	auto addr = (char*)(Core::moduleBase + 0xF6E80);
 	MH_CreateHook((LPVOID)addr, &CollectTheggHook, reinterpret_cast<LPVOID*>(&collectTheggOrigin));
@@ -340,13 +391,18 @@ void CheckHandler::SetupHooks()
 	addr = (char*)(Core::moduleBase + 0x12DD6B);
 	MH_CreateHook((LPVOID)addr, &CollectOpalHook, reinterpret_cast<LPVOID*>(&collectOpalOrigin));
 
+	addr = (char*)(Core::moduleBase + 0x151EDA);
+	MH_CreateHook((LPVOID)addr, &HitSignHook, reinterpret_cast<LPVOID*>(&hitSignOrigin));
+
+	addr = (char*)(Core::moduleBase + 0x11FB1A);
+	MH_CreateHook((LPVOID)addr, &PickupLifeHook, reinterpret_cast<LPVOID*>(&pickupLifeOrigin));
 }
 
 void CheckHandler::OnCollectThegg(int theggIndex) {
 	int level = (int)Level::getCurrentLevel();
-	level -= 4;
-	level -= (level > 3) + (level > 7);
-	ArchipelagoHandler::Check(0x8750100 + static_cast<int64_t>(level) * 0x8 + static_cast<int64_t>(theggIndex));
+	auto adjustedLevel = level - 4;
+	adjustedLevel -= (adjustedLevel > 3) + (adjustedLevel > 7);
+	ArchipelagoHandler::Check(0x8750100 + static_cast<int64_t>(adjustedLevel) * 0x8 + static_cast<int64_t>(theggIndex));
 	if (theggIndex == 3 && !ArchipelagoHandler::gateTimeAttacks) {
 		SaveDataHandler::saveData.StopwatchesActive[level] = true;
 		if (*(int*)(Core::moduleBase + 0x27041C) != 0)
@@ -361,9 +417,10 @@ void CheckHandler::OnCollectCog(int cogIndex) {
 	adjustedLevel -= (adjustedLevel > 3) + (adjustedLevel > 7);
 	ArchipelagoHandler::Check(0x8750148 + static_cast<int64_t>(adjustedLevel) * 0xA + static_cast<int64_t>(cogIndex));
 	auto levelCogCount = std::count(
-		SaveDataHandler::saveData.LevelData[level].GoldenCogs, 
+		SaveDataHandler::saveData.LevelData[level].GoldenCogs,
 		SaveDataHandler::saveData.LevelData[level].GoldenCogs + 10, true
 	);
+	API::LogPluginMessage(std::to_string(level) + " " + std::to_string(levelCogCount));
 	if (levelCogCount == 10) 
 		ArchipelagoHandler::Check(0x87501A2 + static_cast<int64_t>(adjustedLevel));
 	SaveDataHandler::SaveGame();
@@ -418,9 +475,6 @@ void CheckHandler::OnCollectTalisman(int talismanIndex) {
 			triggerAddr = *(int*)(triggerAddr + 0x34);
 		}
 	}
-	if (canGoE4) {
-		LoggerWindow::Log("Final Battle is now accessible.");
-	}
 	if (talismanIndex == 4 && ArchipelagoHandler::goal == Goal::BEAT_CASS)
 		ArchipelagoHandler::Release();
 	SaveDataHandler::SaveGame();
@@ -469,4 +523,33 @@ void CheckHandler::OnCollectOpal(uintptr_t opalPtr) {
 	SaveDataHandler::saveData.LevelData[(int)LevelCode::Z1].Opals[byteIndex] = b;
 	ArchipelagoHandler::Check(0x8750320 + static_cast<int64_t>(opalIndex));
 	SaveDataHandler::SaveGame();
+}
+
+void CheckHandler::OnHitSign(uintptr_t signPtr) {
+	if (!ArchipelagoHandler::signsanity)
+		return;
+	LevelCode level = Level::getCurrentLevel();
+	uintptr_t baseSignAddr = *(uintptr_t*)(Core::moduleBase + 0x26FA90 + 0x48);
+	int levelSignIndex = (signPtr - baseSignAddr) / 0xB4;
+	if (RUNNING_SIGN_COUNTS.find((int)level) == RUNNING_SIGN_COUNTS.end())
+		return;
+	int signIndex = RUNNING_SIGN_COUNTS.at((int)level) + levelSignIndex;
+	ArchipelagoHandler::Check(0x8750400 + static_cast<int64_t>(signIndex));
+}
+
+void CheckHandler::OnPickupLife(uintptr_t lifePtr) {
+	if (!ArchipelagoHandler::lifesanity)
+		return;
+	API::LogPluginMessage(std::to_string(*(uintptr_t*)(lifePtr + 0x4)));
+	if (*(uintptr_t*)(lifePtr + 0x4) != Core::moduleBase + 0x2679D4)
+		return;
+	LevelCode level = Level::getCurrentLevel();
+	if (RUNNING_LIFE_COUNTS.find((int)level) == RUNNING_SIGN_COUNTS.end())
+		return;
+	uintptr_t baseLifeAddr = *(uintptr_t*)(Core::moduleBase + 0x267A00 + 0x48);
+	int levelLifeIndex = (lifePtr - baseLifeAddr) / 0x12C;
+	if (levelLifeIndex < 0 || levelLifeIndex > 4)
+		return;
+	int lifeIndex = RUNNING_LIFE_COUNTS.at((int)level) + levelLifeIndex;
+	ArchipelagoHandler::Check(0x8750420 + static_cast<int64_t>(lifeIndex));
 }

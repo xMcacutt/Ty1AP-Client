@@ -1,0 +1,17 @@
+#pragma once
+#include "Window.h"
+#include <string>
+#include <chrono>
+#include <vector>
+#include "gui.h"
+#include "collectible_info.h"
+
+class InfoWindow : public Window
+{
+public:
+	InfoWindow() : Window("Collectible Info") {};
+	void ToggleVisibility() override;
+	void Draw(int outerWidth, int outerHeight, float uiScale) override;
+private:
+	void CreateTree(LevelCollectibleInfo levelInfo);
+};

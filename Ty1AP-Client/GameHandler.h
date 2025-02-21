@@ -2,6 +2,7 @@
 #include "ArchipelagoHandler.h"
 #include "CheckHandler.h"
 #include "ItemHandler.h"
+#include "LocationHandler.h"
 #include "TimeAttackHandler.h"
 #include "core.h"
 #include "gameobject.h"
@@ -28,6 +29,7 @@ private:
 	static void OnEnterRainbowCliffs();
 	static void OnEnterCrest();
 	static void OnEnterShipRex();
+	static void OnEnterCreditsLevel();
 	static void OnEnterLevel();
 	static void OnMainMenu();
 	static void OnLoadGame();

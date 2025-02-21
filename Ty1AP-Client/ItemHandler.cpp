@@ -3,14 +3,14 @@
 std::queue<APClient::NetworkItem> ItemHandler::storedItems;
 
 std::unordered_map<int, std::string> ItemHandler::boomerangMessages {
-	{1, "Two is better than one."},
-	{2, "You learnt how to Swim."},
-	{3, "Rangs but underwater."},
-	{4, "You can Dive."},
-	{5, "Hot Boomerangs in your area."},
-	{6, "Water but cold."},
-	{7, "BZZZT!"},
-	{8, "This Boomerang spinny."}
+	{1, "Two Rangs are better than one. (Second Rang)"},
+	{2, "You graduated from floaties. (Swim)"},
+	{3, "We're gonna need a wetter rang. (Aquarang)"},
+	{4, "Jump in, the water is fine. (Dive)"},
+	{5, "Hot rangs in your area. (Flamerang)"},
+	{6, "HONEY, WHERE'S MY SUPER SUIT? (Frostyrang)"},
+	{7, "Pikachu, I choose you! (Zappyrang)"},
+	{8, "Beyblade! Beyblade! Let it rip! (Doomerang)"}
 };
 
 void ItemHandler::HandleItem(APClient::NetworkItem item)
@@ -24,11 +24,6 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 		return;
 	
 	SaveDataHandler::saveData.LastItemIndex++;
-
-	std::string itemname = ArchipelagoHandler::GetItemName(item.item);
-	std::string sender = ArchipelagoHandler::GetPlayerAlias(item.player);
-	std::string location = ArchipelagoHandler::GetLocationName(item.location);
-	LoggerWindow::Log(itemname + " [color=AAAAAAFF]found at [color=FFFFFFFF]" + location + " [color=AAAAAAFF]in [color=FFFFFFFF]" + sender + "'s world");
 
 	if (item.item == 0x8750000) {
 		SaveDataHandler::saveData.FireThunderEggCount++;
@@ -66,9 +61,19 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 		if (boomerangMessages.find(SaveDataHandler::saveData.ProgressiveRang) != boomerangMessages.end())
 			LoggerWindow::Log(boomerangMessages.at(SaveDataHandler::saveData.ProgressiveRang));
 		HandleProgressiveRang();
+		if (SaveDataHandler::saveData.ArchAttributeData.GotSecondRang && Level::getCurrentLevel() == LevelCode::Z1) {
+			auto gateAddr = *(uintptr_t*)(Core::moduleBase + 0x269C14);
+			gateAddr = *(uintptr_t*)(gateAddr + 0x78);
+			*(bool*)(gateAddr + 0x111) = true;
+		}
 	}
 	else if (item.item >= 0x8750010 && item.item < 0x8750020) {
 		HandleIndividualRang(item.item - 0x8750010);
+		if (SaveDataHandler::saveData.ArchAttributeData.GotSecondRang && Level::getCurrentLevel() == LevelCode::Z1) {
+			auto gateAddr = *(uintptr_t*)(Core::moduleBase + 0x269C14);
+			gateAddr = *(uintptr_t*)(gateAddr + 0x78);
+			*(bool*)(gateAddr + 0x111) = true;
+		}
 	}
 	else if (item.item >= 0x8750040 && item.item < 0x8750050) {
 		SaveDataHandler::saveData.StopwatchesActive[item.item - 0x8750040] = true;
@@ -88,10 +93,10 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 	else if (item.item >= 0x8750050 && item.item < 0x8750060) {
 		SaveDataHandler::saveData.Talismans[item.item - 0x8750050] = true;
 		if (item.item - 0x8750050 < 3)
-			SaveDataHandler::saveData.ZoneData[item.item - 0x8750050].Complete = true;
+			SaveDataHandler::saveData.ZoneData[(item.item - 0x8750050) + 1].Complete = true;
 	}
 	else if (item.item == 0x8750082) {
-		Sound::PlayTySoundByIndex(0x1BC);
+		Sound::PlayTySoundByIndex(GlobalSound::OpalsAllCollected);
 		auto objAddr = Core::moduleBase + 0x2888AC;
 		void (*incrementLives)() = reinterpret_cast<void(*)()>(Core::moduleBase + 0xF6A80);
 		__asm {
@@ -99,7 +104,7 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 			call incrementLives
 		}
 	}
-	else if (item.item == 0x8750083) {
+	else if (item.item == 0x8750083) { // Opal Magnet
 		if (Level::getCurrentLevel() != LevelCode::Z1)
 		{
 			auto objAddr = Core::moduleBase + 0x270D34;
@@ -110,7 +115,83 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 			}
 		}
 	}
-
+	else if (item.item == 0x8750084) { // Quarter Pie
+		auto objAddr = Hero::isBull() ? Core::moduleBase + 0x254400 : Core::moduleBase + 0x270D10;
+		Sound::PlayTySoundByIndex(GlobalSound::TyBitePie);
+		void (*giveQuarterPie)() = reinterpret_cast<void(*)()>(Core::moduleBase + 0x16F890);
+		__asm {
+			mov ecx, objAddr
+			push 1
+			call giveQuarterPie
+		}
+	}
+	else if (item.item == 0x8750085) { // Full Pie
+		auto objAddr = Hero::isBull() ? Core::moduleBase + 0x254400 : Core::moduleBase + 0x270D10;
+		auto healthCount = *(int*)(Core::moduleBase + 0x2737CC);
+		auto maxHealth = SaveDataHandler::saveData.ArchAttributeData.GotExtraHealth ? 8 : 4;
+		auto healthPush = maxHealth - healthCount;
+		Sound::PlayTySoundByIndex(GlobalSound::TyBitePie);
+		void (*giveFullPie)() = reinterpret_cast<void(*)()>(Core::moduleBase + 0x16F890);
+		__asm {
+			mov ecx, objAddr
+			push healthPush
+			call giveFullPie
+		}
+	}
+	else if (item.item == 0x8750090) { // Knocked Down Trap
+		Hero::setState(TyState::KnockedOver);
+		Hero::setHealth(1);
+	}
+	else if (item.item == 0x8750091) { // Slow Trap
+		std::thread([] {
+			auto iterator = 0;
+			while (iterator < 1000) {
+				Hero::setRunSpeed(5.0f);
+				Sleep(20);
+				iterator++;
+			}
+			Hero::setRunSpeed(10.0f);
+		}).detach();
+	}
+	else if (item.item == 0x8750092) { // Gravity Trap
+		std::thread([] {
+			auto iterator = 0;
+			while (iterator < 1000) {
+				Hero::setGravity(0.9f);
+				Sleep(20);
+				iterator++;
+			}
+			Hero::setGravity(0.75f);
+		}).detach();
+	}
+	else if (item.item == 0x8750093) { // Acid Trap
+		std::thread([] {
+			auto initState = *(bool*)(Core::moduleBase + 0x2895C5);
+			auto initHue = *(float*)(Core::moduleBase + 0x288F7C);
+			*(bool*)(Core::moduleBase + 0x2895C5) = true;
+			auto hue = initHue;
+			while (hue < 10) {
+				hue += 0.006f;
+				*(float*)(Core::moduleBase + 0x288F7C) = hue;
+				if (GameState::onLoadScreenOrMainMenu())
+					break;
+				Sleep(10);
+			}
+			while (hue > initHue) {
+				hue -= 0.006f;
+				*(float*)(Core::moduleBase + 0x288F7C) = hue;
+				if (GameState::onLoadScreenOrMainMenu())
+					break;
+				Sleep(10);
+			}
+			*(float*)(Core::moduleBase + 0x288F7C) = initHue;
+			*(bool*)(Core::moduleBase + 0x2895C5) = initState;
+		}).detach();
+	}
+	else if (item.item == 0x8750094) { // Exit Trap
+		if (Level::getCurrentLevel() != LevelCode::Z1)
+			Level::changeLevel(LevelCode::Z1);
+	}
 	SaveDataHandler::SaveGame();
 }
 
@@ -133,38 +214,38 @@ void ItemHandler::HandleProgressiveLevel() {
 	if (SaveDataHandler::saveData.ProgressiveLevel >= 3 && bossesIncluded) {
 		SaveDataHandler::saveData.PortalOpen[static_cast<int>(LevelCode::A4)] = true;
 	}
-	if (SaveDataHandler::saveData.ProgressiveLevel >= 3 && !bossesIncluded ||
-		SaveDataHandler::saveData.ProgressiveLevel >= 4 && bossesIncluded) {
+	if ((SaveDataHandler::saveData.ProgressiveLevel >= 3 && !bossesIncluded) ||
+		(SaveDataHandler::saveData.ProgressiveLevel >= 4 && bossesIncluded)) {
 		SaveDataHandler::saveData.PortalOpen[static_cast<int>(LevelCode::B1)] = true;
 	}
-	if (SaveDataHandler::saveData.ProgressiveLevel >= 4 && !bossesIncluded ||
-		SaveDataHandler::saveData.ProgressiveLevel >= 5 && bossesIncluded) {
+	if ((SaveDataHandler::saveData.ProgressiveLevel >= 4 && !bossesIncluded) ||
+		(SaveDataHandler::saveData.ProgressiveLevel >= 5 && bossesIncluded)) {
 		SaveDataHandler::saveData.PortalOpen[static_cast<int>(LevelCode::B2)] = true;
 	}
-	if (SaveDataHandler::saveData.ProgressiveLevel >= 5 && !bossesIncluded ||
-		SaveDataHandler::saveData.ProgressiveLevel >= 6 && bossesIncluded) {
+	if ((SaveDataHandler::saveData.ProgressiveLevel >= 5 && !bossesIncluded) ||
+		(SaveDataHandler::saveData.ProgressiveLevel >= 6 && bossesIncluded)) {
 		SaveDataHandler::saveData.PortalOpen[static_cast<int>(LevelCode::B3)] = true;
 	}
 	if (SaveDataHandler::saveData.ProgressiveLevel >= 7 && bossesIncluded) {
 		SaveDataHandler::saveData.PortalOpen[static_cast<int>(LevelCode::D4)] = true;
 	}
-	if (SaveDataHandler::saveData.ProgressiveLevel >= 6 && !bossesIncluded ||
-		SaveDataHandler::saveData.ProgressiveLevel >= 8 && bossesIncluded) {
+	if ((SaveDataHandler::saveData.ProgressiveLevel >= 6 && !bossesIncluded) ||
+		(SaveDataHandler::saveData.ProgressiveLevel >= 8 && bossesIncluded)) {
 		SaveDataHandler::saveData.PortalOpen[static_cast<int>(LevelCode::C1)] = true;
 	}
-	if (SaveDataHandler::saveData.ProgressiveLevel >= 7 && !bossesIncluded ||
-		SaveDataHandler::saveData.ProgressiveLevel >= 9 && bossesIncluded) {
+	if ((SaveDataHandler::saveData.ProgressiveLevel >= 7 && !bossesIncluded) ||
+		(SaveDataHandler::saveData.ProgressiveLevel >= 9 && bossesIncluded)) {
 		SaveDataHandler::saveData.PortalOpen[static_cast<int>(LevelCode::C2)] = true;
 	}
-	if (SaveDataHandler::saveData.ProgressiveLevel >= 8 && !bossesIncluded ||
-		SaveDataHandler::saveData.ProgressiveLevel >= 10 && bossesIncluded) {
+	if ((SaveDataHandler::saveData.ProgressiveLevel >= 8 && !bossesIncluded) ||
+		(SaveDataHandler::saveData.ProgressiveLevel >= 10 && bossesIncluded)) {
 		SaveDataHandler::saveData.PortalOpen[static_cast<int>(LevelCode::C3)] = true;
 	}
 	if (SaveDataHandler::saveData.ProgressiveLevel >= 11 && bossesIncluded) {
 		SaveDataHandler::saveData.PortalOpen[static_cast<int>(LevelCode::C4)] = true;
 	}
-	if (SaveDataHandler::saveData.ProgressiveLevel >= 9 && !bossesIncluded ||
-		SaveDataHandler::saveData.ProgressiveLevel >= 12 && bossesIncluded) {
+	if ((SaveDataHandler::saveData.ProgressiveLevel >= 9 && !bossesIncluded) ||
+		(SaveDataHandler::saveData.ProgressiveLevel >= 12 && bossesIncluded)) {
 		SaveDataHandler::saveData.PortalOpen[static_cast<int>(LevelCode::E1)] = true;
 	}
 
@@ -177,7 +258,7 @@ void ItemHandler::HandleProgressiveLevel() {
 		if (SaveDataHandler::saveData.PortalOpen[portalDestination])
 			*(int*)(portalAddr + 0x9C) = 1;
 		else
-			*(int*)(portalAddr + 0x9C) = 3;
+			*(int*)(portalAddr + 0x9C) = 0;
 		portalAddr = *(int*)(portalAddr + 0x34);
 	}
 }
@@ -279,7 +360,7 @@ void ItemHandler::HandleIndividualLevel(int code) {
 		if (SaveDataHandler::saveData.PortalOpen[portalDestination])
 			*(int*)(portalAddr + 0x9C) = 1;
 		else
-			*(int*)(portalAddr + 0x9C) = 3;
+			*(int*)(portalAddr + 0x9C) = 0;
 		portalAddr = *(int*)(portalAddr + 0x34);
 	}
 }

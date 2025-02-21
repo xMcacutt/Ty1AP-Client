@@ -10,7 +10,7 @@ To set up, first you'll need to install TygerFramework as well as TygerMemory. T
 
 - [TygerFramework](https://github.com/ElusiveFluffy/TygerFramework)
 
-- [TygerMemory](https://github.com/xMcacutt/TygerMemory1)
+- [TygerMemory](https://github.com/xMcacutt/TygerMemory1) VERSION 1.0.3+
 
 Next, you'll need to add the Ty1 AP Client dll to your plugins directory that should have been created when installing TygerFramework. You'll also need to copy libcrpyto-3.dll and libssl-3.dll from the Ty1 AP Client release into your dependencies directory.
 
@@ -25,6 +25,14 @@ To open and close the AP client windows you can press F2. If you wish to hide th
 To interact with any window in TygerFramework, you'll need the TygerFramework window to be open. You can toggle the TygerFramework window with F1.
 
 With the TygerFramework window and the Ty1 AP Client connection window open, enter your server address, password, and slot name and press connect. The load game button on the main menu should now be active. Upon pressing this, you will bypass the load select screen, a save is created in the saves directory in your Ty folder and you will be able to load directly into the save for the seed of the world.
+
+## Collectible Info Window
+
+As of 1.1.3, a new window is available and can be toggled by pressing F5. This window gives information on every collectible so hints showing locations such as 
+
+`Two Up - Golden Cog 7`
+
+Can be found more easily. Simply press F5 and reference the guide.
 
 ## How This Rando Works
 
@@ -50,6 +58,14 @@ In Ty-AP the following locations are considered checks by default
 
 There are 373 picture frames in the game. Only 127 of these can be activated as checks. All of the bonus world picture frames are excluded since they are postgame content. The remaining frames can be enabled as checks through framesanity. If framesanity is set to all, then all 127 frames will be checks. If it is set to per_level then collecting all of the picture frames in a level will grant a single check. 
 
+#### Extra Lives
+
+There are 22 extra lives in the game. They can be enabled as checks through lifesanity. Then, collecting each life will grant a check on the first time it is collected.
+
+#### Signposts
+
+There are 25 sign posts which Maurie sits on in the game and which can be hit with the boomerang. They can be enabled as checks through signsanity. Then, hitting each sign with the boomerang will grant a check on the first time it is hit.
+
 #### Attributes
 
 There are 15 attributes in the game. These are the rangs and abillities that can be unlocked for Ty including swim, dive, second rang, extra health paw, etc. 
@@ -74,7 +90,7 @@ If progressive rang is turned off, then all of the rangs and abilities will be g
 
 #### Levels
 
-The first portal (in Two Up vanilla location) is always open regardless of settings. If you have level shuffle turned on, the 9 core levels are randomised. Boss shuffle will randomise the first 3 bosses too. 
+The first portal (in Two Up vanilla location) is always open regardless of settings. If you have level shuffle turned on, the 9 core levels are randomised. 
 
 If you have level unlock style set to "vanilla" or "checks no bosses" then you will need to obtain the amount of thunder eggs set in the yaml under "theggGating" for a given hub to unlock that boss' portal. The portal will appear automatically once you do this.
 
@@ -116,60 +132,26 @@ Stopwatches can be added to the pool using "Gate Time Attacks". They unlock the 
 
 KNOWN CLIENT ISSUES
 
-- Portals sometimes fail to spawn - fixed on reload into level
-
-- Portals sometimes fail to despawn - fatal but fixed on reload
-
 - Throwing the kaboomerang without having the second rang may crash the game
-
-KNOWN APWORLD ISSUES
-
-- Logic for frostyrang allowing entry into rest of ship rex need to be added
 
 FEATURES TO ADD
 
 - More log text colouring
 
-- Traps
-
-- Pop tracker
-
 SOLVED
 
-- Logic issues surrounding Rainbow Scales on advanced logic fixed
-
-- Cable car logic no longer causes generation errors
-
-- Beyond gate in Lyre region removed
-
-- Death Link text should now dislpay name
-
-- Death Link no longer sends if disabled in yaml
-
-- Default options in yaml have been adjusted to be more accurate
-
-- Options have been reorganised
-
-- Autobalancing added to reduce extra theggs and cogs if extreme values are given in the yaml
-
-- Second rang is now placed in early spheres if progressive rang is off
-
-- Time increased on Stump Time Attack Challenge
-
-- Logic fixed on Time Attack Challenges
-
-- Extra Health check now triggers even with extra health item
-
-- Rainbow Scales save on collection
-
-- Rainbow Scale cutscene no longer plays after the Extra Health check
-
-- Aquarang and Swim checks re-enabled on entering Ship Rex with the aquarang
-
-- Save game option disabled to avoid accidental overwrites
-
-- Tracker scaling fixed to avoid options being cut off
-
-- Hint info now shows the portal which leads to the level containing the location
-
-- Spoiler log now displays the boss completion items required in the spheres
+- Portals no longer spawn and despawn in Rainbow Cliffs incorrectly
+- Events have been moved from set_rules to create_regions
+- Traps added - Acid Trap, Knocked Down Trap, Gravity Trap, Slow Trap, Exit Trap
+- Game no longer crashes on completion of goal
+- Game status changed to beta
+- With stopwatch gating disabled, stopwatches correctly spawn on vanilla level objective thegg
+- Added Signsanity and Lifesanity
+- Fixed bug with cog completion checks not sending
+- Added quarter pie and full pie filler items
+- Gate in hub 1 now activates if second rang is given in Rainbow Cliffs
+- Death link now correctly displays your name to others
+- Print method switched to full json print (better log messages)
+- Window added to show collectible info to ease confusion on location names (F5)
+- All elemental rang checks are now accessible
+- Upon another player collecting, the game info and world will update to show that the locations don't need to be checked

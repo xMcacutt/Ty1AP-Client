@@ -8,8 +8,8 @@ void TrackerWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
     if (!isVisible)
         return;
 
-    //if (GameState::onLoadScreenOrMainMenu())
-        //return;
+    if (GameState::onLoadScreenOrMainMenu())
+        return;
 
     auto windowWidth = 690 * uiScale;
     auto windowHeight = 340 * uiScale;

@@ -8,17 +8,12 @@ void LoggerWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
     if (!isVisible)
         return;
 
+    UpdateVisibleMessages();
+
     // Render the Logger window at the bottom-left
     ImGui::SetNextWindowPos(ImVec2(10, outerHeight - 500 - 10), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(500, 500), ImGuiCond_Always);
     ImGui::Begin(name.c_str(), nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar);
-
-    // Filter out log messages older than 5 seconds
-    auto now = std::chrono::steady_clock::now();
-    logMessages.erase(std::remove_if(logMessages.begin(), logMessages.end(),
-        [now](const LogMessage& msg) {
-            return std::chrono::duration_cast<std::chrono::seconds>(now - msg.timestamp).count() > 5; // 5 seconds
-        }), logMessages.end());
 
     // Get the window draw list for custom drawing
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
@@ -28,12 +23,14 @@ void LoggerWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
     float y_pos = window_pos.y + window_size.y;
 
     // Iterate messages in reverse order (newest at bottom)
-    for (auto it = logMessages.rbegin(); it != logMessages.rend(); ++it) {
-        const LogMessage& log = *it;
+    for (int i = visibleMessages.size() - 1; i >= 0; --i) {
+        const LogMessage& log = visibleMessages[i];
         float x_pos = window_pos.x;
         float max_width = window_size.x;
 
         // Remove color tags and format the raw text for wrapping
+        if (log.message.empty() or &log.message == nullptr) 
+            continue;
         std::string rawMessage = RemoveColorTags(log.message);
 
         std::vector<std::string> wrappedLines;
@@ -99,8 +96,9 @@ void LoggerWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
 // Function to remove color tags from the text
 std::string LoggerWindow::RemoveColorTags(const std::string& text) {
     std::string result;
-    bool insideTag = false;
+    result.reserve(text.size());
 
+    bool insideTag = false;
     for (size_t i = 0; i < text.size(); ++i) {
         if (text[i] == '[') {
             insideTag = true;
@@ -190,7 +188,22 @@ void LoggerWindow::RenderFormattedText(ImDrawList* draw_list, const char* text, 
 
 void LoggerWindow::AddLogMessage(const std::string& message) {
     LogMessage logMessage = { message, std::chrono::steady_clock::now() };
-    logMessages.push_back(logMessage);
+    cachedMessages.push(logMessage);
+}
+
+void LoggerWindow::UpdateVisibleMessages() {
+    auto now = std::chrono::steady_clock::now();
+
+    visibleMessages.erase(std::remove_if(visibleMessages.begin(), visibleMessages.end(),
+        [now, this](const LogMessage& msg) {
+            return std::chrono::duration_cast<std::chrono::seconds>(now - msg.timestamp).count() > TIMEOUT_SECONDS;
+        }), visibleMessages.end());
+
+    while (!cachedMessages.empty() && visibleMessages.size() < MAX_MESSAGES) {
+        cachedMessages.front().timestamp = now;
+        visibleMessages.push_back(cachedMessages.front());
+        cachedMessages.pop(); 
+    }
 }
 
 void LoggerWindow::Log(const std::string& message)

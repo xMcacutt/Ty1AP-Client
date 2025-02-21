@@ -13,6 +13,7 @@
 #include "LoggerWindow.h"
 #include "LoginWindow.h"
 #include "TrackerWindow.h"
+#include "InfoWindow.h"
 #include <gl/GL.h>
 #include <gl/GLU.h>
 #include "resource.h"

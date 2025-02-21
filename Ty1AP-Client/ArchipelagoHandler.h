@@ -54,6 +54,8 @@ public:
 	static double deathtime;
 	static Framesanity framesanity;
 	static bool scalesanity;
+	static bool signsanity;
+	static bool lifesanity;
 	static bool progressiveRang;
 	static bool progressiveLevel;
 	static bool ap_sync_queued;
