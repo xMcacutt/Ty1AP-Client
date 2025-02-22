@@ -15,6 +15,9 @@ void LocationHandler::HandleLocation(int64_t location)
 		auto levelIndex = theggId / 8;
 		auto levelId = levelIndex + 4 + (levelIndex > 2) + (levelIndex > 5);
 		auto theggIndex = theggId % 8;
+		bool myCollection = SaveDataHandler::saveData.LevelData[levelId].ThunderEggs[theggIndex];
+		if (myCollection)
+			return;
 		SaveDataHandler::saveData.LevelData[levelId].ThunderEggs[theggIndex] = true;
 		SaveDataHandler::SaveGame();
 		if ((LevelCode)levelId != currentLevel)
@@ -35,6 +38,9 @@ void LocationHandler::HandleLocation(int64_t location)
 		auto levelIndex = cogId / 10;
 		auto levelId = levelIndex + 4 + (levelIndex > 2) + (levelIndex > 5);
 		auto cogIndex = cogId % 10;
+		bool myCollection = SaveDataHandler::saveData.LevelData[levelId].GoldenCogs[cogIndex];
+		if (myCollection)
+			return;
 		SaveDataHandler::saveData.LevelData[levelId].GoldenCogs[cogIndex] = true;
 		SaveDataHandler::SaveGame();
 		if ((LevelCode)levelId != currentLevel)
@@ -57,6 +63,9 @@ void LocationHandler::HandleLocation(int64_t location)
 		auto bilbyIndex = bilbyId % 5;
 		auto bilbyWrite = std::count(SaveDataHandler::saveData.LevelData[levelId].Bilbies,
 			SaveDataHandler::saveData.LevelData[levelId].Bilbies + 0x5, 1) == 4 ? 3 : 1;
+		bool myCollection = SaveDataHandler::saveData.LevelData[levelId].Bilbies[bilbyIndex] > 0;
+		if (myCollection)
+			return;
 		SaveDataHandler::saveData.LevelData[levelId].Bilbies[bilbyIndex] = bilbyWrite;
 		SaveDataHandler::SaveGame();
 		if ((LevelCode)levelId != currentLevel)

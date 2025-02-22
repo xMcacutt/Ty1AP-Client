@@ -12,11 +12,13 @@ To set up, first you'll need to install TygerFramework as well as TygerMemory. T
 
 - [TygerMemory](https://github.com/xMcacutt/TygerMemory1) VERSION 1.0.3+
 
-Next, you'll need to add the Ty1 AP Client dll to your plugins directory that should have been created when installing TygerFramework. You'll also need to copy libcrpyto-3.dll and libssl-3.dll from the Ty1 AP Client release into your dependencies directory.
+Next, you'll need to add the Ty1 AP Client dll to your plugins directory that should have been created when installing TygerFramework.
 
 Once you launch the game, the client should be up and running.
 
 Optionally, you can place the Patch_PC.rkv from the releases page into your Ty folder to have some extra Archipelago branding.
+
+**as of v1.1.4, libcrypto and libssl are no longer required as dependencies**
 
 ## Connecting
 
@@ -140,18 +142,7 @@ FEATURES TO ADD
 
 SOLVED
 
-- Portals no longer spawn and despawn in Rainbow Cliffs incorrectly
-- Events have been moved from set_rules to create_regions
-- Traps added - Acid Trap, Knocked Down Trap, Gravity Trap, Slow Trap, Exit Trap
-- Game no longer crashes on completion of goal
-- Game status changed to beta
-- With stopwatch gating disabled, stopwatches correctly spawn on vanilla level objective thegg
-- Added Signsanity and Lifesanity
-- Fixed bug with cog completion checks not sending
-- Added quarter pie and full pie filler items
-- Gate in hub 1 now activates if second rang is given in Rainbow Cliffs
-- Death link now correctly displays your name to others
-- Print method switched to full json print (better log messages)
-- Window added to show collectible info to ease confusion on location names (F5)
-- All elemental rang checks are now accessible
-- Upon another player collecting, the game info and world will update to show that the locations don't need to be checked
+- Collectibles no longer disappear before collection animation plays
+- libssl and libcrypto are no longer dependencies
+- Full pie can now be obtained as an item and works correctly
+- Updated wswrap to 1.0.3 and linked against zlib
