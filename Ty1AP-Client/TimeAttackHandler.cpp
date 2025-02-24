@@ -17,11 +17,11 @@ std::map<LevelCode, int> TimeAttackHandler::advTimes = {
 	{LevelCode::A2, 3850},
 	{LevelCode::A3, 10200},
 	{LevelCode::B1, 7100}, 
-	{LevelCode::B2, 11200},
+	{LevelCode::B2, 11300},
 	{LevelCode::B3, 9900},
 	{LevelCode::C1, 2700},
 	{LevelCode::C2, 8200},
-	{LevelCode::C3, 7850},
+	{LevelCode::C3, 7950},
 };
 
 typedef void(__stdcall* StartTimeAttackFunctionType)();

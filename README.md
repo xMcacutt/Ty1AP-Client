@@ -142,7 +142,8 @@ FEATURES TO ADD
 
 SOLVED
 
-- Collectibles no longer disappear before collection animation plays
-- libssl and libcrypto are no longer dependencies
-- Full pie can now be obtained as an item and works correctly
-- Updated wswrap to 1.0.3 and linked against zlib
+- Increased gravity in trap
+- Fixed bad characters in deathlink messages
+- Increased length of time attack challenges for adv logic
+- Fixed portals incorrectly spawning (hopefully for good)
+- Improved logic for Koala Chaos and pontoon Rainbow Scale

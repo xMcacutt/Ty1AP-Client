@@ -157,7 +157,7 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 		std::thread([] {
 			auto iterator = 0;
 			while (iterator < 1000) {
-				Hero::setGravity(0.9f);
+				Hero::setGravity(1.15f);
 				Sleep(20);
 				iterator++;
 			}

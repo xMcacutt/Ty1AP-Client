@@ -308,20 +308,20 @@ bool ArchipelagoHandler::LoadSaveData() {
 }
 
 const std::vector<std::string> deathCauses{
-    "didn't catch the boomerang",
+    "didn\'t catch the boomerang",
     "bit off more than they could chew",
     "turned into a tasmanian fossil",
     "forgot to wear gloves",
     "had trouble in the outhouse",
-    "couldn't hold their breath",
+    "couldn\'t hold their breath",
     "listened to Lenny",
     "was crushed by an icicle",
     "forgot how to glide",
     "bit the ground too hard",
     "fell over",
     "was a little too Australian",
-    "didn't wear sunblock",
-    "didn't listen to Lenny",
+    "didn\'t wear sunblock",
+    "didn\'t listen to Lenny",
     "ate too much pie",
     "hugged a crocodile",
     "got lost in the outback",
@@ -329,12 +329,13 @@ const std::vector<std::string> deathCauses{
     "forgot eels were electric",
     "got too confident with the didgeridoo",
     "tried to ride a stingray",
-    "told a dingo it wasn’t that scary",
+    "told a dingo it wasn\'t that scary",
     "got dropkicked by a kangaroo",
-    "... Boonie",
+    "said it wasn't their fault",
+    "blames Boonie",
     "miscounted the multirangs",
     "licked a toad for science",
-    "ran out of ‘she’ll be right’ energy mid-jump",
+    "ran out of \'she\'ll be right\' energy mid-jump",
     "tried to code an AP game"
 };
 

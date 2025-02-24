@@ -35,8 +35,8 @@ MenuStateFunctionType menuStateOrigin = nullptr;
 typedef void(__stdcall* DeathFunctionType)(void);
 DeathFunctionType deathOrigin = nullptr;
 
-typedef void(__stdcall* EnterLevelFunctionType)(void);
-EnterLevelFunctionType enterLevelOrigin = nullptr;
+typedef void(__stdcall* LoadRainbowCliffsFunctionType)(void);
+LoadRainbowCliffsFunctionType loadRainbowCliffsOrigin = nullptr;
 
 
 uintptr_t stopwatchJmpAddr;
@@ -95,6 +95,19 @@ __declspec(naked) void __stdcall GameHandler::DeathHook() {
 		popad
 		mov [edx+0xAD0],ax
 		jmp dword ptr[deathOriginAddr]
+	}
+}
+
+uintptr_t loadRainbowCliffsOriginAddr;
+__declspec(naked) void __stdcall GameHandler::LoadRainbowCliffsHook() {
+	__asm {
+		pushad
+		pushfd
+		call OnLoadRainbowCliffs
+		popfd
+		popad
+		cmp byte ptr[esi+0xA9],00
+		jmp dword ptr[loadRainbowCliffsOriginAddr]
 	}
 }
 
@@ -168,6 +181,10 @@ void GameHandler::Setup()
 	deathOriginAddr = Core::moduleBase + 0xF7A1A;
 	addr = (char*)(Core::moduleBase + 0xF7A13);
 	MH_CreateHook((LPVOID)addr, &DeathHook, reinterpret_cast<LPVOID*>(&deathOrigin));
+
+	loadRainbowCliffsOriginAddr = Core::moduleBase + 0x14D345;
+	addr = (char*)(Core::moduleBase + 0x14D33E);
+	MH_CreateHook((LPVOID)addr, &LoadRainbowCliffsHook, reinterpret_cast<LPVOID*>(&loadRainbowCliffsOrigin));
 
 	CheckHandler::SetupHooks();
 	TimeAttackHandler::SetupHooks();
@@ -388,6 +405,12 @@ void GameHandler::OnEnterShipRex() {
 	}
 }
 
+void GameHandler::OnLoadRainbowCliffs() {
+	auto levelId = Level::getCurrentLevel();
+	if (levelId == LevelCode::Z1)
+		OnEnterRainbowCliffs();
+}
+
 void GameHandler::OnEnterLevel() {	
 	*(uintptr_t*)(Core::moduleBase + 0x2888D8) = reinterpret_cast<uintptr_t>(&SaveDataHandler::saveData);
 	*(uintptr_t*)(Core::moduleBase + 0x288730) = reinterpret_cast<uintptr_t>(&SaveDataHandler::saveData);
@@ -398,8 +421,7 @@ void GameHandler::OnEnterLevel() {
 	LocationHandler::HandleStoredCheckedLocations();
 
 	auto levelId = Level::getCurrentLevel();
-	if (levelId == LevelCode::Z1)
-		OnEnterRainbowCliffs();
+
 	if (levelId == LevelCode::A3)
 		OnEnterShipRex();
 	if (levelId == LevelCode::D2)
