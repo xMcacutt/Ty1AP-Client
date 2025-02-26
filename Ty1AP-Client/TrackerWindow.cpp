@@ -97,12 +97,28 @@ void TrackerWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
     ImGui::NewLine();
 
     constexpr std::array<int, 12> levelIndices = { 5, 6, 7, 8, 9, 10, 19, 12, 13, 14, 15, 20 };
+    constexpr std::array<int, 9> coreLevelIndices = { 4, 5, 6, 8, 9, 10, 12, 13, 14 };
+    const std::unordered_map<int, std::string> levelMapping = {
+        {4, "A1"}, {5, "A2"}, {6, "A3"},
+        {8, "B1"}, {9, "B2"}, {10, "B3"},
+        {12, "C1"}, {13, "C2"}, {14, "C3"}
+    };
 
     for (int i : levelIndices) {
         auto b = SaveDataHandler::saveData.PortalOpen[i];
         auto brightness = b ? 0.7f : 0.2f;
         tintColor = ImVec4(brightness, brightness, brightness, 1.0f);
+        cursorPos = ImGui::GetCursorScreenPos();
         ImGui::Image((ImTextureID)(intptr_t)GUI::icons["level"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
+        auto it = std::find(coreLevelIndices.begin(), coreLevelIndices.end(), i);
+        if (it != coreLevelIndices.end()) {
+            int index = std::distance(coreLevelIndices.begin(), it);
+            std::string levelLabel = levelMapping.at(ArchipelagoHandler::portalMap[index]);
+            textSize = ImGui::CalcTextSize(levelLabel.c_str());
+            textPos = ImVec2(cursorPos.x + (iconSize - textSize.x) * 0.5f,
+                cursorPos.y + (iconSize - textSize.y) * 0.5f);
+            drawList->AddText(textPos, IM_COL32(255, 255, 255, 255), levelLabel.c_str());
+        }
         ImGui::SameLine();
     }
 

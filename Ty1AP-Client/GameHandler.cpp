@@ -17,6 +17,8 @@ std::unordered_map<int, std::vector<float>> spawnpointMap{
 	{ 15, {4161.0f, 1054.0f, 10735.0f, 1.458f} },
 };
 
+const int portalOrder[16] = {7, 5, 4, 13, 10, 23, 20, 19, 9, 21, 22, 12, 8, 6, 14, 15};
+
 typedef void(__stdcall* MainMenuFunctionType)(void);
 MainMenuFunctionType mainMenuOrigin = nullptr;
 
@@ -228,6 +230,47 @@ void GameHandler::WatchMemory() {
 				OnEnterLevel();
 			oldLoadValue = currentLoadValue;
 		}
+
+		if (Level::getCurrentLevel() == LevelCode::Z1) {
+			if (ArchipelagoHandler::levelUnlockStyle != LevelUnlockStyle::VANILLA) {
+				auto portalCount = *(int*)(Core::moduleBase + 0x267404);
+				auto portalAddr = *(int*)(Core::moduleBase + 0x267408);
+				for (auto portalIndex = 0; portalIndex < portalCount; portalIndex++) {
+					auto portalDestination = *(int*)(portalAddr + 0xAC);
+					if (SaveDataHandler::saveData.PortalOpen[portalDestination] && *(int*)(portalAddr + 0x9C) == 3)
+						*(int*)(portalAddr + 0x9C) = 1;
+					else if (!SaveDataHandler::saveData.PortalOpen[portalDestination] && *(int*)(portalAddr + 0x9C) == 2)
+						*(int*)(portalAddr + 0x9C) = 3;
+					portalAddr = *(int*)(portalAddr + 0x34);
+				}
+			}
+
+			auto& portalMap = ArchipelagoHandler::portalMap;
+			auto portalCount = *(int*)(Core::moduleBase + 0x267404);
+			auto portalAddr = *(int*)(Core::moduleBase + 0x267408);
+			for (auto portalIndex = 0; portalIndex < portalCount; portalIndex++) {
+				auto portalDestination = portalOrder[portalIndex];
+				if (portalDestination == 4)
+					*(int*)(portalAddr + 0xAC) = portalMap[0];
+				if (portalDestination == 5)
+					*(int*)(portalAddr + 0xAC) = portalMap[1];
+				if (portalDestination == 6)
+					*(int*)(portalAddr + 0xAC) = portalMap[2];
+				if (portalDestination == 8)
+					*(int*)(portalAddr + 0xAC) = portalMap[3];
+				if (portalDestination == 9)
+					*(int*)(portalAddr + 0xAC) = portalMap[4];
+				if (portalDestination == 10)
+					*(int*)(portalAddr + 0xAC) = portalMap[5];
+				if (portalDestination == 12)
+					*(int*)(portalAddr + 0xAC) = portalMap[6];
+				if (portalDestination == 13)
+					*(int*)(portalAddr + 0xAC) = portalMap[7];
+				if (portalDestination == 14)
+					*(int*)(portalAddr + 0xAC) = portalMap[8];
+				portalAddr = *(int*)(portalAddr + 0x34);
+			}
+		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 }
@@ -278,45 +321,6 @@ void GameHandler::OnEnterRainbowCliffs() {
 		memset((char*)(counterAddr + 0xA0), 0x0, 1);
 		memset((char*)(counterAddr + 0x48), 0x0, 1);
 		counterAddr = *(int*)(counterAddr + 0x34);
-	}
-
-	if (ArchipelagoHandler::levelUnlockStyle != LevelUnlockStyle::VANILLA) {
-		auto portalCount = *(int*)(Core::moduleBase + 0x267404);
-		auto portalAddr = *(int*)(Core::moduleBase + 0x267408);
-		for (auto portalIndex = 0; portalIndex < portalCount; portalIndex++) {
-			auto portalDestination = *(int*)(portalAddr + 0xAC);
-			if (SaveDataHandler::saveData.PortalOpen[portalDestination])
-				*(int*)(portalAddr + 0x9C) = 1;
-			else
-				*(int*)(portalAddr + 0x9C) = 0;
-			portalAddr = *(int*)(portalAddr + 0x34);
-		}
-	}
-
-	auto& portalMap = ArchipelagoHandler::portalMap; 
-	auto portalCount = *(int*)(Core::moduleBase + 0x267404);
-	auto portalAddr = *(int*)(Core::moduleBase + 0x267408);
-	for (auto portalIndex = 0; portalIndex < portalCount; portalIndex++) {
-		auto portalDestination = *(int*)(portalAddr + 0xAC);
-		if (portalDestination == 4)
-			*(int*)(portalAddr + 0xAC) = portalMap[0];
-		if (portalDestination == 5)
-			*(int*)(portalAddr + 0xAC) = portalMap[1];
-		if (portalDestination == 6)
-			*(int*)(portalAddr + 0xAC) = portalMap[2];
-		if (portalDestination == 8)
-			*(int*)(portalAddr + 0xAC) = portalMap[3];
-		if (portalDestination == 9)
-			*(int*)(portalAddr + 0xAC) = portalMap[4];
-		if (portalDestination == 10)
-			*(int*)(portalAddr + 0xAC) = portalMap[5];
-		if (portalDestination == 12)
-			*(int*)(portalAddr + 0xAC) = portalMap[6];
-		if (portalDestination == 13)
-			*(int*)(portalAddr + 0xAC) = portalMap[7];
-		if (portalDestination == 14)
-			*(int*)(portalAddr + 0xAC) = portalMap[8];
-		portalAddr = *(int*)(portalAddr + 0x34);
 	}
 
 	if (SaveDataHandler::saveData.ArchAttributeData.GotSecondRang) {

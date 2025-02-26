@@ -142,8 +142,5 @@ FEATURES TO ADD
 
 SOLVED
 
-- Increased gravity in trap
-- Fixed bad characters in deathlink messages
-- Increased length of time attack challenges for adv logic
-- Fixed portals incorrectly spawning (hopefully for good)
-- Improved logic for Koala Chaos and pontoon Rainbow Scale
+- Fixed portals... for real this time
+- Added level codes to tracker on portals

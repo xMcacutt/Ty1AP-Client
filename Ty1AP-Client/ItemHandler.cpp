@@ -248,19 +248,6 @@ void ItemHandler::HandleProgressiveLevel() {
 		(SaveDataHandler::saveData.ProgressiveLevel >= 12 && bossesIncluded)) {
 		SaveDataHandler::saveData.PortalOpen[static_cast<int>(LevelCode::E1)] = true;
 	}
-
-	if (Level::getCurrentLevel() != LevelCode::Z1)
-		return;
-	auto portalCount = *(int*)(Core::moduleBase + 0x267404);
-	auto portalAddr = *(int*)(Core::moduleBase + 0x267408);
-	for (auto portalIndex = 0; portalIndex < portalCount; portalIndex++) {
-		auto portalDestination = *(int*)(portalAddr + 0xAC);
-		if (SaveDataHandler::saveData.PortalOpen[portalDestination])
-			*(int*)(portalAddr + 0x9C) = 1;
-		else
-			*(int*)(portalAddr + 0x9C) = 0;
-		portalAddr = *(int*)(portalAddr + 0x34);
-	}
 }
 
 void ItemHandler::HandleIndividualLevel(int code) {
