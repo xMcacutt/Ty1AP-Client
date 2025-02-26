@@ -258,7 +258,7 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
                     if (data["source"].get<std::string>() != slot) {
                         std::string source = data["source"].is_string() ? data["source"].get<std::string>().c_str() : "???";
                         std::string cause = data["cause"].is_string() ? data["cause"].get<std::string>().c_str() : "???";
-                        LoggerWindow::Log("[color=86F3CAFF]" + source + " [color=FFFFFFFF]" + cause);
+                        LoggerWindow::Log("[color = FFFFFFFF]" + cause);
                         someoneElseDied = true;
                         Hero::kill();
                     }
@@ -315,11 +315,11 @@ const std::vector<std::string> deathCauses{
     "had trouble in the outhouse",
     "couldn\'t hold their breath",
     "listened to Lenny",
-    "was crushed by an icicle",
+    "got crushed by an icicle",
     "forgot how to glide",
     "bit the ground too hard",
     "fell over",
-    "was a little too Australian",
+    "got a little too Australian",
     "didn\'t wear sunblock",
     "didn\'t listen to Lenny",
     "ate too much pie",
@@ -349,7 +349,7 @@ std::string GetRandomCause() {
 
 void ArchipelagoHandler::SendDeath() {
     std::string cause = GetRandomCause();
-    LoggerWindow::Log("Death Sent: You " + cause);
+    LoggerWindow::Log("Death Sent:  " + slot + " " + cause);
     json data{
         {"time", ap->get_server_time()},
         {"cause", slot + " " + GetRandomCause()},
