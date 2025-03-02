@@ -1,6 +1,6 @@
 {
   "name": "Archipelago Client",
-  "dll_name": "Ty1AP-Client.dll",
+  "dll_name": "Ty1AP-Client",
   "description": "Client implementation of Ty into the Archipelago.gg project.",
   "version": "1.1.7",
   "dependencies": [
@@ -17,6 +17,6 @@
     "MTP Console"
   ],
   "author": "xMcacutt",
-  "download_url": "https://github.com/xMcacutt/Ty1AP-Client/releases/latest/Ty1AP-Client.zip"
+  "download_url": "https://github.com/xMcacutt/Ty1AP-Client/releases/latest/Ty1AP-Client.zip",
   "last_updated": "2025-03-02"
 }
