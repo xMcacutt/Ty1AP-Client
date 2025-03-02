@@ -112,8 +112,7 @@ void TrackerWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
         ImGui::Image((ImTextureID)(intptr_t)GUI::icons["level"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
         auto it = std::find(coreLevelIndices.begin(), coreLevelIndices.end(), i);
         if (it != coreLevelIndices.end()) {
-            int index = std::distance(coreLevelIndices.begin(), it);
-            std::string levelLabel = levelMapping.at(ArchipelagoHandler::portalMap[index]);
+            std::string levelLabel = levelMapping.at(ArchipelagoHandler::portalMap[i]);
             textSize = ImGui::CalcTextSize(levelLabel.c_str());
             textPos = ImVec2(cursorPos.x + (iconSize - textSize.x) * 0.5f,
                 cursorPos.y + (iconSize - textSize.y) * 0.5f);

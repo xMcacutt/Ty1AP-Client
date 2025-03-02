@@ -69,7 +69,8 @@ bool ArchipelagoHandler::progressiveLevel = false;
 bool ArchipelagoHandler::gateTimeAttacks = false;
 bool ArchipelagoHandler::goalReqBosses = false;
 bool ArchipelagoHandler::advancedLogic = false;
-std::vector<int> ArchipelagoHandler::portalMap;
+std::unordered_map<int, int> ArchipelagoHandler::portalMap;
+std::unordered_map<int, int> ArchipelagoHandler::inversePortalMap;
 std::unique_ptr<APClient> ArchipelagoHandler::ap;
 std::string ArchipelagoHandler::seed;
 
@@ -161,8 +162,22 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
         else levelUnlockStyle = LevelUnlockStyle::VANILLA;
 
         portalMap.clear();
-        if (data.find("PortalMap") != data.end() && data["PortalMap"].is_array()) 
-            portalMap = data["PortalMap"].get<std::vector<int>>();
+        inversePortalMap.clear();
+        if (data.find("PortalMap") != data.end() && data["PortalMap"].is_array()) {
+            auto portalList = data["PortalMap"].get<std::vector<int>>();
+            portalMap[4] = portalList[0];
+            portalMap[5] = portalList[1];
+            portalMap[6] = portalList[2];
+            portalMap[8] = portalList[3];
+            portalMap[9] = portalList[4];
+            portalMap[10] = portalList[5];
+            portalMap[12] = portalList[6];
+            portalMap[13] = portalList[7];
+            portalMap[14] = portalList[8];
+            for (const auto& pair : portalMap) {
+                inversePortalMap[pair.second] = pair.first;
+            }
+        }
 
         if (data.find("DeathLink") != data.end())
             deathlink = data["DeathLink"].get<int>() == 1;;

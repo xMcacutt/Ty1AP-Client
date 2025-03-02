@@ -253,82 +253,37 @@ void ItemHandler::HandleProgressiveLevel() {
 void ItemHandler::HandleIndividualLevel(int code) {
 	switch (code) {
 	case 0:
-	{
-		auto it = std::find(ArchipelagoHandler::portalMap.begin(), ArchipelagoHandler::portalMap.end(), 4);
-		int index = std::distance(ArchipelagoHandler::portalMap.begin(), it);
-		auto levelIndex = index + 4 + (index > 2) + (index > 5);
-		SaveDataHandler::saveData.PortalOpen[levelIndex] = true;
-	}
+		SaveDataHandler::saveData.PortalOpen[ArchipelagoHandler::inversePortalMap[4]] = true;
 		break;
 	case 1:
-	{
-		auto it = std::find(ArchipelagoHandler::portalMap.begin(), ArchipelagoHandler::portalMap.end(), 5);
-		int index = std::distance(ArchipelagoHandler::portalMap.begin(), it);
-		auto levelIndex = index + 4 + (index > 2) + (index > 5);
-		SaveDataHandler::saveData.PortalOpen[levelIndex] = true;
-	}
+		SaveDataHandler::saveData.PortalOpen[ArchipelagoHandler::inversePortalMap[5]] = true;
 		break;
 	case 2:
-	{
-		auto it = std::find(ArchipelagoHandler::portalMap.begin(), ArchipelagoHandler::portalMap.end(), 6);
-		int index = std::distance(ArchipelagoHandler::portalMap.begin(), it);
-		auto levelIndex = index + 4 + (index > 2) + (index > 5);
-		SaveDataHandler::saveData.PortalOpen[levelIndex] = true;
-	}
+		SaveDataHandler::saveData.PortalOpen[ArchipelagoHandler::inversePortalMap[6]] = true;
 		break;
 	case 3:
 		SaveDataHandler::saveData.PortalOpen[7] = true;
 		break;
 	case 4:
-	{
-		auto it = std::find(ArchipelagoHandler::portalMap.begin(), ArchipelagoHandler::portalMap.end(), 8);
-		int index = std::distance(ArchipelagoHandler::portalMap.begin(), it);
-		auto levelIndex = index + 4 + (index > 2) + (index > 5);
-		SaveDataHandler::saveData.PortalOpen[levelIndex] = true;
-	}
+		SaveDataHandler::saveData.PortalOpen[ArchipelagoHandler::inversePortalMap[8]] = true;
 		break;
 	case 5:
-	{
-		auto it = std::find(ArchipelagoHandler::portalMap.begin(), ArchipelagoHandler::portalMap.end(), 9);
-		int index = std::distance(ArchipelagoHandler::portalMap.begin(), it);
-		auto levelIndex = index + 4 + (index > 2) + (index > 5);
-		SaveDataHandler::saveData.PortalOpen[levelIndex] = true;
-	}
+		SaveDataHandler::saveData.PortalOpen[ArchipelagoHandler::inversePortalMap[9]] = true;
 		break;
 	case 6:
-	{
-		auto it = std::find(ArchipelagoHandler::portalMap.begin(), ArchipelagoHandler::portalMap.end(), 10);
-		int index = std::distance(ArchipelagoHandler::portalMap.begin(), it);
-		auto levelIndex = index + 4 + (index > 2) + (index > 5);
-		SaveDataHandler::saveData.PortalOpen[levelIndex] = true;
-	}
+		SaveDataHandler::saveData.PortalOpen[ArchipelagoHandler::inversePortalMap[10]] = true;
 		break;
 	case 7:
 		SaveDataHandler::saveData.PortalOpen[19] = true;
 		break;
 	case 8:
-	{
-		auto it = std::find(ArchipelagoHandler::portalMap.begin(), ArchipelagoHandler::portalMap.end(), 12);
-		int index = std::distance(ArchipelagoHandler::portalMap.begin(), it);
-		auto levelIndex = index + 4 + (index > 2) + (index > 5);
-		SaveDataHandler::saveData.PortalOpen[levelIndex] = true;
-	}
+		SaveDataHandler::saveData.PortalOpen[ArchipelagoHandler::inversePortalMap[12]] = true;
 		break;
 	case 9:
-	{
-		auto it = std::find(ArchipelagoHandler::portalMap.begin(), ArchipelagoHandler::portalMap.end(), 13);
-		int index = std::distance(ArchipelagoHandler::portalMap.begin(), it);
-		auto levelIndex = index + 4 + (index > 2) + (index > 5);
-		SaveDataHandler::saveData.PortalOpen[levelIndex] = true;
-	}
+		SaveDataHandler::saveData.PortalOpen[ArchipelagoHandler::inversePortalMap[13]] = true;
 		break;
 	case 10: 
-	{
-		auto it = std::find(ArchipelagoHandler::portalMap.begin(), ArchipelagoHandler::portalMap.end(), 14);
-		int index = std::distance(ArchipelagoHandler::portalMap.begin(), it);
-		auto levelIndex = index + 4 + (index > 2) + (index > 5);
-		SaveDataHandler::saveData.PortalOpen[levelIndex] = true;
-	}
+		SaveDataHandler::saveData.PortalOpen[ArchipelagoHandler::inversePortalMap[14]] = true;
 		break;
 	case 11:
 		SaveDataHandler::saveData.PortalOpen[15] = true;
@@ -336,19 +291,6 @@ void ItemHandler::HandleIndividualLevel(int code) {
 	case 12:
 		SaveDataHandler::saveData.PortalOpen[20] = true;
 		break;
-	}
-
-	if (Level::getCurrentLevel() != LevelCode::Z1)
-		return;
-	auto portalCount = *(int*)(Core::moduleBase + 0x267404);
-	auto portalAddr = *(int*)(Core::moduleBase + 0x267408);
-	for (auto portalIndex = 0; portalIndex < portalCount; portalIndex++) {
-		auto portalDestination = *(int*)(portalAddr + 0xAC);
-		if (SaveDataHandler::saveData.PortalOpen[portalDestination])
-			*(int*)(portalAddr + 0x9C) = 1;
-		else
-			*(int*)(portalAddr + 0x9C) = 0;
-		portalAddr = *(int*)(portalAddr + 0x34);
 	}
 }
 

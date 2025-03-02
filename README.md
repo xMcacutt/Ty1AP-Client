@@ -6,7 +6,13 @@ For the APWorld for Ty the Tasmanian Tiger see [Ty the Tasmanian Tiger APWorld](
 
 ## Setup
 
-To set up, first you'll need to install TygerFramework as well as TygerMemory. These are simple dlls that sit in your Ty directory. Information on their setup can be found at the respective pages below
+To set up, first you'll need to install TygerFramework as well as TygerMemory. These are simple dlls that sit in your Ty directory. 
+
+As of version 1.1.7, this can be done using the [Ty Mod Manager](https://github.com/xMcacutt/ty1_mod_manager/tree/master). Simply find the mod in the mod directory and hit install. Alternatively you can download the zip from releases and add a custom mod in the manager.
+
+#### Manual Installation
+
+**To install MANUALLY** information setup can be found at the respective pages below
 
 - [TygerFramework](https://github.com/ElusiveFluffy/TygerFramework)
 
@@ -142,5 +148,5 @@ FEATURES TO ADD
 
 SOLVED
 
-- Fixed portals... for real this time
-- Added level codes to tracker on portals
+- Fixed portals I swear this time I mean it
+- Added infra logic option to slot data to support in development pop tracker

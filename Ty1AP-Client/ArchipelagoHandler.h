@@ -45,7 +45,8 @@ public:
 	static Goal goal;
 	static bool deathlink;
 	static LevelUnlockStyle levelUnlockStyle;
-	static std::vector<int> portalMap;
+	static std::unordered_map<int, int> portalMap;
+	static std::unordered_map<int, int> inversePortalMap;
 	static int theggGating;
 	static int cogGating;
 	static bool someoneElseDied;

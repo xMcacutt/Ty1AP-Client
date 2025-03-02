@@ -1,0 +1,22 @@
+{
+  "name": "Archipelago Client",
+  "dll_name": "Ty1AP-Client.dll",
+  "description": "Client implementation of Ty into the Archipelago.gg project.",
+  "version": "1.1.7",
+  "dependencies": [
+    {
+      "dep_name": "TygerMemory",
+      "dep_version": "1.0.3",
+      "dep_url": "https://github.com/xMcacutt/TygerMemory1/releases/download/1.0.3/TygerMemory.dll"
+    }
+  ],
+  "conflicts": [
+    "Collectible Tracker",
+    "Memory Leak Manager",
+    "Tyger Utility",
+    "MTP Console"
+  ],
+  "author": "xMcacutt",
+  "download_url": "https://github.com/xMcacutt/Ty1AP-Client/releases/latest/Ty1AP-Client.zip"
+  "last_updated": "2025-03-02"
+}

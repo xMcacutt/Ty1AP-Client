@@ -232,42 +232,27 @@ void GameHandler::WatchMemory() {
 		}
 
 		if (Level::getCurrentLevel() == LevelCode::Z1) {
-			if (ArchipelagoHandler::levelUnlockStyle != LevelUnlockStyle::VANILLA) {
-				auto portalCount = *(int*)(Core::moduleBase + 0x267404);
-				auto portalAddr = *(int*)(Core::moduleBase + 0x267408);
-				for (auto portalIndex = 0; portalIndex < portalCount; portalIndex++) {
-					auto portalDestination = *(int*)(portalAddr + 0xAC);
-					if (SaveDataHandler::saveData.PortalOpen[portalDestination] && *(int*)(portalAddr + 0x9C) == 3)
-						*(int*)(portalAddr + 0x9C) = 1;
-					else if (!SaveDataHandler::saveData.PortalOpen[portalDestination] && *(int*)(portalAddr + 0x9C) == 2)
-						*(int*)(portalAddr + 0x9C) = 3;
-					portalAddr = *(int*)(portalAddr + 0x34);
-				}
-			}
-
 			auto& portalMap = ArchipelagoHandler::portalMap;
 			auto portalCount = *(int*)(Core::moduleBase + 0x267404);
 			auto portalAddr = *(int*)(Core::moduleBase + 0x267408);
 			for (auto portalIndex = 0; portalIndex < portalCount; portalIndex++) {
 				auto portalDestination = portalOrder[portalIndex];
-				if (portalDestination == 4)
-					*(int*)(portalAddr + 0xAC) = portalMap[0];
-				if (portalDestination == 5)
-					*(int*)(portalAddr + 0xAC) = portalMap[1];
-				if (portalDestination == 6)
-					*(int*)(portalAddr + 0xAC) = portalMap[2];
-				if (portalDestination == 8)
-					*(int*)(portalAddr + 0xAC) = portalMap[3];
-				if (portalDestination == 9)
-					*(int*)(portalAddr + 0xAC) = portalMap[4];
-				if (portalDestination == 10)
-					*(int*)(portalAddr + 0xAC) = portalMap[5];
-				if (portalDestination == 12)
-					*(int*)(portalAddr + 0xAC) = portalMap[6];
-				if (portalDestination == 13)
-					*(int*)(portalAddr + 0xAC) = portalMap[7];
-				if (portalDestination == 14)
-					*(int*)(portalAddr + 0xAC) = portalMap[8];
+				auto portalLocationLevel = portalDestination;
+				if (portalMap.find(portalDestination) != portalMap.end()) {
+					portalDestination = portalMap[portalDestination];
+					portalLocationLevel = ArchipelagoHandler::inversePortalMap[portalDestination];
+				}
+				*(int*)(portalAddr + 0xAC) = portalDestination;
+				if (ArchipelagoHandler::levelUnlockStyle != LevelUnlockStyle::VANILLA) {
+					int portalOpenState = SaveDataHandler::saveData.PortalOpen[portalLocationLevel];
+					int& portalState = *(int*)(portalAddr + 0x9C);
+					if (portalOpenState && portalState == 3) {
+						portalState = 1;
+					}
+					else if (!portalOpenState && portalState == 2) {
+						portalState = 3;
+					}
+				}
 				portalAddr = *(int*)(portalAddr + 0x34);
 			}
 		}
@@ -463,12 +448,11 @@ void GameHandler::OnSpawnpointSet() {
 	if (prevLevel == 4 || prevLevel == 5 || prevLevel == 6 ||
 		prevLevel == 8 || prevLevel == 9 || prevLevel == 10 ||
 		prevLevel == 12 || prevLevel == 13 || prevLevel == 14) {
-		auto it = std::find(ArchipelagoHandler::portalMap.begin(), ArchipelagoHandler::portalMap.end(), prevLevel);
-		if (it != ArchipelagoHandler::portalMap.end()) {
-			auto prevLevelPortalIndex = std::distance(ArchipelagoHandler::portalMap.begin(), it);
-			auto pseudoPrevLevel = prevLevelPortalIndex + (4 + (prevLevelPortalIndex > 2) + (prevLevelPortalIndex > 5));
-			if (spawnpointMap.find(pseudoPrevLevel) != spawnpointMap.end()) {
-				auto& posData = spawnpointMap.at(pseudoPrevLevel);
+		auto it = ArchipelagoHandler::inversePortalMap.find(prevLevel);
+		if (it != ArchipelagoHandler::inversePortalMap.end()) {
+			prevLevel = ArchipelagoHandler::inversePortalMap[prevLevel];
+			if (spawnpointMap.find(prevLevel) != spawnpointMap.end()) {
+				auto& posData = spawnpointMap.at(prevLevel);
 				Vector3f posVector;
 				posVector.x = posData[0];
 				posVector.y = posData[1];
