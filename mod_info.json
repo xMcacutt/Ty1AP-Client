@@ -2,7 +2,7 @@
   "name": "Archipelago Client",
   "dll_name": "Ty1AP-Client",
   "description": "Client implementation of Ty into the Archipelago.gg project.",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "dependencies": [
     {
       "dep_name": "TygerMemory",
@@ -19,5 +19,5 @@
   "author": "xMcacutt",
   "download_url": "https://github.com/xMcacutt/Ty1AP-Client/releases/latest/download/Ty1AP-Client.zip",
   "icon_url": "https://raw.githubusercontent.com/xMcacutt/Ty1AP-Client/refs/heads/master/favico.ico",
-  "last_updated": "2025-03-02"
+  "last_updated": "2025-03-08"
 }

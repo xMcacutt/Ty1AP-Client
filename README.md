@@ -148,5 +148,5 @@ FEATURES TO ADD
 
 SOLVED
 
-- Fixed portals I swear this time I mean it
-- Added infra logic option to slot data to support in development pop tracker
+- Fix boss portals not spawning on vanilla unlock style
+- Fix issues with picture frames despawning incorrectly
