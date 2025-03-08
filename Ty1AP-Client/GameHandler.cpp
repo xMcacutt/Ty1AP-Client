@@ -243,15 +243,13 @@ void GameHandler::WatchMemory() {
 					portalLocationLevel = ArchipelagoHandler::inversePortalMap[portalDestination];
 				}
 				*(int*)(portalAddr + 0xAC) = portalDestination;
-				if (ArchipelagoHandler::levelUnlockStyle != LevelUnlockStyle::VANILLA) {
-					int portalOpenState = SaveDataHandler::saveData.PortalOpen[portalLocationLevel];
-					int& portalState = *(int*)(portalAddr + 0x9C);
-					if (portalOpenState && portalState == 3) {
-						portalState = 1;
-					}
-					else if (!portalOpenState && portalState == 2) {
-						portalState = 3;
-					}
+				int portalOpenState = SaveDataHandler::saveData.PortalOpen[portalLocationLevel];
+				int& portalState = *(int*)(portalAddr + 0x9C);
+				if (portalOpenState && portalState == 3) {
+					portalState = 1;
+				}
+				else if (!portalOpenState && portalState == 2) {
+					portalState = 3;
 				}
 				portalAddr = *(int*)(portalAddr + 0x34);
 			}

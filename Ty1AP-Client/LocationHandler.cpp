@@ -93,37 +93,16 @@ void LocationHandler::HandleLocation(int64_t location)
 		b |= 1 << bitIndex;
 		SaveDataHandler::saveData.PictureFrames[byteIndex] = b;
 		SaveDataHandler::SaveGame();
-		for (auto it = RUNNING_FRAME_COUNTS.begin(); it != RUNNING_FRAME_COUNTS.end(); ++it) {
-			int start = it->second;
-			int end = (std::next(it) != RUNNING_FRAME_COUNTS.end()) ? std::next(it)->second : INT_MAX;
-			LevelCode expectedLevel;
-			switch (it->first) {
-			case 0: expectedLevel = LevelCode::Z1; break;
-			case 4: expectedLevel = LevelCode::A1; break;
-			case 5: expectedLevel = LevelCode::A2; break;
-			case 6: expectedLevel = LevelCode::A3; break;
-			case 8: expectedLevel = LevelCode::B1; break;
-			case 9: expectedLevel = LevelCode::B2; break;
-			case 12: expectedLevel = LevelCode::C1; break;
-			case 13: expectedLevel = LevelCode::C2; break;
-			case 14: expectedLevel = LevelCode::C3; break;
-			default: return;  // In case of unexpected keys
-			}
-
-			if (frameId >= start && frameId < end && currentLevel == expectedLevel) {
-				auto frameIndex = frameId - start;
-				auto frameCount = *(int*)(Core::moduleBase + 0x254D68 + 0x44);
-				auto addr = *(uintptr_t*)(Core::moduleBase + 0x254D68 + 0x48);
-				for (int i = 0; i < frameCount; i++) {
-					if (frameIndex == i) {
-						*(int*)(addr + 0x48) = 0;
-						*(int*)(addr + 0x114) = 2;
-						return;
-					}
-					addr = *(uintptr_t*)(addr + 0x34);
-				}
+		auto frameCount = *(int*)(Core::moduleBase + 0x254D68 + 0x44);
+		auto addr = *(uintptr_t*)(Core::moduleBase + 0x254D68 + 0x48);
+		for (int i = 0; i < frameCount; i++) {
+			auto currentFrameId = *(int*)(addr + 0x1D0);
+			if (frameId == currentFrameId) {
+				*(int*)(addr + 0x48) = 0;
+				*(int*)(addr + 0x114) = 2;
 				return;
 			}
+			addr = *(uintptr_t*)(addr + 0x34);
 		}
 		return;
 	}
