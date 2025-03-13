@@ -3,6 +3,7 @@
   "dll_name": "Ty1AP-Client",
   "description": "Client implementation of Ty into the Archipelago.gg project.",
   "version": "1.1.9",
+  "website": "https://github.com/xMcacutt/Ty1AP-Client/blob/master/README.md",
   "dependencies": [
     {
       "dep_name": "TygerMemory",
