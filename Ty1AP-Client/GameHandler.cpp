@@ -136,8 +136,8 @@ void GameHandler::Setup()
 	memset(addr, 0x90, 5);
 
 	// SEPARATE SECOND RANG ON JULIUS KABOOM CHECK
-	char* addr = (char*)(Core::moduleBase + 0x16D378);
-	DWORD oldProtect;
+	addr = (char*)(Core::moduleBase + 0x16D378);
+	oldProtect;
 	VirtualProtect(addr, 0xC, PAGE_EXECUTE_READWRITE, &oldProtect);
 	memset(addr, 0x90, 0xC);
 
