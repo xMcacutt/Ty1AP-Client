@@ -9,7 +9,9 @@
 class InfoWindow : public Window
 {
 public:
-	InfoWindow() : Window("Collectible Info") {};
+	InfoWindow() : Window("Collectible Info") {
+		isVisible = false;
+	};
 	void ToggleVisibility() override;
 	void Draw(int outerWidth, int outerHeight, float uiScale) override;
 private:

@@ -9,7 +9,7 @@ void LoginWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
         return;
 
     // Draw login window
-    ImGui::Begin(name.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::Begin(name.c_str(), &isVisible, ImGuiWindowFlags_AlwaysAutoResize);
     ImGui::InputText("Server", server, IM_ARRAYSIZE(server));
     ImGui::InputText("Password", password, IM_ARRAYSIZE(password), ImGuiInputTextFlags_Password);
     ImGui::InputText("Slot Name", slot, IM_ARRAYSIZE(slot));

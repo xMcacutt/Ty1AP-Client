@@ -8,36 +8,6 @@ std::map<std::string, unsigned int> GUI::icons;
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 bool GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-    if (msg == WM_KEYDOWN) {
-        // Check if the key corresponds to any window's toggle hotkey
-        if (wParam == VK_F2) {
-            GUI::isShown = !GUI::isShown;
-        }
-        if (wParam == VK_F3) {
-            for (auto& window : windows) {
-                if (auto login = dynamic_cast<LoginWindow*>(window.get())) {
-                    login->ToggleVisibility();
-                    break;
-                }
-            }
-        }
-        if (wParam == VK_F4) {
-            for (auto& window : windows) {
-                if (auto tracker = dynamic_cast<TrackerWindow*>(window.get())) {
-                    tracker->ToggleVisibility();
-                    break;
-                }
-            }
-        }
-        if (wParam == VK_F5) {
-            for (auto& window : windows) {
-                if (auto info = dynamic_cast<InfoWindow*>(window.get())) {
-                    info->ToggleVisibility();
-                    break;
-                }
-            }
-        }
-    }
     if (API::DrawingGUI())
         if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
             return true;
@@ -79,8 +49,6 @@ void GUI::Initialize() {
 void GUI::DrawUI() {
     if (!GUI::init)
         Initialize();
-    if (!GUI::isShown)
-        return;
 
     HWND hwnd = (HWND)API::GetTyWindowHandle();
     RECT rect;
@@ -99,6 +67,39 @@ void GUI::DrawUI() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
+    ImGui::SetNextWindowPos(ImVec2(windowWidth - (114 * uiScale), 0));
+    auto popupId = "APMenu";
+    ImGui::Begin("AP Button", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize);
+
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.f, 0.f));
+    if (ImGui::ImageButton("##AP_BUTTON", (ImTextureID)(intptr_t)GUI::icons["ap"], ImVec2(64 * uiScale, 64 * uiScale), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0, 0, 0, 0), ImVec4(1, 1, 1, 1))) {
+        ImGui::OpenPopup(popupId);
+    }
+    ImGui::PopStyleColor(3);
+
+    if (ImGui::BeginPopup(popupId)) {
+        if (ImGui::MenuItem("Connection")) {
+            for (auto& window : windows) {
+                if (auto login = dynamic_cast<LoginWindow*>(window.get())) {
+                    login->isVisible = true;
+                    break;
+                }
+            }
+        }
+        if (ImGui::MenuItem("Collectible Info")) {
+            for (auto& window : windows) {
+                if (auto info = dynamic_cast<InfoWindow*>(window.get())) {
+                    info->isVisible = true;
+                    break;
+                }
+            }
+        }
+    }
+    ImGui::EndPopup();
+    ImGui::End();
+
     for (auto& window : windows) { window.get()->Draw(windowWidth, windowHeight, uiScale); }
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -163,5 +164,18 @@ bool GUI::LoadIcons() {
     icons["bilby"] = GUI::LoadTextureFromResource(BILBY_ICON);
     icons["level"] = GUI::LoadTextureFromResource(LEVEL_ICON);
     icons["stopwatch"] = GUI::LoadTextureFromResource(STOPWATCH_ICON);
+    icons["boom"] = GUI::LoadTextureFromResource(BOOM_ICON);
+    icons["flame"] = GUI::LoadTextureFromResource(FLAME_ICON);
+    icons["frosty"] = GUI::LoadTextureFromResource(FROSTY_ICON);
+    icons["zappy"] = GUI::LoadTextureFromResource(ZAPPY_ICON);
+    icons["doom"] = GUI::LoadTextureFromResource(DOOM_ICON);
+    icons["multi"] = GUI::LoadTextureFromResource(MULTI_ICON);
+    icons["zoom"] = GUI::LoadTextureFromResource(ZOOM_ICON);
+    icons["mega"] = GUI::LoadTextureFromResource(MEGA_ICON);
+    icons["infra"] = GUI::LoadTextureFromResource(INFRA_ICON);
+    icons["kaboom"] = GUI::LoadTextureFromResource(KABOOM_ICON);
+    icons["chrono"] = GUI::LoadTextureFromResource(CHRONO_ICON);
+    icons["aqua"] = GUI::LoadTextureFromResource(AQUA_ICON);
+    icons["ap"] = GUI::LoadTextureFromResource(AP_ICON);
     return true;
 }

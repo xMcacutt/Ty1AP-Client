@@ -28,19 +28,19 @@ Optionally, you can place the Patch_PC.rkv from the releases page into your Ty f
 
 ## Connecting
 
-To open and close the AP client windows you can press F2. If you wish to hide the connection window but keep the item log in the bottom left, simply press F3.
+To open and close the AP client windows click the AP logo in the top right. 
 
-To interact with any window in TygerFramework, you'll need the TygerFramework window to be open. You can toggle the TygerFramework window with F1.
+Interacting with any window in TygerFramework requires the TygerFramework window to be open. You can toggle the TygerFramework window with F1.
 
 With the TygerFramework window and the Ty1 AP Client connection window open, enter your server address, password, and slot name and press connect. The load game button on the main menu should now be active. Upon pressing this, you will bypass the load select screen, a save is created in the saves directory in your Ty folder and you will be able to load directly into the save for the seed of the world.
 
 ## Collectible Info Window
 
-As of 1.1.3, a new window is available and can be toggled by pressing F5. This window gives information on every collectible so hints showing locations such as 
+As of 1.1.3, a new window is available. This window gives information on every collectible so hints showing locations such as 
 
 `Two Up - Golden Cog 7`
 
-Can be found more easily. Simply press F5 and reference the guide.
+Can be found more easily. Simply select collectible info from the ap menu in game and reference the guide.
 
 ## How This Rando Works
 
@@ -82,7 +82,7 @@ For each attribute its unlock to grant the check varies. Using scalesanity, you 
 
 ### Items
 
-Receiving items in an ap world will not lead to items being collected in the Ty world. Instead, it will give an item which is saved separately into the save data. These items can be tracked using the built in tracker which is opened whilst not on the main menu using F4. 
+Receiving items in an ap world will not lead to items being collected in the Ty world. Instead, it will give an item which is saved separately into the save data. These items can be tracked using the built in tracker which is opened while not on the main menu.
 
 #### Rangs
 
@@ -140,13 +140,14 @@ Stopwatches can be added to the pool using "Gate Time Attacks". They unlock the 
 
 KNOWN CLIENT ISSUES
 
-- Throwing the kaboomerang without having the second rang may crash the game
-
 FEATURES TO ADD
-
-- More log text colouring
 
 SOLVED
 
-- Fix boss portals not spawning on vanilla unlock style
-- Fix issues with picture frames despawning incorrectly
+- Kaboom no longer crashes when thrown without second rang
+- Gate no longer opens on second rang check instead of item
+- Added rang icons to tracker
+- Second rang check no longer sends on kaboom check
+- Rang wheel fixed
+- Rang swapping while stationary with one rang is now possible
+- More log coloring

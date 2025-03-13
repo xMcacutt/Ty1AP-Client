@@ -135,8 +135,23 @@ void GameHandler::Setup()
 	VirtualProtect(addr, 5, PAGE_EXECUTE_READWRITE, &oldProtect);
 	memset(addr, 0x90, 5);
 
+	// SEPARATE SECOND RANG ON JULIUS KABOOM CHECK
+	char* addr = (char*)(Core::moduleBase + 0x16D378);
+	DWORD oldProtect;
+	VirtualProtect(addr, 0xC, PAGE_EXECUTE_READWRITE, &oldProtect);
+	memset(addr, 0x90, 0xC);
+
 	// ONE RANG SWAP
 	addr = (char*)(Core::moduleBase + 0x162B9C);
+	VirtualProtect(addr, 6, PAGE_EXECUTE_READWRITE, &oldProtect);
+	memset(addr, 0x90, 6);
+	addr = (char*)(Core::moduleBase + 0x162B65);
+	VirtualProtect(addr, 6, PAGE_EXECUTE_READWRITE, &oldProtect);
+	memset(addr, 0x90, 6);
+	addr = (char*)(Core::moduleBase + 0x162B6E);
+	VirtualProtect(addr, 6, PAGE_EXECUTE_READWRITE, &oldProtect);
+	memset(addr, 0x90, 6);
+	addr = (char*)(Core::moduleBase + 0x162B5C);
 	VirtualProtect(addr, 6, PAGE_EXECUTE_READWRITE, &oldProtect);
 	memset(addr, 0x90, 6);
 
@@ -144,6 +159,11 @@ void GameHandler::Setup()
 	addr = (char*)(Core::moduleBase + 0xE4334);
 	VirtualProtect(addr, 1, PAGE_EXECUTE_READWRITE, &oldProtect);
 	memset(addr, 0xEB, 1);
+
+	// KABOOM FIX
+	addr = (char*)(Core::moduleBase + 0x3F8EE);
+	VirtualProtect(addr, 2, PAGE_EXECUTE_READWRITE, &oldProtect);
+	memset(addr, 0x90, 2);
 
 	*(uintptr_t*)(Core::moduleBase + 0x528210) = *(uintptr_t*)&hardDiskMessage;
 
@@ -201,7 +221,10 @@ void GameHandler::Setup()
 		{0x2E61B, 0xBA6}, {0x2E5B9, 0xBA6}, {0x2E3FB, 0xBA6}, {0x25F75, 0xBA6}, {0x35723, 0xBA4},
 		{0x35754, 0xBA4}, {0x162EFD, 0xBA4}, {0x35781, 0xBA4}, {0x357AE, 0xBA4}, {0x34D0D, 0xBA4},
 		{0x34F32, 0xBA4}, {0x26B1E, 0xBA5}, {0xF8490, 0xBA7}, /*{0xD50B1, 0xBA7},*/
-		{0x3E32C, 0xBA8}, {0x3E02D, 0xBA8}, {0xF356A, 0xBA8}, {0xF330E, 0xBA8}, {0xF352E, 0xBA8}, {0xF356A, 0xBA8}
+		{0x3E32C, 0xBA8}, {0x3E02D, 0xBA8}, {0xF356A, 0xBA8}, {0xF330E, 0xBA8}, {0xF352E, 0xBA8}, {0xF356A, 0xBA8}, 
+		{0x3DC0D, 0xBA8} /*Rang Wheel 1*/, {0x3DC40, 0xBA8} /*Rang Wheel 2*/,
+		{0x3DFA1, 0xBA8}, {0x3DFD0, 0xBA8}, {0x3DFF6, 0xBA8}
+
 	};
 	PatchRangMemory(patches);
 	 
@@ -250,7 +273,7 @@ void GameHandler::WatchMemory() {
 				}
 				else if (!portalOpenState && portalState == 2) {
 					portalState = 3;
-				}
+				} 
 				portalAddr = *(int*)(portalAddr + 0x34);
 			}
 		}
@@ -306,11 +329,9 @@ void GameHandler::OnEnterRainbowCliffs() {
 		counterAddr = *(int*)(counterAddr + 0x34);
 	}
 
-	if (SaveDataHandler::saveData.ArchAttributeData.GotSecondRang) {
-		auto gateAddr = *(uintptr_t*)(Core::moduleBase + 0x269C14);
-		gateAddr = *(uintptr_t*)(gateAddr + 0x78);
-		*(bool*)(gateAddr + 0x111) = true;
-	}
+	auto gateAddr = *(uintptr_t*)(Core::moduleBase + 0x269C14);
+	gateAddr = *(uintptr_t*)(gateAddr + 0x78);
+	*(bool*)(gateAddr + 0x111) = SaveDataHandler::saveData.ArchAttributeData.GotSecondRang;
 }
 
 void GameHandler::HandleItemReceived(APClient::NetworkItem item) {

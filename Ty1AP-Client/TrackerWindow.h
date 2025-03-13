@@ -8,7 +8,9 @@
 
 class TrackerWindow : public Window {
 public:
-    TrackerWindow() : Window("Tracker") {};
+    TrackerWindow() : Window("Tracker") {
+        isVisible = true;
+    };
     void ToggleVisibility() override;
     void Draw(int outerWidth, int outerHeight, float uiScale) override;
 };

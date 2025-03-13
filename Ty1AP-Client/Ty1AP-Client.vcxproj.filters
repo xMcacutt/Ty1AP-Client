@@ -222,5 +222,80 @@
     <Image Include="resource\TE.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="..\..\..\..\Downloads\concept_transparent\aquarang.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\Downloads\concept_transparent\boomerang.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\Downloads\concept_transparent\chronorang.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\Downloads\concept_transparent\doomerang.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\Downloads\concept_transparent\flamerang.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\Downloads\concept_transparent\frostyrang.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\Downloads\concept_transparent\infrarang.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\Downloads\concept_transparent\kaboomerang.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\Downloads\concept_transparent\megarang.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\Downloads\concept_transparent\multirang.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\Downloads\concept_transparent\zappyrang.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\Downloads\concept_transparent\zoomerang.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\aquarang.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\boomerang.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\chronorang.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\doomerang.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\flamerang.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\frostyrang.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\infrarang.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\kaboomerang.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\megarang.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\multirang.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\zappyrang.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\zoomerang.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

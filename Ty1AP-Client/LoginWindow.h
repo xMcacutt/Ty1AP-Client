@@ -8,6 +8,7 @@ class LoginWindow : public Window {
 public:
     LoginWindow() : Window("Login") {
         std::string savedServer, savedSlot, savedPassword;
+        isVisible = false;
         if (LoadLoginData(savedServer, savedSlot, savedPassword)) {
             // If data was loaded successfully, pre-fill the fields
             strncpy(server, savedServer.c_str(), sizeof(server));

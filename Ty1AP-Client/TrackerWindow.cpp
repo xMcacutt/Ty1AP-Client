@@ -125,89 +125,89 @@ void TrackerWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
 
     auto brightness = SaveDataHandler::saveData.ArchAttributeData.GotBoomerang  ? 0.7f : 0.2f;
     tintColor = ImVec4(brightness, brightness, brightness, 1.0f);
-    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["rang"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
+    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["boom"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
 
     ImGui::SameLine();
 
     brightness = SaveDataHandler::saveData.ArchAttributeData.GotSecondRang ? 0.7f : 0.2f;
     tintColor = ImVec4(brightness, brightness, brightness, 1.0f);
-    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["rang"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
+    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["boom"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
 
     ImGui::SameLine();
 
     brightness = SaveDataHandler::saveData.ArchAttributeData.LearntToSwim ? 0.7f : 0.2f;
     tintColor = ImVec4(brightness, brightness, brightness, 1.0f);
-    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["rang"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
+    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["aqua"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
 
     ImGui::SameLine();
 
     brightness = SaveDataHandler::saveData.ArchAttributeData.GotAquarang ? 0.7f : 0.2f;
     tintColor = ImVec4(brightness, brightness, brightness, 1.0f);
-    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["rang"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
+    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["aqua"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
 
     ImGui::SameLine();
 
     brightness = SaveDataHandler::saveData.ArchAttributeData.LearntToDive ? 0.7f : 0.2f;
     tintColor = ImVec4(brightness, brightness, brightness, 1.0f);
-    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["rang"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
+    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["aqua"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
     
     ImGui::SameLine();
 
     brightness = SaveDataHandler::saveData.ArchAttributeData.GotFlamerang ? 0.7f : 0.2f;
     tintColor = ImVec4(brightness, brightness, brightness, 1.0f);
-    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["rang"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
+    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["flame"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
 
     ImGui::SameLine();
 
     brightness = SaveDataHandler::saveData.ArchAttributeData.GotFrostyrang ? 0.7f : 0.2f;
     tintColor = ImVec4(brightness, brightness, brightness, 1.0f);
-    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["rang"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
+    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["frosty"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
 
     ImGui::SameLine();
 
     brightness = SaveDataHandler::saveData.ArchAttributeData.GotZappyrang ? 0.7f : 0.2f;
     tintColor = ImVec4(brightness, brightness, brightness, 1.0f);
-    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["rang"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
+    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["zappy"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
 
     ImGui::SameLine();
 
     brightness = SaveDataHandler::saveData.ArchAttributeData.GotDoomerang ? 0.7f : 0.2f;
     tintColor = ImVec4(brightness, brightness, brightness, 1.0f);
-    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["rang"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
+    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["doom"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
 
     brightness = SaveDataHandler::saveData.ArchAttributeData.GotZoomerang ? 0.7f : 0.2f;
     tintColor = ImVec4(brightness, brightness, brightness, 1.0f);
-    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["rang"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
+    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["zoom"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
 
     ImGui::SameLine();
 
     brightness = SaveDataHandler::saveData.ArchAttributeData.GotMultirang ? 0.7f : 0.2f;
     tintColor = ImVec4(brightness, brightness, brightness, 1.0f);
-    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["rang"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
+    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["multi"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
 
     ImGui::SameLine();
 
     brightness = SaveDataHandler::saveData.ArchAttributeData.GotInfrarang ? 0.7f : 0.2f;
     tintColor = ImVec4(brightness, brightness, brightness, 1.0f);
-    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["rang"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
+    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["infra"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
 
     ImGui::SameLine();
 
     brightness = SaveDataHandler::saveData.ArchAttributeData.GotMegarang ? 0.7f : 0.2f;
     tintColor = ImVec4(brightness, brightness, brightness, 1.0f);
-    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["rang"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
+    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["mega"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
 
     ImGui::SameLine();
 
     brightness = SaveDataHandler::saveData.ArchAttributeData.GotKaboomerang ? 0.7f : 0.2f;
     tintColor = ImVec4(brightness, brightness, brightness, 1.0f);
-    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["rang"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
+    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["kaboom"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
 
     ImGui::SameLine();
 
     brightness = SaveDataHandler::saveData.ArchAttributeData.GotChronorang ? 0.7f : 0.2f;
     tintColor = ImVec4(brightness, brightness, brightness, 1.0f);
-    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["rang"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
+    ImGui::Image((ImTextureID)(intptr_t)GUI::icons["chrono"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), tintColor);
 
 
     ImGui::End();

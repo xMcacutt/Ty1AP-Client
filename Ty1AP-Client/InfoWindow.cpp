@@ -10,7 +10,7 @@ void InfoWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
 
     // Draw info window
     ImGui::SetNextWindowSizeConstraints(ImVec2(450, 200), ImVec2(450, 500));
-    ImGui::Begin(name.c_str(), nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::Begin(name.c_str(), &isVisible, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(50, 50));
     CreateTree(Z1Info);

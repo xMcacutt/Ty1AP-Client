@@ -219,13 +219,38 @@
     <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\..\..\..\Downloads\concept_transparent\aquarang.png" />
+    <Image Include="..\..\..\..\Downloads\concept_transparent\boomerang.png" />
+    <Image Include="..\..\..\..\Downloads\concept_transparent\chronorang.png" />
+    <Image Include="..\..\..\..\Downloads\concept_transparent\doomerang.png" />
+    <Image Include="..\..\..\..\Downloads\concept_transparent\flamerang.png" />
+    <Image Include="..\..\..\..\Downloads\concept_transparent\frostyrang.png" />
+    <Image Include="..\..\..\..\Downloads\concept_transparent\infrarang.png" />
+    <Image Include="..\..\..\..\Downloads\concept_transparent\kaboomerang.png" />
+    <Image Include="..\..\..\..\Downloads\concept_transparent\megarang.png" />
+    <Image Include="..\..\..\..\Downloads\concept_transparent\multirang.png" />
+    <Image Include="..\..\..\..\Downloads\concept_transparent\zappyrang.png" />
+    <Image Include="..\..\..\..\Downloads\concept_transparent\zoomerang.png" />
+    <Image Include="resource\aquarang.png" />
     <Image Include="resource\Bilby.png" />
+    <Image Include="resource\boomerang.png" />
+    <Image Include="resource\chronorang.png" />
     <Image Include="resource\Cog.png" />
+    <Image Include="resource\doomerang.png" />
+    <Image Include="resource\flamerang.png" />
+    <Image Include="resource\frostyrang.png" />
+    <Image Include="resource\icon.png" />
+    <Image Include="resource\infrarang.png" />
+    <Image Include="resource\kaboomerang.png" />
     <Image Include="resource\Level.png" />
+    <Image Include="resource\megarang.png" />
+    <Image Include="resource\multirang.png" />
     <Image Include="resource\Rang.png" />
     <Image Include="resource\Stopwatch.png" />
     <Image Include="resource\Talisman.png" />
     <Image Include="resource\TE.png" />
+    <Image Include="resource\zappyrang.png" />
+    <Image Include="resource\zoomerang.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
