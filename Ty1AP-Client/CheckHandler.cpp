@@ -443,7 +443,6 @@ void CheckHandler::OnCollectFrame(int frameIndex)
 	int level = (int)Level::getCurrentLevel();
 	SaveDataHandler::saveData.FrameCount[level]++;
 	auto adjustedLevel = level - (3 + (level > 7) + (level > 9) + (level > 11));
-	adjustedLevel -= (adjustedLevel > 3) + (adjustedLevel > 7);
 	if (adjustedLevel == -3)
 		adjustedLevel = 0;
 	auto levelFrameCount = SaveDataHandler::saveData.FrameCount[level];

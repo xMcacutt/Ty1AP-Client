@@ -135,19 +135,3 @@ When you receive a bilby, it will be named Bilby - LEVEL NAME. This will save a 
 #### Stopwatches
 
 Stopwatches can be added to the pool using "Gate Time Attacks". They unlock the time attack for their corresponding level and add a harder time attack challenge check to each level. The time attack challenge can be completed on the same attempt as obtaining the time attack thunder egg check but you will only see the time you are trying to beat after obtaining the thunder egg.
-
-## Known Issues
-
-KNOWN CLIENT ISSUES
-
-FEATURES TO ADD
-
-SOLVED
-
-- Kaboom no longer crashes when thrown without second rang
-- Gate no longer opens on second rang check instead of item
-- Added rang icons to tracker
-- Second rang check no longer sends on kaboom check
-- Rang wheel fixed
-- Rang swapping while stationary with one rang is now possible
-- More log coloring

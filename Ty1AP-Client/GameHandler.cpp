@@ -429,6 +429,7 @@ void GameHandler::OnEnterLevel() {
 	LocationHandler::HandleStoredCheckedLocations();
 
 	auto levelId = Level::getCurrentLevel();
+	ArchipelagoHandler::SendLevel(static_cast<int>(levelId));
 
 	if (levelId == LevelCode::A3)
 		OnEnterShipRex();

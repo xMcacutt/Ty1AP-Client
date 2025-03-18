@@ -372,3 +372,11 @@ void ArchipelagoHandler::SendDeath() {
     };
     ap->Bounce(data, {}, {}, { "DeathLink" });
 }
+
+void ArchipelagoHandler::SendLevel(int levelId) {
+    APClient::DataStorageOperation operation;
+    operation.operation = "replace";
+    operation.value = levelId;
+    auto key = "ty1_level_" + std::to_string(ap->get_team_number()) + "_" + slot;
+    ap->Set(key, 0, false, { operation });
+}

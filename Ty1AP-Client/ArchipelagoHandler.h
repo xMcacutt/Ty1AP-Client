@@ -38,6 +38,7 @@ public:
 	static void Release();
 	static bool LoadSaveData();
 	static void SendDeath();
+	static void SendLevel(int levelId);
 	static std::string GetItemName(int64_t itemId);
 	static std::string GetPlayerAlias(int64_t playerId);
 	static std::string GetLocationName(int64_t locId);
