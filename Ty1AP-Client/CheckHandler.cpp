@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "CheckHandler.h"
 
 typedef void(__stdcall* CollectTheggFunctionType)();
@@ -511,17 +512,26 @@ void CheckHandler::OnCollectRang(int rangId) {
 }
 
 void CheckHandler::OnCollectOpal(uintptr_t opalPtr) {
-	if (Level::getCurrentLevel() != LevelCode::Z1 || !ArchipelagoHandler::scalesanity) 
-		return;
-	uintptr_t baseOpalAddr = *(uintptr_t*)(Core::moduleBase + 0x269818 + 0x48);
-	int opalIndex = (opalPtr - baseOpalAddr) / 0x114;
-	auto byteIndex = opalIndex / 8;
-	auto bitIndex = opalIndex % 8;
-	auto b = SaveDataHandler::saveData.LevelData[(int)LevelCode::Z1].Opals[byteIndex];
+	auto currentLevel = Level::getCurrentLevel();
+
+	API::LogPluginMessage(std::to_string(opalPtr));
+
+	auto opalId = *(int*)(opalPtr + 0x10);
+	auto byteIndex = opalId / 8;
+	auto bitIndex = opalId % 8;
+	auto b = SaveDataHandler::saveData.LevelData[(int)currentLevel].Opals[byteIndex];
 	b |= 1 << bitIndex;
-	SaveDataHandler::saveData.LevelData[(int)LevelCode::Z1].Opals[byteIndex] = b;
-	ArchipelagoHandler::Check(0x8750320 + static_cast<int64_t>(opalIndex));
+	SaveDataHandler::saveData.LevelData[(int)currentLevel].Opals[byteIndex] = b;
+	
 	SaveDataHandler::SaveGame();
+	
+	if (currentLevel == LevelCode::Z1 && !ArchipelagoHandler::scalesanity)
+		return;
+	if (currentLevel != LevelCode::Z1 && !ArchipelagoHandler::opalsanity)
+		return;
+
+	auto levelOffset = (int)currentLevel << 0xC;
+	ArchipelagoHandler::Check(0x8750350 + levelOffset + static_cast<int64_t>(opalId));
 }
 
 void CheckHandler::OnHitSign(uintptr_t signPtr) {

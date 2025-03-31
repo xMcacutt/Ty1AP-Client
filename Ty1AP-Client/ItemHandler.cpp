@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ItemHandler.h"
 
 std::queue<APClient::NetworkItem> ItemHandler::storedItems;
@@ -12,6 +13,8 @@ std::unordered_map<int, std::string> ItemHandler::boomerangMessages {
 	{7, "Pikachu, I choose you! (Zappyrang)"},
 	{8, "Beyblade! Beyblade! Let it rip! (Doomerang)"}
 };
+
+bool ItemHandler::isSlowTrapped = false;
 
 void ItemHandler::HandleItem(APClient::NetworkItem item)
 {
@@ -145,11 +148,13 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 	else if (item.item == 0x8750091) { // Slow Trap
 		std::thread([] {
 			auto iterator = 0;
+			isSlowTrapped = true;
 			while (iterator < 1000) {
 				Hero::setRunSpeed(5.0f);
 				Sleep(20);
 				iterator++;
 			}
+			isSlowTrapped = false;
 			Hero::setRunSpeed(10.0f);
 		}).detach();
 	}

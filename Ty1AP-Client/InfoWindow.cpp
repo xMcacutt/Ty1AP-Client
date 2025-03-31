@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "InfoWindow.h"
 
 void InfoWindow::ToggleVisibility() {

@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "TimeAttackHandler.h"
 
 std::map<LevelCode, int> TimeAttackHandler::stdTimes = {

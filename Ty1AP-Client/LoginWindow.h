@@ -1,7 +1,6 @@
 #pragma once
 #include "imgui.h"
 #include "ArchipelagoHandler.h"
-#include <string>
 #include "Window.h"
 
 class LoginWindow : public Window {
@@ -11,9 +10,9 @@ public:
         isVisible = false;
         if (LoadLoginData(savedServer, savedSlot, savedPassword)) {
             // If data was loaded successfully, pre-fill the fields
-            strncpy(server, savedServer.c_str(), sizeof(server));
-            strncpy(slot, savedSlot.c_str(), sizeof(slot));
-            strncpy(password, savedPassword.c_str(), sizeof(password));
+            strncpy_s(server, savedServer.c_str(), sizeof(server));
+            strncpy_s(slot, savedSlot.c_str(), sizeof(slot));
+            strncpy_s(password, savedPassword.c_str(), sizeof(password));
         }
     };
     void ToggleVisibility() override;

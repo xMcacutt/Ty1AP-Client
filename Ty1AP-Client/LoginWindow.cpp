@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "LoginWindow.h"
 
 void LoginWindow::ToggleVisibility() {

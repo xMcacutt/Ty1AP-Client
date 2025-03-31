@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "TrackerWindow.h"
 
 void TrackerWindow::ToggleVisibility() {

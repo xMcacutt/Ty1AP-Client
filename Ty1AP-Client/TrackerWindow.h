@@ -3,7 +3,6 @@
 #include "imgui.h"
 #include "gui.h"
 #include "SaveDataHandler.h"
-#include <string>
 #include "Window.h"
 
 class TrackerWindow : public Window {

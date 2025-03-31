@@ -1,14 +1,44 @@
 #pragma once
 #include "apclient.hpp"
 #include "GameHandler.h"
-#include "uuid.h"
 #include "nlohmann/json.hpp"
-#include <fstream>
-#include <map>
 #include "TygerFrameworkAPI.hpp"
 #include "gui.h"
 #include "LoginWindow.h"
-#include "gamestate.h"
+#include <inttypes.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#include <emscripten/html5.h>
+#include <emscripten/bind.h>
+#else
+#define EM_BOOL bool
+#define EM_TRUE true
+#define EM_FALSE false
+#if !defined WIN32 && !defined _WIN32
+#include <poll.h>
+#endif
+#endif
+#include <limits>
+
+#if defined(WIN32) && !defined(PRId64 )
+#define PRId64 "I64d"
+#endif
+
+#define VERSION_TUPLE {0,5,1}
+
+#ifdef __EMSCRIPTEN__
+#define VIRTUAL_HOME_DIR "/settings"
+#define OLD_DATAPACKAGE_CACHE "/settings/datapackage.json"
+#define UUID_FILE "/settings/uuid"
+#define CERT_STORE "" // not required in a browser context
+#else
+#define OLD_DATAPACKAGE_CACHE "datapackage.json"
+#define UUID_FILE "uuid" // TODO: place in %appdata%
+#define CERT_STORE "cacert.pem" // SSL certificate store for non-browser contexts
+#endif
+
+#define GAME_NAME "Ty the Tasmanian Tiger"
+#define AP_OFFSET 8750000
 
 enum class LevelUnlockStyle {
 	VANILLA,
@@ -58,6 +88,7 @@ public:
 	static bool scalesanity;
 	static bool signsanity;
 	static bool lifesanity;
+	static bool opalsanity;
 	static bool progressiveRang;
 	static bool progressiveLevel;
 	static bool ap_sync_queued;

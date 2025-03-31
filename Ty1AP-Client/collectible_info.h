@@ -1,6 +1,4 @@
 #pragma once
-#include <string>
-#include <map>
 
 struct LevelCollectibleInfo {
     std::string levelName; 

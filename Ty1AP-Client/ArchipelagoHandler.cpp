@@ -1,45 +1,7 @@
 #pragma once
+#include "pch.h"
 #include "ArchipelagoHandler.h"
 #include "apuuid.hpp"
-#include <stdio.h>
-#include <inttypes.h>
-#include <algorithm>
-#include <memory>
-#include "hero.h"
-#ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-#include <emscripten/html5.h>
-#include <emscripten/bind.h>
-#else
-#define EM_BOOL bool
-#define EM_TRUE true
-#define EM_FALSE false
-#if !defined WIN32 && !defined _WIN32
-#include <poll.h>
-#endif
-#endif
-#include <math.h>
-#include <limits>
-
-#if defined(WIN32) && !defined(PRId64 )
-#define PRId64 "I64d"
-#endif
-
-#define VERSION_TUPLE {0,5,1}
-
-#ifdef __EMSCRIPTEN__
-#define VIRTUAL_HOME_DIR "/settings"
-#define OLD_DATAPACKAGE_CACHE "/settings/datapackage.json"
-#define UUID_FILE "/settings/uuid"
-#define CERT_STORE "" // not required in a browser context
-#else
-#define OLD_DATAPACKAGE_CACHE "datapackage.json"
-#define UUID_FILE "uuid" // TODO: place in %appdata%
-#define CERT_STORE "cacert.pem" // SSL certificate store for non-browser contexts
-#endif
-
-#define GAME_NAME "Ty the Tasmanian Tiger"
-#define AP_OFFSET 8750000
 
 using nlohmann::json;
 bool ap_connect_sent = false;
@@ -64,6 +26,7 @@ Framesanity ArchipelagoHandler::framesanity = Framesanity::NONE;
 bool ArchipelagoHandler::scalesanity = false;
 bool ArchipelagoHandler::signsanity = false;
 bool ArchipelagoHandler::lifesanity = false;
+bool ArchipelagoHandler::opalsanity = false;
 bool ArchipelagoHandler::progressiveRang = false;
 bool ArchipelagoHandler::progressiveLevel = false;
 bool ArchipelagoHandler::gateTimeAttacks = false;
@@ -122,10 +85,6 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
     polling = true;
     API::LogPluginMessage("Connecting to AP, server " + uri + "\n", LogLevel::Info);
     SetAPStatus("Connecting", 1);
-    try {
-        ap->set_data_package_from_file(OLD_DATAPACKAGE_CACHE);
-    }
-    catch (std::exception) { /* ignore */ }
 
     ap_sync_queued = false;
     ap->set_socket_connected_handler([login]() {
@@ -212,6 +171,9 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
         if (data.find("Signsanity") != data.end())
             signsanity = data["Signsanity"].get<int>() == 1;
 
+        if (data.find("Opalsanity") != data.end())
+            opalsanity = data["Opalsanity"].get<int>() == 1;
+
         if (data.find("AdvancedLogic") != data.end() && data["AdvancedLogic"].is_number_integer())
             advancedLogic = data["AdvancedLogic"].get<int>() == 1;
 
@@ -248,7 +210,6 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
         for (const auto& item : items) {
             ItemHandler::HandleItem(item);
         }
-
     });
     ap->set_location_checked_handler([](const std::list<int64_t> locations){
         for (auto& location : locations) {
@@ -297,7 +258,7 @@ void ArchipelagoHandler::Release() {
 }
 
 std::string ArchipelagoHandler::GetItemName(int64_t itemId) {
-    return ap->get_item_name(itemId);
+    return ap->get_item_name(itemId, GAME_NAME);
 }
 
 std::string ArchipelagoHandler::GetPlayerAlias(int64_t playerId) {
@@ -305,7 +266,7 @@ std::string ArchipelagoHandler::GetPlayerAlias(int64_t playerId) {
 }
 
 std::string ArchipelagoHandler::GetLocationName(int64_t locId) {
-    return ap->get_location_name(locId);
+    return ap->get_location_name(locId, GAME_NAME);
 }
 
 void ArchipelagoHandler::Poll() {

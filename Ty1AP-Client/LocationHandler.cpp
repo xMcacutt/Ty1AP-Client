@@ -1,4 +1,18 @@
+#include "pch.h"
 #include "LocationHandler.h"
+
+std::unordered_map<int, int> LocationHandler::crateOpalCounts = {
+	{ 0, 0 },
+	{ 4, 170 },
+	{ 5, 102 },
+	{ 6, 119 },
+	{ 8, 120 },
+	{ 9, 60 },
+	{ 10, 300 },
+	{ 12, 30 },
+	{ 13, 170 },
+	{ 14, 215 },
+};
 
 void LocationHandler::HandleLocation(int64_t location)
 {
@@ -106,24 +120,40 @@ void LocationHandler::HandleLocation(int64_t location)
 		}
 		return;
 	}
-	if (location >= 0x8750320 && location < 0x8750339) {
-		// RAINBOW SCALES
-		int scaleId = location - 0x8750320;
-		auto byteIndex = scaleId / 8;
-		auto bitIndex = scaleId % 8;
-		auto b = SaveDataHandler::saveData.LevelData[(int)LevelCode::Z1].Opals[byteIndex];
+	if (location >= 0x8750350 && location < 0x875E47C) {
+		// OPALS / RAINBOW SCALES
+		int level = (location - 0x8750000) >> 0xC;
+		int opalId = location - (0x8750350 + (level << 0xC));
+		auto byteIndex = opalId / 8;
+		auto bitIndex = opalId % 8;
+		auto b = SaveDataHandler::saveData.LevelData[level].Opals[byteIndex];
 		b |= 1 << bitIndex;
-		SaveDataHandler::saveData.LevelData[(int)LevelCode::Z1].Opals[byteIndex] = b;
+		SaveDataHandler::saveData.LevelData[level].Opals[byteIndex] = b;
 		SaveDataHandler::SaveGame();
-		if (currentLevel != LevelCode::Z1)
+
+		if ((LevelCode)level != currentLevel)
 			return;
-		auto addr = *(uintptr_t*)(Core::moduleBase + 0x269818 + 0x48);
-		for (int i = 0; i < 25; i++) {
-			if (scaleId == i) {
-				*(int*)(addr + 0x78) = 5;
-				return;
+
+		auto looseOpalCount = *(int*)(Core::moduleBase + 0x269818 + 0x44);
+		auto looseOpalAddr = *(uintptr_t*)(Core::moduleBase + 0x269818 + 0x48);
+		auto crateOpalAddr = *(uintptr_t*)(Core::moduleBase + 0x28AB70);
+		if (opalId < looseOpalCount) {
+			for (int i = 0; i < looseOpalCount; i++) {
+				if (opalId == i) {
+					*(int*)(looseOpalAddr + 0x78) = 5;
+					return;
+				}
+				looseOpalAddr = *(uintptr_t*)(looseOpalAddr + 0x34);
 			}
-			addr = *(uintptr_t*)(addr + 0x34);
+		}
+		else {
+			for (int i = looseOpalCount; i < 300; i++) {
+				if (opalId == i) {
+					*(int*)(crateOpalAddr + 0x78) = 5;
+					return;
+				}
+				crateOpalAddr = *(uintptr_t*)(crateOpalAddr + 0x34);
+			}
 		}
 	}
 	if (location >= 0x8750261 && location < 0x8750266) {

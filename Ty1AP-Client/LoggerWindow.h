@@ -1,8 +1,5 @@
 #pragma once
 #include "Window.h"
-#include <string>
-#include <chrono>
-#include <vector>
 #include "gui.h"
 
 class LoggerWindow : public Window

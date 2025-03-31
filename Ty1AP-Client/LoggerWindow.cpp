@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "LoggerWindow.h"
 
 void LoggerWindow::ToggleVisibility() {
@@ -169,7 +170,7 @@ void LoggerWindow::RenderFormattedText(ImDrawList* draw_list, const char* text, 
             // Parse color code
             s += 7; // Skip "[color="
             unsigned int r, g, b, a = 255;
-            if (sscanf(s, "%2x%2x%2x%2x", &r, &g, &b, &a) >= 3) {
+            if (sscanf_s(s, "%2x%2x%2x%2x", &r, &g, &b, &a) >= 3) {
                 current_color = IM_COL32(r, g, b, a);
             }
 

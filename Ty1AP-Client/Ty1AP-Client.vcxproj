@@ -96,12 +96,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;TY1APCLIENT_EXPORTS;_WINDOWS;_USRDLL;_WIN32_WINNT=0x0600;ASIO_STANDALONE;AP_NO_SCHEMA;ASIO_NO_WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>C:\Users\admin\source\repos\Ty1AP-Client\Ty1AP-Client\include\ImGui;C:\Users\admin\source\repos\Ty1AP-Client\Ty1AP-Client\include\ImGui\backends;C:\Users\admin\source\repos\Ty1AP-Client\Ty1AP-Client\include\TygerFramework;D:\Ty\APIs\TygerMemory;D:\Ty\APIs\AP\json\include\include;D:\Ty\APIs\AP\wswrap\include;D:\Ty\APIs\AP\websocketpp;D:\Ty\APIs\AP\ap-soeclient\subprojects\asio\include;C:\Users\admin\source\repos\Ty1AP-Client\Ty1AP-Client\include\apclientpp;D:\Ty\APIs\AP\OpenSSL-Win32\include;D:\Ty\APIs\minhook\include;C:\Users\admin\source\repos\Ty1AP-Client\Ty1AP-Client\include\stb_image;D:\Ty\APIs\zlib131\zlib-1.3.1;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -175,17 +176,26 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SaveDataHandler.h" />
-    <ClInclude Include="uuid.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ArchipelagoHandler.cpp" />
     <ClCompile Include="CheckHandler.cpp" />
-    <ClCompile Include="D:\Ty\APIs\minhook\src\buffer.c" />
-    <ClCompile Include="D:\Ty\APIs\minhook\src\hde\hde32.c" />
-    <ClCompile Include="D:\Ty\APIs\minhook\src\hde\hde64.c" />
-    <ClCompile Include="D:\Ty\APIs\minhook\src\hook.c" />
-    <ClCompile Include="D:\Ty\APIs\minhook\src\trampoline.c" />
+    <ClCompile Include="D:\Ty\APIs\minhook\src\buffer.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="D:\Ty\APIs\minhook\src\hde\hde32.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="D:\Ty\APIs\minhook\src\hde\hde64.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="D:\Ty\APIs\minhook\src\hook.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="D:\Ty\APIs\minhook\src\trampoline.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="GameHandler.cpp" />
     <ClCompile Include="gui.cpp" />

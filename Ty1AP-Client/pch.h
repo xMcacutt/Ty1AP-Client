@@ -8,6 +8,24 @@
 #define PCH_H
 
 // add headers that you want to pre-compile here
-#include "framework.h"
+#pragma once
+#include "apclient.hpp"
+#include <map>
+#include <string>
+#include <algorithm>
+#include <iostream>
+#include <memory>
+#include <vector>
+#include <functional>
+#include <chrono>
+#include <fstream>
+#include <stdio.h>
+#include <math.h>
+#include <filesystem>
+#include "core.h"
+#include "gameobject.h"
+#include "level.h"
+#include "gamestate.h"
+#include "hero.h"
 
 #endif //PCH_H

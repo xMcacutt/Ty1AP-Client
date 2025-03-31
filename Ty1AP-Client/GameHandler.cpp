@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "GameHandler.h"
 
 bool GameHandler::isTyShutdown = false;
@@ -40,6 +41,8 @@ DeathFunctionType deathOrigin = nullptr;
 typedef void(__stdcall* LoadRainbowCliffsFunctionType)(void);
 LoadRainbowCliffsFunctionType loadRainbowCliffsOrigin = nullptr;
 
+typedef void(__stdcall* CheckTheggsForRangsFunctionType)(void);
+CheckTheggsForRangsFunctionType checkTheggsForRangsOrigin = nullptr;
 
 uintptr_t stopwatchJmpAddr;
 uintptr_t stopwatchOriginAddr;
@@ -129,15 +132,19 @@ void PatchRangMemory(std::vector<std::pair<uintptr_t, short>> patches) {
 
 void GameHandler::Setup()
 {
-	// STOPWATCH
-	char* addr = (char*)(Core::moduleBase + 0xF8388);
+	// LEADERBOARD PROTECT
+	char* addr = (char*)(Core::moduleBase + 0x1C8D6D);
 	DWORD oldProtect;
+	VirtualProtect(addr, 5, PAGE_EXECUTE_READWRITE, &oldProtect);
+	memset(addr, 0x90, 5);
+
+	// STOPWATCH
+	addr = (char*)(Core::moduleBase + 0xF8388);
 	VirtualProtect(addr, 5, PAGE_EXECUTE_READWRITE, &oldProtect);
 	memset(addr, 0x90, 5);
 
 	// SEPARATE SECOND RANG ON JULIUS KABOOM CHECK
 	addr = (char*)(Core::moduleBase + 0x16D378);
-	oldProtect;
 	VirtualProtect(addr, 0xC, PAGE_EXECUTE_READWRITE, &oldProtect);
 	memset(addr, 0x90, 0xC);
 
@@ -254,7 +261,7 @@ void GameHandler::WatchMemory() {
 			oldLoadValue = currentLoadValue;
 		}
 
-		if (Level::getCurrentLevel() == LevelCode::Z1) {
+		if (Level::getCurrentLevel() == LevelCode::Z1 && !GameState::onLoadScreenOrMainMenu()) {
 			auto& portalMap = ArchipelagoHandler::portalMap;
 			auto portalCount = *(int*)(Core::moduleBase + 0x267404);
 			auto portalAddr = *(int*)(Core::moduleBase + 0x267408);
@@ -277,6 +284,16 @@ void GameHandler::WatchMemory() {
 				portalAddr = *(int*)(portalAddr + 0x34);
 			}
 		}
+
+		uintptr_t addr = Hero::isBull() ? 0x254564 : 0x27158C;
+		auto state = *(uintptr_t*)(Core::moduleBase + addr);
+		if (!ItemHandler::isSlowTrapped && state == (int)TyState::Running) {
+			if (SaveDataHandler::saveData.CurrentRang == Rang::Chronorang)
+				*(float*)(Core::moduleBase + 0x271C3C) = 12.0f;
+			else
+				*(float*)(Core::moduleBase + 0x271C3C) = 10.0f;
+		}
+
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 }
@@ -294,6 +311,50 @@ void GameHandler::SetupOnConnect() {
 		*(char*)(addr) = (char)(ArchipelagoHandler::cogGating * (i + 1));
 		addr += 0x37 - 0xC;
 	}
+
+	addr = (char*)(Core::moduleBase + 0xD8917);
+	VirtualProtect(addr, 0x2, PAGE_EXECUTE_READWRITE, &oldProtect);
+	memset(addr, 0x90, 2);
+	uintptr_t fireTheggCountAddr = reinterpret_cast<uintptr_t>(&SaveDataHandler::saveData.FireThunderEggCount);
+	addr = (char*)(Core::moduleBase + 0xD891E);
+	VirtualProtect(addr, 0x5, PAGE_EXECUTE_READWRITE, &oldProtect);
+	addr[0] = 0xA1;
+	*reinterpret_cast<uintptr_t*>(&addr[1]) = fireTheggCountAddr;
+	addr = (char*)(Core::moduleBase + 0xD8925);
+	VirtualProtect(addr, 0x1, PAGE_EXECUTE_READWRITE, &oldProtect);
+	memset(addr, (char)ArchipelagoHandler::theggGating, 1);
+
+	addr = (char*)(Core::moduleBase + 0xD8979);
+	VirtualProtect(addr, 0x2, PAGE_EXECUTE_READWRITE, &oldProtect);
+	memset(addr, 0x90, 2);
+	uintptr_t iceTheggCountAddr = reinterpret_cast<uintptr_t>(&SaveDataHandler::saveData.IceThunderEggCount);
+	addr = (char*)(Core::moduleBase + 0xD8980);
+	VirtualProtect(addr, 0x5, PAGE_EXECUTE_READWRITE, &oldProtect);
+	addr[0] = 0xA1;
+	*reinterpret_cast<uintptr_t*>(&addr[1]) = iceTheggCountAddr;
+	addr = (char*)(Core::moduleBase + 0xD8987);
+	VirtualProtect(addr, 0x1, PAGE_EXECUTE_READWRITE, &oldProtect);
+	memset(addr, (char)ArchipelagoHandler::theggGating, 1);
+
+	addr = (char*)(Core::moduleBase + 0xD89DB);
+	VirtualProtect(addr, 0x2, PAGE_EXECUTE_READWRITE, &oldProtect);
+	memset(addr, 0x90, 2);
+	uintptr_t airTheggCountAddr = reinterpret_cast<uintptr_t>(&SaveDataHandler::saveData.AirThunderEggCount);
+	addr = (char*)(Core::moduleBase + 0xD89E2);
+	VirtualProtect(addr, 0x5, PAGE_EXECUTE_READWRITE, &oldProtect);
+	addr[0] = 0xA1;
+	*reinterpret_cast<uintptr_t*>(&addr[1]) = airTheggCountAddr;
+	addr = (char*)(Core::moduleBase + 0xD89E9);
+	VirtualProtect(addr, 0x1, PAGE_EXECUTE_READWRITE, &oldProtect);
+	memset(addr, (char)ArchipelagoHandler::theggGating, 1);
+
+	addr = (char*)(Core::moduleBase + 0x139090);
+	VirtualProtect(addr, 0x5, PAGE_EXECUTE_READWRITE, &oldProtect);
+	std::vector<uint8_t> bytes = ArchipelagoHandler::opalsanity
+		? std::vector<uint8_t>{ 0x90, 0x90, 0x90, 0x90, 0x90 }
+		: std::vector<uint8_t>{ 0xE8, 0x6B, 0x51, 0xFF, 0xFF };
+	std::memcpy(addr, bytes.data(), bytes.size());
+
 }
 
 void GameHandler::OnEnterRainbowCliffs() {
@@ -371,8 +432,10 @@ void GameHandler::OnEnterCrest() {
 }
 
 void GameHandler::OnEnterShipRex() {
-	if (!SaveDataHandler::saveData.AttributeData.GotAquarang &&
-		SaveDataHandler::saveData.ArchAttributeData.GotAquarang) {
+	// IF WE HAVEN'T GOTTEN SWIM OR AQUA CHECK YET RE-ENABLE TRIGGERS ETC TO AVOID LOCKING THE CHECKS OUT
+	if ((!SaveDataHandler::saveData.AttributeData.GotAquarang || 
+		!SaveDataHandler::saveData.AttributeData.LearntToSwim)
+		&& SaveDataHandler::saveData.ArchAttributeData.GotAquarang) {
 		auto triggerCount = *(int*)(Core::moduleBase + 0x26DBD4);
 		auto triggerAddr = *(uintptr_t*)(Core::moduleBase + 0x26DBD8);
 		for (auto triggerIndex = 0; triggerIndex < triggerCount; triggerIndex++) {
@@ -423,6 +486,8 @@ void GameHandler::OnEnterLevel() {
 	*(uintptr_t*)(Core::moduleBase + 0x2888D8) = reinterpret_cast<uintptr_t>(&SaveDataHandler::saveData);
 	*(uintptr_t*)(Core::moduleBase + 0x288730) = reinterpret_cast<uintptr_t>(&SaveDataHandler::saveData);
 
+	GameHandler::SetOpalIndices();
+
 	SaveDataHandler::SaveGame();
 
 	ItemHandler::HandleStoredItems();
@@ -439,6 +504,15 @@ void GameHandler::OnEnterLevel() {
 	if (*(int*)(Core::moduleBase + 0x27041C) != 0
 		&& SaveDataHandler::saveData.StopwatchesActive[(int)levelId] == 1)
 		*(int*)(*(int*)(Core::moduleBase + 0x270420) + 0x68) = 0x2;
+}
+
+void GameHandler::SetOpalIndices() {
+	auto opalCount = *(int*)(Core::moduleBase + 0x28AB80);
+	auto opalListAddr = *(uintptr_t*)(Core::moduleBase + 0x28AB7C);
+	for (auto i = 0; i < opalCount; i++) {
+		auto opalAddr = *(uintptr_t*)(opalListAddr + i * 4);
+		*(int*)(opalAddr + 0x10) = i;
+	}
 }
 
 void GameHandler::OnMainMenu() {

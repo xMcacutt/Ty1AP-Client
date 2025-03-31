@@ -1,11 +1,7 @@
-// dllmain.cpp : Defines the entry point for the DLL application.
-#pragma once
-#include "apclient.hpp"
 #include "pch.h"
 #include "TygerFrameworkAPI.hpp"
-#include "core.h"
-#include "gui.h"
 #include "GameHandler.h"
+#include "gui.h"
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,

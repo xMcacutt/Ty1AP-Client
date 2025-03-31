@@ -1,6 +1,5 @@
 #pragma once
 #include "SaveDataHandler.h"
-#include <map>
 #include "core.h"
 #include "level.h"
 #include "MinHook.h"

@@ -1,9 +1,6 @@
 #pragma once
 #include "LoggerWindow.h"
 #include "savedata.h"
-#include <iostream>
-#include <fstream>
-#include <string>
 
 struct ExtendedSaveData {
 	int Size;

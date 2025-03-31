@@ -1,8 +1,5 @@
 #pragma once
 #include "Window.h"
-#include <string>
-#include <chrono>
-#include <vector>
 #include "gui.h"
 #include "collectible_info.h"
 

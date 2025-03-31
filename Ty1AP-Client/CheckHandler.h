@@ -2,7 +2,6 @@
 #include "ArchipelagoHandler.h"
 #include "GameHandler.h"
 #include "SaveDataHandler.h"
-#include <algorithm>
 
 const std::unordered_map<int, std::string> LEVEL_NAMES = {
     {0, "Rainbow Cliffs"},
