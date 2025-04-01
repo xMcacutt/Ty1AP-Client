@@ -100,7 +100,7 @@ void GUI::DrawUI() {
         if (ImGui::MenuItem("Tracker Window")) {
             for (auto& window : windows) {
                 if (auto info = dynamic_cast<TrackerWindow*>(window.get())) {
-                    info->isVisible = true;
+                    info->isVisible = !info->isVisible;
                     break;
                 }
             }
