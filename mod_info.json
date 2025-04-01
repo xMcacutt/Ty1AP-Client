@@ -2,7 +2,7 @@
   "name": "Archipelago Client",
   "dll_name": "Ty1AP-Client",
   "description": "Client implementation of Ty into the Archipelago.gg project.",
-  "version": "1.1.10",
+  "version": "1.2.1",
   "website": "https://github.com/xMcacutt/Ty1AP-Client/blob/master/README.md",
   "dependencies": [
     {
