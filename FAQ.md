@@ -10,7 +10,9 @@
 
 ## How do I get the Elemental Rang checks?
 
-As of version 1.1.10 and previous, the elemental rang conditions are incorrect. This is a known issue and will be fixed in the next update. The documentation is also incorrect for this check as well as the apworld leading to a potential impossible seed (though unlikely). To obtain the elemental rang checks you'll need to be given the talisman for that rang's hub boss as well as checking 17 Thunder Eggs of the rang's hub type. So for the Flamerang check you'd need the Frog Talisman and you'll also need to check 17 Fire Thunder Eggs (***NOT*** BE GIVEN 17 THUNDER EGG ITEMS*)
+As of version 1.1.10 and previous, the elemental rang conditions are incorrect. This is a known issue and was fixed in v1.2.1.
+
+To obtain the elemental rang checks on pre 1.2.1 versions, you'll need to be given the talisman for that rang's hub boss as well as checking 17 Thunder Eggs of the rang's hub type. So for the Flamerang check you'd need the Frog Talisman and you'll also need to check 17 Fire Thunder Eggs (***NOT*** BE GIVEN 17 THUNDER EGG ITEMS*)
 
 ---
 

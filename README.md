@@ -110,13 +110,13 @@ With progressive level on, the portals will be unlocked in standard game order, 
 
 On being given a talisman, you unlock the ability to obtain a check on the elemental rangs. The conditions for the check are:
 
-- Boss for the hub is defeated
-
 - Talisman is obtained
 
 - Thunder egg count for that hub is greater than the count set by "theggGating"
 
 - Return to Rainbow Cliffs
+
+The elemental rang checks must be obtained in order so you cannot obtain the Frostyrang check without first completing the Flamerang check.
 
 #### Thunder Eggs
 
