@@ -514,7 +514,7 @@ void CheckHandler::OnCollectRang(int rangId) {
 void CheckHandler::OnCollectOpal(uintptr_t opalPtr) {
 	auto currentLevel = Level::getCurrentLevel();
 
-	API::LogPluginMessage(std::to_string(opalPtr));
+	//API::LogPluginMessage(std::to_string(opalPtr));
 
 	auto opalId = *(int*)(opalPtr + 0x10);
 	auto byteIndex = opalId / 8;
@@ -549,7 +549,7 @@ void CheckHandler::OnHitSign(uintptr_t signPtr) {
 void CheckHandler::OnPickupLife(uintptr_t lifePtr) {
 	if (!ArchipelagoHandler::lifesanity)
 		return;
-	API::LogPluginMessage(std::to_string(*(uintptr_t*)(lifePtr + 0x4)));
+	//API::LogPluginMessage(std::to_string(*(uintptr_t*)(lifePtr + 0x4)));
 	if (*(uintptr_t*)(lifePtr + 0x4) != Core::moduleBase + 0x2679D4)
 		return;
 	LevelCode level = Level::getCurrentLevel();

@@ -120,7 +120,8 @@ void LocationHandler::HandleLocation(int64_t location)
 		}
 		return;
 	}
-	if (location >= 0x8750350 && location < 0x875E47C) {
+	if ((location >= 0x8754350 && location < 0x875E47C) /*Opals*/ 
+		|| (location >= 0x8750350 && location < 0x8750369) /*Rainbow Scales*/) {
 		// OPALS / RAINBOW SCALES
 		int level = (location - 0x8750000) >> 0xC;
 		int opalId = location - (0x8750350 + (level << 0xC));
