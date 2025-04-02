@@ -106,14 +106,14 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 
     ap->set_room_info_handler([login]() {
         login->SetMessage("Room info received");
-        ap->ConnectSlot(login->slot, login->password, 0b111, {}, { 0,5,1 });
+        ap->ConnectSlot(login->slot, login->password, 0b111, {}, { 0,6,0 });
         ap_connect_sent = true;
     });
 
     ap->set_slot_connected_handler([](const json& data) {
         ap_connected = true;
 
-        if (data.find("ModVersion") != data.end() || data["ModVersion"] != "1.2.1")
+        if (data.find("ModVersion") != data.end() || data["ModVersion"] != "1.2.2")
             LoggerWindow::Log("Your client and apworld versions do not match. This might be fine but please check for updates.");
 
         if (data.find("Goal") != data.end() && data["Goal"].is_number_integer())
