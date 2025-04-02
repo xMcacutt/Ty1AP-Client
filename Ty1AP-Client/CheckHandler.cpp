@@ -516,7 +516,7 @@ void CheckHandler::OnCollectOpal(uintptr_t opalPtr) {
 
 	//API::LogPluginMessage(std::to_string(opalPtr));
 
-	auto opalId = *(int*)(opalPtr + 0x10);
+	auto opalId = *(int*)(opalPtr + 0x14);
 	auto byteIndex = opalId / 8;
 	auto bitIndex = opalId % 8;
 	auto b = SaveDataHandler::saveData.LevelData[(int)currentLevel].Opals[byteIndex];

@@ -256,8 +256,9 @@ void GameHandler::WatchMemory() {
 	while (!isTyShutdown) {
 		currentLoadValue = *(int*)(Core::moduleBase + 0x27EBF0);
 		if (currentLoadValue != oldLoadValue) {
-			if (currentLoadValue != 0 && oldLoadValue == 0)
+			if (currentLoadValue != 0 && oldLoadValue == 0) {
 				OnEnterLevel();
+			}
 			oldLoadValue = currentLoadValue;
 		}
 
@@ -511,7 +512,7 @@ void GameHandler::SetOpalIndices() {
 	auto opalListAddr = *(uintptr_t*)(Core::moduleBase + 0x28AB7C);
 	for (auto i = 0; i < opalCount; i++) {
 		auto opalAddr = *(uintptr_t*)(opalListAddr + i * 4);
-		*(int*)(opalAddr + 0x10) = i;
+		*(int*)(opalAddr + 0x14) = i;
 	}
 }
 

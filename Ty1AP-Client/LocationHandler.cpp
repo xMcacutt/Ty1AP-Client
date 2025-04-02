@@ -135,27 +135,9 @@ void LocationHandler::HandleLocation(int64_t location)
 		if ((LevelCode)level != currentLevel)
 			return;
 
-		auto looseOpalCount = *(int*)(Core::moduleBase + 0x269818 + 0x44);
-		auto looseOpalAddr = *(uintptr_t*)(Core::moduleBase + 0x269818 + 0x48);
-		auto crateOpalAddr = *(uintptr_t*)(Core::moduleBase + 0x28AB70);
-		if (opalId < looseOpalCount) {
-			for (int i = 0; i < looseOpalCount; i++) {
-				if (opalId == i) {
-					*(int*)(looseOpalAddr + 0x78) = 5;
-					return;
-				}
-				looseOpalAddr = *(uintptr_t*)(looseOpalAddr + 0x34);
-			}
-		}
-		else {
-			for (int i = looseOpalCount; i < 300; i++) {
-				if (opalId == i) {
-					*(int*)(crateOpalAddr + 0x78) = 5;
-					return;
-				}
-				crateOpalAddr = *(uintptr_t*)(crateOpalAddr + 0x34);
-			}
-		}
+		auto opalListAddr = *(uintptr_t*)(Core::moduleBase + 0x28AB7C);
+		auto opalAddr = *(uintptr_t*)(opalListAddr + opalId * 4);
+		*(int*)(opalAddr + 0x78) = 5;
 	}
 	if (location >= 0x8750261 && location < 0x8750266) {
 		// TALISMAN
