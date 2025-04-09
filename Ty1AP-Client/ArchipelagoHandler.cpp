@@ -15,8 +15,10 @@ int nextCheckToGet = 0;
 bool ArchipelagoHandler::ap_sync_queued = false;
 bool ArchipelagoHandler::ap_connected = false;
 bool ArchipelagoHandler::polling = false;
+std::string ArchipelagoHandler::uuid = "";
 Goal ArchipelagoHandler::goal = Goal::BEAT_CASS;
 bool ArchipelagoHandler::deathlink = false;
+bool ArchipelagoHandler::multylink = false;
 bool ArchipelagoHandler::someoneElseDied = false;
 LevelUnlockStyle ArchipelagoHandler::levelUnlockStyle = LevelUnlockStyle::VANILLA;
 int ArchipelagoHandler::theggGating = 17;
@@ -46,6 +48,7 @@ void ArchipelagoHandler::DisconnectAP() {
     LoggerWindow::Log("Disconnected");
     SetAPStatus("Disconnected", 1);
     polling = false;
+    MulTyHandler::IsRunning = false;
     ap_connect_sent = false;
     ap_connected = false;
     if (GameState::onLoadScreenOrMainMenu())
@@ -62,7 +65,7 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
     is_ws = uri.rfind("ws://", 0) == 0;
     is_wss = uri.rfind("wss://", 0) == 0;
 
-    std::string uuid = ap_get_uuid(UUID_FILE,
+    uuid = ap_get_uuid(UUID_FILE,
         uri.empty() ? APClient::DEFAULT_URI :
         is_ws ? uri.substr(5) :
         is_wss ? uri.substr(6) :
@@ -91,11 +94,12 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
         login->SetMessage("Connected, authenticating...");
         SetAPStatus("Authenticating", 1);
     });
-
     ap->set_socket_disconnected_handler([login]() {
         login->SetMessage("");
         LoggerWindow::Log("Disconnected");
         SetAPStatus("Disconnected", 1);
+        polling = false;
+        MulTyHandler::IsRunning = false;
         ap_connect_sent = false;
         ap_connected = false;
         if (GameState::onLoadScreenOrMainMenu())
@@ -103,13 +107,11 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
         else
             GameState::forceMainMenu();
     });
-
     ap->set_room_info_handler([login]() {
         login->SetMessage("Room info received");
         ap->ConnectSlot(login->slot, login->password, 0b111, {}, { 0,6,0 });
         ap_connect_sent = true;
     });
-
     ap->set_slot_connected_handler([](const json& data) {
         ap_connected = true;
 
@@ -143,6 +145,8 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 
         if (data.find("DeathLink") != data.end())
             deathlink = data["DeathLink"].get<int>() == 1;;
+        if (data.find("MulTyLink") != data.end())
+            multylink = data["MulTyLink"].get<int>() == 1;;
 
         if (data.find("ProgressiveLevel") != data.end())
             progressiveLevel = data["ProgressiveLevel"].get<int>() == 1;;
@@ -180,7 +184,12 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
         if (data.find("AdvancedLogic") != data.end() && data["AdvancedLogic"].is_number_integer())
             advancedLogic = data["AdvancedLogic"].get<int>() == 1;
 
-        if (deathlink) ap->ConnectUpdate(false, 0b111, true, { "DeathLink" });
+        std::list<std::string> tags = {};
+        if (deathlink)
+            tags.push_back("DeathLink");
+        if (multylink)
+            tags.push_back("MulTyLink");
+        ap->ConnectUpdate(false, 0b111, true, tags);
         ap->StatusUpdate(APClient::ClientStatus::PLAYING);
         seed = ap->get_seed();
         slot = ap->get_slot();
@@ -191,7 +200,6 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 
         SetAPStatus("Connected", 0);
     });
-
     ap->set_slot_disconnected_handler([login]() {
         login->SetMessage("");
         LoggerWindow::Log("Disconnected");
@@ -203,7 +211,6 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
         else
             GameState::forceMainMenu();
     });
-
     ap->set_items_received_handler([](const std::list<APClient::NetworkItem>& items) {
         if (!ap->is_data_package_valid()) {
             if (!ap_sync_queued) ap->Sync();
@@ -226,9 +233,33 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
         LoggerWindow::Log(ap->render_json(msg, APClient::RenderFormat::TEXT));
      });
     ap->set_bounced_handler([](const json& cmd) {
+        auto tagsIt = cmd.find("tags");
+        auto dataIt = cmd.find("data");
+        if (multylink) {
+            if (tagsIt != cmd.end() && tagsIt->is_array()
+                && std::find(tagsIt->begin(), tagsIt->end(), "MulTyLink") != tagsIt->end())
+            {
+                if (dataIt != cmd.end() && dataIt->is_object()) {
+                    json data = *dataIt;
+                    if (data["source"].get<std::string>() != uuid) {
+                        std::string source = data["source"].get<std::string>().c_str();
+                        int level = data["level"].is_number_integer() ? data["level"].get<int>() : -1;
+                        if ((int)Level::getCurrentLevel() == level)
+                        {
+                            if (data.find("pos") != data.end() && data["pos"].is_array()) {
+                                auto pos = data["pos"].get<std::vector<float>>();
+                                MulTyHandler::HandlePosData(level, source, pos);
+                            }
+                        }
+
+                    }
+                }
+                else {
+                    LoggerWindow::Log("Bad Deathlink");
+                }
+            }
+        }
         if (deathlink) {
-            auto tagsIt = cmd.find("tags");
-            auto dataIt = cmd.find("data");
             if (tagsIt != cmd.end() && tagsIt->is_array()
                 && std::find(tagsIt->begin(), tagsIt->end(), "DeathLink") != tagsIt->end())
             {
@@ -335,6 +366,15 @@ void ArchipelagoHandler::SendDeath() {
         {"source", slot},
     };
     ap->Bounce(data, {}, {}, { "DeathLink" });
+}
+
+void ArchipelagoHandler::SendPosition(int level, std::vector<float> pos) {
+    json data{
+        {"level", level},
+        {"source", uuid},
+        {"pos", pos},
+    };
+    ap->Bounce(data, { "Ty the Tasmanian Tiger" }, { ap->get_player_number()}, {"MulTyLink"});
 }
 
 void ArchipelagoHandler::SendLevel(int levelId) {

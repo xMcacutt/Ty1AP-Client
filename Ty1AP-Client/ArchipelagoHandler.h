@@ -5,6 +5,7 @@
 #include "TygerFrameworkAPI.hpp"
 #include "gui.h"
 #include "LoginWindow.h"
+#include "MulTyHandler.h"
 #include <inttypes.h>
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -68,13 +69,16 @@ public:
 	static void Release();
 	static bool LoadSaveData();
 	static void SendDeath();
+	static void SendPosition(int level, std::vector<float> pos);
 	static void SendLevel(int levelId);
 	static std::string GetItemName(int64_t itemId);
 	static std::string GetPlayerAlias(int64_t playerId);
 	static std::string GetLocationName(int64_t locId);
+	static std::string uuid;
 	static bool polling;
 	static Goal goal;
 	static bool deathlink;
+	static bool multylink;
 	static LevelUnlockStyle levelUnlockStyle;
 	static std::unordered_map<int, int> portalMap;
 	static std::unordered_map<int, int> inversePortalMap;

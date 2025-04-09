@@ -1,5 +1,4 @@
 #pragma once
-#include "imgui.h"
 #include "ArchipelagoHandler.h"
 #include "Window.h"
 

@@ -137,7 +137,9 @@ void LocationHandler::HandleLocation(int64_t location)
 
 		auto opalListAddr = *(uintptr_t*)(Core::moduleBase + 0x28AB7C);
 		auto opalAddr = *(uintptr_t*)(opalListAddr + opalId * 4);
-		*(int*)(opalAddr + 0x78) = 5;
+		if (*(int*)(opalAddr + 0x78) > 2)
+			return;
+		*(int*)(opalAddr + 0x78) = 3;
 	}
 	if (location >= 0x8750261 && location < 0x8750266) {
 		// TALISMAN

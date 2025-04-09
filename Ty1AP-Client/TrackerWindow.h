@@ -1,6 +1,5 @@
 #pragma once
 #include "ArchipelagoHandler.h"
-#include "imgui.h"
 #include "gui.h"
 #include "SaveDataHandler.h"
 #include "Window.h"

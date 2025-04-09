@@ -138,6 +138,15 @@ void GameHandler::Setup()
 	VirtualProtect(addr, 5, PAGE_EXECUTE_READWRITE, &oldProtect);
 	memset(addr, 0x90, 5);
 
+	// DISABLE KOALA COUNTING FOR MTP
+	addr = (char*)(Core::moduleBase + 0x1318FE);
+	VirtualProtect(addr, 0x7, PAGE_EXECUTE_READWRITE, &oldProtect);
+	std::vector<uint8_t> bytes = std::vector<uint8_t>{ 0xC6, 0x05 };
+	uintptr_t targetAddress = Core::moduleBase + 0x28B178;
+	bytes.insert(bytes.end(), (uint8_t*)&targetAddress, (uint8_t*)&targetAddress + 4); 
+	bytes.push_back(0x08);
+	memcpy(addr, bytes.data(), bytes.size());
+
 	// STOPWATCH
 	addr = (char*)(Core::moduleBase + 0xF8388);
 	VirtualProtect(addr, 5, PAGE_EXECUTE_READWRITE, &oldProtect);
@@ -300,6 +309,10 @@ void GameHandler::WatchMemory() {
 }
 
 void GameHandler::SetupOnConnect() {
+
+	std::thread t(MulTyHandler::Run);
+	t.detach();
+
 	uintptr_t goldenCogAddr = (uintptr_t)&SaveDataHandler::saveData.GoldenCogCount;
 	auto addr = (char*)(Core::moduleBase + 0xD8A4E);
 	DWORD oldProtect;

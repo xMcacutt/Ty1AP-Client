@@ -105,6 +105,12 @@
     <ClInclude Include="LocationHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MulTyHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -121,24 +127,6 @@
     </ClCompile>
     <ClCompile Include="gui.cpp">
       <Filter>Source Files\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="include\ImGui\imgui_widgets.cpp">
-      <Filter>Source Files\Dependencies</Filter>
-    </ClCompile>
-    <ClCompile Include="include\ImGui\imgui_draw.cpp">
-      <Filter>Source Files\Dependencies</Filter>
-    </ClCompile>
-    <ClCompile Include="include\ImGui\backends\imgui_impl_opengl3.cpp">
-      <Filter>Source Files\Dependencies</Filter>
-    </ClCompile>
-    <ClCompile Include="include\ImGui\backends\imgui_impl_win32.cpp">
-      <Filter>Source Files\Dependencies</Filter>
-    </ClCompile>
-    <ClCompile Include="include\ImGui\imgui_tables.cpp">
-      <Filter>Source Files\Dependencies</Filter>
-    </ClCompile>
-    <ClCompile Include="include\ImGui\imgui.cpp">
-      <Filter>Source Files\Dependencies</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>Source Files\Dependencies</Filter>
@@ -181,6 +169,27 @@
     </ClCompile>
     <ClCompile Include="LocationHandler.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MulTyHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\imgui\imgui.cpp">
+      <Filter>Source Files\Dependencies</Filter>
+    </ClCompile>
+    <ClCompile Include="..\imgui\backends\imgui_impl_opengl3.cpp">
+      <Filter>Source Files\Dependencies</Filter>
+    </ClCompile>
+    <ClCompile Include="..\imgui\backends\imgui_impl_win32.cpp">
+      <Filter>Source Files\Dependencies</Filter>
+    </ClCompile>
+    <ClCompile Include="..\imgui\imgui_draw.cpp">
+      <Filter>Source Files\Dependencies</Filter>
+    </ClCompile>
+    <ClCompile Include="..\imgui\imgui_tables.cpp">
+      <Filter>Source Files\Dependencies</Filter>
+    </ClCompile>
+    <ClCompile Include="..\imgui\imgui_widgets.cpp">
+      <Filter>Source Files\Dependencies</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

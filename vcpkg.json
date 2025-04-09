@@ -1,0 +1,11 @@
+{
+  "name": "ty1-ap-client",
+  "version-date": "2025-04-09",
+  "dependencies": [
+    "asio",
+    "minhook",
+    "nlohmann-json",
+    "openssl",
+    "zlib"
+  ]
+}

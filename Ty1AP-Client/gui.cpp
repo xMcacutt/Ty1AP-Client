@@ -31,8 +31,8 @@ void GUI::Initialize() {
         return;
     }
 
-    ImGui_ImplWin32_InitForOpenGL(API::GetTyWindowHandle());
     ImGui_ImplOpenGL3_Init();
+    ImGui_ImplWin32_InitForOpenGL(API::GetTyWindowHandle());
 
     if (!GUI::LoadIcons()) {
         API::LogPluginMessage("Failed to load icons.");
@@ -105,8 +105,8 @@ void GUI::DrawUI() {
                 }
             }
         }
+        ImGui::EndPopup();
     }
-    ImGui::EndPopup();
     ImGui::End();
 
     for (auto& window : windows) { window.get()->Draw(windowWidth, windowHeight, uiScale); }
