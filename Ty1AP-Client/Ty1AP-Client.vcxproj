@@ -101,7 +101,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>C:\Users\admin\source\repos\Ty1AP-Client\Ty1AP-Client\include\TygerFramework;D:\Ty\APIs\TygerMemory;$(ProjectDir)..\wswrap\include;$(ProjectDir)..\websocketpp;$(ProjectDir)..\imgui;$(ProjectDir)..\imgui\backends;C:\Users\admin\source\repos\Ty1AP-Client\Ty1AP-Client\include\apclientpp;$(ProjectDir)..\imgui\misc\cpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\TygerMemory1\TygerMemory;$(ProjectDir)..\wswrap\include;$(ProjectDir)..\websocketpp;$(ProjectDir)..\imgui;$(ProjectDir)..\imgui\backends;$(ProjectDir)..\apclientpp;$(ProjectDir)..\imgui\misc\cpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -155,6 +155,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\TygerFramework\TygerFramework\TygerFrameworkAPI.h" />
+    <ClInclude Include="..\TygerFramework\TygerFramework\TygerFrameworkAPI.hpp" />
     <ClInclude Include="ArchipelagoHandler.h" />
     <ClInclude Include="CheckHandler.h" />
     <ClInclude Include="collectible_info.h" />
@@ -168,13 +170,13 @@
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="TimeAttackHandler.h" />
     <ClInclude Include="TrackerWindow.h" />
-    <ClInclude Include="include\TyNumberFont.hpp" />
     <ClInclude Include="ItemHandler.h" />
     <ClInclude Include="LoggerWindow.h" />
     <ClInclude Include="LoginWindow.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SaveDataHandler.h" />
+    <ClInclude Include="TyNumberFont.hpp" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>

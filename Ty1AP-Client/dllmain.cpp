@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "TygerFrameworkAPI.hpp"
 #include "GameHandler.h"
 #include "gui.h"
 

@@ -4,7 +4,6 @@
 #include "ItemHandler.h"
 #include "LocationHandler.h"
 #include "TimeAttackHandler.h"
-#include "TygerFrameworkAPI.hpp"
 #include "MinHook.h"
 #include "SaveDataHandler.h"
 

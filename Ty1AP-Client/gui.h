@@ -1,7 +1,6 @@
 #pragma once
 #include "apclient.hpp"
 #include "pch.h"
-#include "TygerFrameworkAPI.hpp"
 #include "LoggerWindow.h"
 #include "LoginWindow.h"
 #include "TrackerWindow.h"
@@ -10,7 +9,7 @@
 #include <gl/GLU.h>
 #include "resource.h"
 #include "imgui_stdlib.h"
-#include "include/TyNumberFont.hpp"
+#include "TyNumberFont.hpp"
 #include "RobotoMedium.hpp"
 
 

@@ -2,7 +2,6 @@
 #include "apclient.hpp"
 #include "GameHandler.h"
 #include "nlohmann/json.hpp"
-#include "TygerFrameworkAPI.hpp"
 #include "gui.h"
 #include "LoginWindow.h"
 #include "MulTyHandler.h"

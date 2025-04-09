@@ -63,9 +63,6 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\TyNumberFont.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TrackerWindow.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
@@ -88,6 +85,15 @@
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
     <ClInclude Include="RobotoMedium.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TygerFramework\TygerFramework\TygerFrameworkAPI.h">
+      <Filter>Header Files\Dependencies</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TygerFramework\TygerFramework\TygerFrameworkAPI.hpp">
+      <Filter>Header Files\Dependencies</Filter>
+    </ClInclude>
+    <ClInclude Include="TyNumberFont.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
