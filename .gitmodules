@@ -7,3 +7,12 @@
 [submodule "imgui"]
 	path = imgui
 	url = https://github.com/ocornut/imgui
+[submodule "apclientpp"]
+	path = apclientpp
+	url = https://github.com/black-sliver/apclientpp
+[submodule "TygerMemory1"]
+	path = TygerMemory1
+	url = https://github.com/xMcacutt/TygerMemory1
+[submodule "TygerFramework"]
+	path = TygerFramework
+	url = https://github.com/ElusiveFluffy/TygerFramework
