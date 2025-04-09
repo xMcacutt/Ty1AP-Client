@@ -28,8 +28,9 @@
 #include "gamestate.h"
 #include "hero.h"
 #include "imgui.h"
-#include "backends\imgui_impl_opengl3.h"
+#include "imgui_impl_opengl3.h"
 #include "imgui_internal.h"
+#include "imgui_stdlib.h"
 #include "imgui_impl_win32.h"
 
 #endif //PCH_H

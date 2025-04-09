@@ -9,7 +9,9 @@
 #include <gl/GL.h>
 #include <gl/GLU.h>
 #include "resource.h"
+#include "imgui_stdlib.h"
 #include "include/TyNumberFont.hpp"
+#include "RobotoMedium.hpp"
 
 
 class GUI

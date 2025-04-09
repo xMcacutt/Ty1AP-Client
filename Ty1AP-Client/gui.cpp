@@ -19,8 +19,8 @@ bool GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 void GUI::Initialize() {
     ImGui::CreateContext();
 
-    API::SetImGuiFont(ImGui::GetIO().Fonts);
     ImGuiIO& io = ImGui::GetIO();
+    io.Fonts->AddFontFromMemoryCompressedTTF(RobotoMedium_compressed_data, RobotoMedium_compressed_size, 16);
     io.FontGlobalScale = 1.3f;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
