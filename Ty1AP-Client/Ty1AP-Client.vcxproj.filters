@@ -96,6 +96,12 @@
     <ClInclude Include="TyNumberFont.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\apclientpp\apclient.hpp">
+      <Filter>Header Files\Dependencies</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apclientpp\apuuid.hpp">
+      <Filter>Header Files\Dependencies</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
