@@ -155,6 +155,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\apclientpp\apclient.hpp" />
+    <ClInclude Include="..\apclientpp\apuuid.hpp" />
     <ClInclude Include="..\TygerFramework\TygerFramework\TygerFrameworkAPI.h" />
     <ClInclude Include="..\TygerFramework\TygerFramework\TygerFrameworkAPI.hpp" />
     <ClInclude Include="ArchipelagoHandler.h" />
