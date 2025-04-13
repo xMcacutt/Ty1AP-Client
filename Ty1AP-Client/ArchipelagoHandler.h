@@ -70,6 +70,10 @@ public:
 	static void SendDeath();
 	static void SendPosition(int level, std::vector<float> pos);
 	static void SendLevel(int levelId);
+	static void ReadKoala();
+	static int koalaIndex;
+	static std::string mulTyName;
+	static void UpdateKoalaIndex();
 	static std::string GetItemName(int64_t itemId);
 	static std::string GetPlayerAlias(int64_t playerId);
 	static std::string GetLocationName(int64_t locId);
@@ -81,6 +85,7 @@ public:
 	static LevelUnlockStyle levelUnlockStyle;
 	static std::unordered_map<int, int> portalMap;
 	static std::unordered_map<int, int> inversePortalMap;
+	static std::vector<std::string> koalaMapping;
 	static int theggGating;
 	static int cogGating;
 	static bool someoneElseDied;

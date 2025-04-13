@@ -36,6 +36,9 @@ bool ArchipelagoHandler::goalReqBosses = false;
 bool ArchipelagoHandler::advancedLogic = false;
 std::unordered_map<int, int> ArchipelagoHandler::portalMap;
 std::unordered_map<int, int> ArchipelagoHandler::inversePortalMap;
+std::vector<std::string> ArchipelagoHandler::koalaMapping;
+int ArchipelagoHandler::koalaIndex = -1;
+std::string ArchipelagoHandler::mulTyName = "";
 std::unique_ptr<APClient> ArchipelagoHandler::ap;
 std::string ArchipelagoHandler::seed;
 
@@ -94,6 +97,7 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
         login->SetMessage("Connected, authenticating...");
         SetAPStatus("Authenticating", 1);
     });
+    
     ap->set_socket_disconnected_handler([login]() {
         login->SetMessage("");
         LoggerWindow::Log("Disconnected");
@@ -112,7 +116,7 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
         ap->ConnectSlot(login->slot, login->password, 0b111, {}, { 0,6,0 });
         ap_connect_sent = true;
     });
-    ap->set_slot_connected_handler([](const json& data) {
+    ap->set_slot_connected_handler([login](const json& data) {
         ap_connected = true;
 
         if (data.find("ModVersion") != data.end() || data["ModVersion"] != "1.2.3")
@@ -187,8 +191,11 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
         std::list<std::string> tags = {};
         if (deathlink)
             tags.push_back("DeathLink");
-        if (multylink)
+        if (multylink) {
             tags.push_back("MulTyLink");
+            mulTyName = login->mulTyName;
+            ReadKoala();
+        }
         ap->ConnectUpdate(false, 0b111, true, tags);
         ap->StatusUpdate(APClient::ClientStatus::PLAYING);
         seed = ap->get_seed();
@@ -241,7 +248,7 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
             {
                 if (dataIt != cmd.end() && dataIt->is_object()) {
                     json data = *dataIt;
-                    if (data["source"].get<std::string>() != uuid) {
+                    if (data["source"].get<std::string>() != mulTyName) {
                         std::string source = data["source"].get<std::string>().c_str();
                         int level = data["level"].is_number_integer() ? data["level"].get<int>() : -1;
                         if ((int)Level::getCurrentLevel() == level)
@@ -277,6 +284,54 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
                     LoggerWindow::Log("Bad Deathlink");
                 }
             }
+        }
+    });
+    ap->set_retrieved_handler([](const std::map<std::string, json>& data, const json& message) {
+        API::LogPluginMessage("Retrieved");
+        auto key = "ty1_koalaId_" + std::to_string(ap->get_team_number()) + "_" + slot;
+        ap->SetNotify({ key });
+        auto value = data.find(key);
+        if (value != data.end() && !value->second.is_null()) {
+
+            koalaMapping = value->second;
+        }
+        else {
+            koalaMapping = {};
+        }
+        API::LogPluginMessage("After grab");
+        if (koalaMapping.size() < 8 && koalaIndex == -1) {
+            API::LogPluginMessage("Koala Mapping appended with: " + mulTyName);
+            koalaIndex = koalaMapping.size();
+            koalaMapping.push_back(mulTyName);
+            UpdateKoalaIndex();
+        }
+    });
+    ap->set_set_reply_handler([](const json& command) {
+        API::LogPluginMessage("Set Reply");
+        if (!command.contains("key") || !command.contains("value"))
+            return;
+        auto key = "ty1_koalaId_" + std::to_string(ap->get_team_number()) + "_" + slot;
+        if (command["key"] == key){
+            API::LogPluginMessage("Key Right");
+            auto value = command.["value"]
+            if (value != command.end() && !value->second.is_null()) {
+                std::vector<std::string> values = value->second;
+                //I wasnt kicked out
+                if (koalaMapping[koalaIndex] == values[koalaIndex]) {
+                    koalaMapping = values;
+                    LoggerWindow::Log("User Joined: " + koalaMapping[koalaMapping.size()]);
+                }
+                //I was kicked out. I sort worse so I find a new id and update
+                else if (koalaMapping[koalaIndex] < value[koalaIndex] && koalaMapping.size() < 8) {
+                    koalaMapping = value;
+                    koalaIndex = koalaMapping.size();
+                    koalaMapping.push_back(mulTyName);
+                    UpdateKoalaIndex();
+                }
+            }
+        }
+        for (int i = 0; i < koalaMapping.size(); i++) {
+            API::LogPluginMessage(i +" Koala " + koalaMapping[i]);
         }
     });
 }
@@ -371,7 +426,7 @@ void ArchipelagoHandler::SendDeath() {
 void ArchipelagoHandler::SendPosition(int level, std::vector<float> pos) {
     json data{
         {"level", level},
-        {"source", uuid},
+        {"source", mulTyName},
         {"pos", pos},
     };
     ap->Bounce(data, { "Ty the Tasmanian Tiger" }, { ap->get_player_number()}, {"MulTyLink"});
@@ -383,4 +438,20 @@ void ArchipelagoHandler::SendLevel(int levelId) {
     operation.value = levelId;
     auto key = "ty1_level_" + std::to_string(ap->get_team_number()) + "_" + slot;
     ap->Set(key, 0, false, { operation });
+}
+
+void ArchipelagoHandler::ReadKoala() {
+    auto key = "ty1_koalaId_" + std::to_string(ap->get_team_number()) + "_" + slot;
+    API::LogPluginMessage("ReadKoala");
+    ap->Get({ key });
+}
+
+void ArchipelagoHandler::UpdateKoalaIndex() {
+    API::LogPluginMessage("Send Update");
+    APClient::DataStorageOperation operation;
+    operation.operation = "replace";
+    operation.value = koalaMapping;
+    auto key = "ty1_koalaId_" + std::to_string(ap->get_team_number()) + "_" + slot;
+    ap->Set(key, {}, true, { operation });
+    
 }
