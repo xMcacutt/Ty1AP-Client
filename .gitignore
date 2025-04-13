@@ -362,3 +362,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /Ty1AP-Client/Ty1AP-Client.vcxproj
+/vcpkg_installed/x86-windows-static
