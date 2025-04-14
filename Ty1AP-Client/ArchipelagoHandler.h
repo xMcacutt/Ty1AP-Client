@@ -71,6 +71,7 @@ public:
 	static void SendPosition(int level, std::vector<float> pos);
 	static void SendLevel(int levelId);
 	static void ReadKoala();
+	static void TryClaimKoalaIndex();
 	static int koalaIndex;
 	static std::string mulTyName;
 	static void UpdateKoalaIndex();
@@ -86,6 +87,7 @@ public:
 	static std::unordered_map<int, int> portalMap;
 	static std::unordered_map<int, int> inversePortalMap;
 	static std::vector<std::string> koalaMapping;
+	static std::map<int, double> koalaConnected;
 	static int theggGating;
 	static int cogGating;
 	static bool someoneElseDied;

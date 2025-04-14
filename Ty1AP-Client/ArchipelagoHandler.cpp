@@ -37,6 +37,7 @@ bool ArchipelagoHandler::advancedLogic = false;
 std::unordered_map<int, int> ArchipelagoHandler::portalMap;
 std::unordered_map<int, int> ArchipelagoHandler::inversePortalMap;
 std::vector<std::string> ArchipelagoHandler::koalaMapping;
+std::map<int, double> ArchipelagoHandler::koalaConnected;
 int ArchipelagoHandler::koalaIndex = -1;
 std::string ArchipelagoHandler::mulTyName = "";
 std::unique_ptr<APClient> ArchipelagoHandler::ap;
@@ -191,15 +192,16 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
         std::list<std::string> tags = {};
         if (deathlink)
             tags.push_back("DeathLink");
+        
+        ap->ConnectUpdate(false, 0b111, true, tags);
+        ap->StatusUpdate(APClient::ClientStatus::PLAYING);
+        seed = ap->get_seed();
+        slot = ap->get_slot();
         if (multylink) {
             tags.push_back("MulTyLink");
             mulTyName = login->mulTyName;
             ReadKoala();
         }
-        ap->ConnectUpdate(false, 0b111, true, tags);
-        ap->StatusUpdate(APClient::ClientStatus::PLAYING);
-        seed = ap->get_seed();
-        slot = ap->get_slot();
         if (ArchipelagoHandler::LoadSaveData()) {
             GameHandler::SetLoadActive(true);
         }
@@ -255,7 +257,13 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
                         {
                             if (data.find("pos") != data.end() && data["pos"].is_array()) {
                                 auto pos = data["pos"].get<std::vector<float>>();
-                                MulTyHandler::HandlePosData(level, source, pos);
+                                auto it = std::find(koalaMapping.begin(), koalaMapping.end(), source);
+
+                                if (it != koalaMapping.end()) {
+                                    int index = std::distance(koalaMapping.begin(), it);
+                                    koalaConnected[index] = ap->get_server_time();
+                                    MulTyHandler::HandlePosData(level, index, pos);
+                                }
                             }
                         }
 
@@ -288,24 +296,49 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
     });
     ap->set_retrieved_handler([](const std::map<std::string, json>& data, const json& message) {
         API::LogPluginMessage("Retrieved");
-        auto key = "ty1_koalaId_" + std::to_string(ap->get_team_number()) + "_" + slot;
-        ap->SetNotify({ key });
-        auto value = data.find(key);
-        if (value != data.end() && !value->second.is_null()) {
+        auto koalakey = "ty1_koalaId_" + std::to_string(ap->get_team_number()) + "_" + slot;
+        ap->SetNotify({ koalakey });
+        bool hasIndex = false;
+        for (const auto& [key, value_json] : data) {
+            if (koalakey == key) {
+                if (value_json.is_null()) {
+                    koalaMapping = {};
+                    continue;
+                }
 
-            koalaMapping = value->second;
+                try {
+                    std::vector<std::string> values = value_json.get<std::vector<std::string>>();
+                    for (int i = 0; i < values.size(); i++) {
+                        API::LogPluginMessage("Value: " + values[i]);
+                        if (values[i] == mulTyName) {
+                            API::LogPluginMessage("Found My Name");
+                            hasIndex = true;
+                            koalaIndex = i;
+                            break;
+                        }
+                    }
+                    koalaMapping = values;
+                }
+                catch (const std::exception& e) {
+                    API::LogPluginMessage("Error parsing value for key " + key + ": " + e.what());
+                }
+            }
         }
-        else {
-            koalaMapping = {};
-        }
+
         API::LogPluginMessage("After grab");
-        if (koalaMapping.size() < 8 && koalaIndex == -1) {
-            API::LogPluginMessage("Koala Mapping appended with: " + mulTyName);
-            koalaIndex = koalaMapping.size();
-            koalaMapping.push_back(mulTyName);
-            UpdateKoalaIndex();
+        if (koalaMapping.size() < 8) {
+            if (!hasIndex) {
+                API::LogPluginMessage("Koala Mapping appended with: " + mulTyName);
+                koalaIndex = koalaMapping.size();
+                koalaMapping.push_back(mulTyName);
+                for (const auto& val : koalaMapping) {
+                    API::LogPluginMessage("koalaMapping: " + val);
+                }
+                UpdateKoalaIndex();
+            }
         }
     });
+
     ap->set_set_reply_handler([](const json& command) {
         API::LogPluginMessage("Set Reply");
         if (!command.contains("key") || !command.contains("value"))
@@ -313,25 +346,35 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
         auto key = "ty1_koalaId_" + std::to_string(ap->get_team_number()) + "_" + slot;
         if (command["key"] == key){
             API::LogPluginMessage("Key Right");
-            auto value = command.["value"]
-            if (value != command.end() && !value->second.is_null()) {
-                std::vector<std::string> values = value->second;
-                //I wasnt kicked out
+            std::vector<std::string> values;
+            try {
+                values = command["value"].get<std::vector<std::string>>();
+            }
+            catch (const std::exception& e) {
+                API::LogPluginMessage("Failed to parse value as vector<string>: " + std::string(e.what()));
+                return;
+            }
+            for (const auto& val : values) {
+                API::LogPluginMessage("Value repied: " + val);
+            }
+
+            if (koalaIndex < koalaMapping.size() && koalaIndex < values.size()) {
                 if (koalaMapping[koalaIndex] == values[koalaIndex]) {
                     koalaMapping = values;
-                    LoggerWindow::Log("User Joined: " + koalaMapping[koalaMapping.size()]);
+                    LoggerWindow::Log("Users Joined: " + std::to_string(koalaMapping.size()));
                 }
-                //I was kicked out. I sort worse so I find a new id and update
-                else if (koalaMapping[koalaIndex] < value[koalaIndex] && koalaMapping.size() < 8) {
-                    koalaMapping = value;
-                    koalaIndex = koalaMapping.size();
+                // I was kicked out. I sort worse, so I find a new id and update
+                else if (koalaMapping[koalaIndex] < values[koalaIndex] && koalaMapping.size() < 8) {
+                    koalaMapping = values;
+                    API::LogPluginMessage("Uh oh I'm in charge of fixing this");
+                    koalaIndex = koalaMapping.size();  // will be valid index after push_back
                     koalaMapping.push_back(mulTyName);
                     UpdateKoalaIndex();
                 }
             }
-        }
-        for (int i = 0; i < koalaMapping.size(); i++) {
-            API::LogPluginMessage(i +" Koala " + koalaMapping[i]);
+            else {
+                API::LogPluginMessage("Invalid koalaIndex detected: out of bounds");
+            }
         }
     });
 }
@@ -424,6 +467,9 @@ void ArchipelagoHandler::SendDeath() {
 }
 
 void ArchipelagoHandler::SendPosition(int level, std::vector<float> pos) {
+    if (koalaIndex == -1) {
+        return;
+    }
     json data{
         {"level", level},
         {"source", mulTyName},
@@ -453,5 +499,20 @@ void ArchipelagoHandler::UpdateKoalaIndex() {
     operation.value = koalaMapping;
     auto key = "ty1_koalaId_" + std::to_string(ap->get_team_number()) + "_" + slot;
     ap->Set(key, {}, true, { operation });
-    
+}
+
+void ArchipelagoHandler::TryClaimKoalaIndex() {
+    if (koalaIndex >= 0) {
+        return;
+    }
+    API::LogPluginMessage("I dont have an Index");
+    for (int i = 0; i < 8; i++) {
+        if (koalaConnected[i] < ap->get_server_time() - 10000) {
+            koalaMapping[i] = mulTyName;
+            koalaIndex = i;
+            API::LogPluginMessage("I Claim: " + i);
+            UpdateKoalaIndex();
+            break;
+        }
+    }
 }

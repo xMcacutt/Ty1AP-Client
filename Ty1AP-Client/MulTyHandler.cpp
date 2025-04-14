@@ -2,9 +2,8 @@
 #include "MulTyHandler.h"
 
 std::map<int, std::vector<float>> MulTyHandler::posData;
-std::map<std::string, int> MulTyHandler::koalaData;
 
-void MulTyHandler::HandlePosData(int level, std::string source, std::vector<float> pos)
+void MulTyHandler::HandlePosData(int level, int index, std::vector<float> pos)
 {
     if (GameState::onLoadScreenOrMainMenu())
         return;
@@ -12,24 +11,11 @@ void MulTyHandler::HandlePosData(int level, std::string source, std::vector<floa
     if (pos.size() != 4)
         return;
 
-    if (koalaData.find(source) == koalaData.end()) {
-        std::set<int> usedIndices;
-        for (const auto& entry : koalaData) {
-            usedIndices.insert(entry.second);
-        }
-        for (int i = 0; i <= 7; ++i) {
-            if (usedIndices.find(i) == usedIndices.end()) {
-                koalaData[source] = i;
-                break;
-            }
-        }
-    }
-
-    posData[koalaData[source]] = pos;
+    posData[index] = pos;
 
     auto modifier = (LevelCode)level == LevelCode::B2 || (LevelCode)level == LevelCode::C2 ? 2 : 1;
     auto offset = (LevelCode)level == LevelCode::B2 || (LevelCode)level == LevelCode::C2 ? 0x518 : 0x0;
-    auto koalaOffset = 0x518 * modifier * koalaData[source] + offset;
+    auto koalaOffset = 0x518 * modifier * index + offset;
     auto baseKoalaAddress = *(uintptr_t*)(Core::moduleBase + 0x26B070);
     if (*(unsigned short*)(baseKoalaAddress) != (17327608 & 0xFFFF))
         return;
@@ -39,23 +25,17 @@ void MulTyHandler::HandlePosData(int level, std::string source, std::vector<floa
     *(float*)(baseKoalaAddress + 0x2B8 + koalaOffset) = pos[3];
 }
 
-void MulTyHandler::TryRemove(std::string source) {
-    auto it = koalaData.find(source);
-    if (it != koalaData.end()) {
-        int index = it->second;
-        posData.erase(index);
-        koalaData.erase(it);
-    }
+void MulTyHandler::TryRemove(int index) {
+    posData.erase(index);
 }
 
 bool MulTyHandler::IsRunning;
 void MulTyHandler::Run() {
     IsRunning = true;
     posData = {};
-    koalaData = {};
     while (IsRunning) {
-        if (GameState::onLoadScreenOrMainMenu())
-            continue;
+        //if (GameState::onLoadScreenOrMainMenu())
+        //    continue;
         auto vectorPos = Hero::getPosition();
         auto pos = std::vector<float>{};
         pos.push_back(vectorPos.x);
