@@ -322,7 +322,9 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
                 }
             }
         }
-
+        for (const auto& val : koalaMapping) {
+            API::LogPluginMessage("Value: " + val);
+        }
         API::LogPluginMessage("After grab");
         if (koalaMapping.size() < 8) {
             if (!hasIndex) {
