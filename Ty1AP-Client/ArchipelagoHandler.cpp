@@ -309,9 +309,7 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
                 try {
                     std::vector<std::string> values = value_json.get<std::vector<std::string>>();
                     for (int i = 0; i < values.size(); i++) {
-                        API::LogPluginMessage("Value: " + values[i]);
                         if (values[i] == mulTyName) {
-                            API::LogPluginMessage("Found My Name");
                             hasIndex = true;
                             koalaIndex = i;
                             break;
@@ -328,24 +326,18 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
         API::LogPluginMessage("After grab");
         if (koalaMapping.size() < 8) {
             if (!hasIndex) {
-                API::LogPluginMessage("Koala Mapping appended with: " + mulTyName);
                 koalaIndex = koalaMapping.size();
                 koalaMapping.push_back(mulTyName);
-                for (const auto& val : koalaMapping) {
-                    API::LogPluginMessage("koalaMapping: " + val);
-                }
                 UpdateKoalaIndex();
             }
         }
     });
 
     ap->set_set_reply_handler([](const json& command) {
-        API::LogPluginMessage("Set Reply");
         if (!command.contains("key") || !command.contains("value"))
             return;
         auto key = "ty1_koalaId_" + std::to_string(ap->get_team_number()) + "_" + slot;
         if (command["key"] == key){
-            API::LogPluginMessage("Key Right");
             std::vector<std::string> values;
             try {
                 values = command["value"].get<std::vector<std::string>>();
@@ -354,14 +346,20 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
                 API::LogPluginMessage("Failed to parse value as vector<string>: " + std::string(e.what()));
                 return;
             }
-            for (const auto& val : values) {
-                API::LogPluginMessage("Value repied: " + val);
-            }
 
             if (koalaIndex < koalaMapping.size() && koalaIndex < values.size()) {
                 if (koalaMapping[koalaIndex] == values[koalaIndex]) {
+                    std::string newnames = "";
+                    for (int i = 0; i < values.size(); i++) {
+                        if (koalaMapping.size() > i && koalaMapping[i] != values[i]) {
+                            newnames = newnames + values[i] + " ";
+                        }
+                        else {
+                            newnames = newnames + values[i] + " ";
+                        }
+                    }
                     koalaMapping = values;
-                    LoggerWindow::Log("Users Joined: " + std::to_string(koalaMapping.size()));
+                    LoggerWindow::Log(newnames + "Joined. Total Users Joined: " + std::to_string(koalaMapping.size()));
                 }
                 // I was kicked out. I sort worse, so I find a new id and update
                 else if (koalaMapping[koalaIndex] < values[koalaIndex] && koalaMapping.size() < 8) {
