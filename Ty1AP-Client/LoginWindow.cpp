@@ -14,11 +14,12 @@ void LoginWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
     ImGui::InputText("Server", server, IM_ARRAYSIZE(server));
     ImGui::InputText("Password", password, IM_ARRAYSIZE(password), ImGuiInputTextFlags_Password);
     ImGui::InputText("Slot Name", slot, IM_ARRAYSIZE(slot));
+    ImGui::InputText("MulTy Name", mulTyName, IM_ARRAYSIZE(mulTyName));
 
     if (!ArchipelagoHandler::ap_connected) {
         if (ImGui::Button("Connect")) {
             if (strlen(server) > 0 && strlen(slot) > 0) {
-                SaveLoginData(server, slot, password);
+                SaveLoginData(server, slot, password, mulTyName);
                 ArchipelagoHandler::ConnectAP(this);
                 SetMessage("Connecting to " + std::string(server) + "...");
             }
@@ -43,11 +44,12 @@ void LoginWindow::SetMessage(std::string newMessage) {
     message = newMessage;
 }
 
-void LoginWindow::SaveLoginData(const std::string& server, const std::string& slot, const std::string& password) {
+void LoginWindow::SaveLoginData(const std::string& server, const std::string& slot, const std::string& password, const std::string& mulTyName) {
     nlohmann::json jsonData;
     jsonData["server"] = server;
     jsonData["slot"] = slot;
     jsonData["password"] = password;
+    jsonData["mulTyName"] = mulTyName;
 
     // Save the JSON data to a file
     std::ofstream file("./connection.json");
@@ -55,7 +57,7 @@ void LoginWindow::SaveLoginData(const std::string& server, const std::string& sl
     file.close();
 }
 
-bool LoginWindow::LoadLoginData(std::string& server, std::string& slot, std::string& password) {
+bool LoginWindow::LoadLoginData(std::string& server, std::string& slot, std::string& password, std::string& mulTyName) {
     std::ifstream file("./connection.json");
 
     if (!file.is_open()) {
@@ -70,6 +72,7 @@ bool LoginWindow::LoadLoginData(std::string& server, std::string& slot, std::str
     server = jsonData.value("server", "");
     slot = jsonData.value("slot", "");
     password = jsonData.value("password", "");
+    mulTyName = jsonData.value("mulTyName", "");
 
     return true;  // Return true if loading was successful
 }
