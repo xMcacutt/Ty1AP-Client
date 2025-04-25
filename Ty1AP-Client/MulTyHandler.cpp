@@ -114,9 +114,9 @@ void MulTyHandler::InterpolateAndDraw() {
         *(float*)(baseKoalaAddress + 0x2AC + koalaOffset) = z;
         *(float*)(baseKoalaAddress + 0x2B8 + koalaOffset) = yaw;
         auto position2Address = *(uintptr_t*)(baseKoalaAddress + 8 + koalaOffset);
-        *(float*)(position2Address + 0x84) = x;
-        *(float*)(position2Address + 0x88) = y;
-        *(float*)(position2Address + 0x8C) = z;
+        *(float*)(position2Address + 0x74) = x;
+        *(float*)(position2Address + 0x78) = y;
+        *(float*)(position2Address + 0x7C) = z;
 
 
     }
