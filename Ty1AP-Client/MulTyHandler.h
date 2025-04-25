@@ -5,6 +5,7 @@
 class MulTyHandler
 {
 public:
+	static void InterpolateAndDraw();
 	static void HandlePosData(int level, int index, std::vector<float> pos);
 	static void TryRemove(int index);
 	static void Run();
@@ -18,7 +19,7 @@ private:
 		uint64_t newTime = 0;             
 	};
 	static std::map<int, TimedPos> posData;
-	static void InterpolateAndDraw();
+	
 	static float Lerp(float a, float b, float t);
 	static float LerpAngle(float a, float b, float t);
 	static uint64_t GetTimeMS();
