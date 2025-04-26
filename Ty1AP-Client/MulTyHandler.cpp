@@ -59,16 +59,12 @@ void MulTyHandler::Run() {
 void MulTyHandler::InterpolateAndDraw() {
 
     if (GameState::onLoadScreenOrMainMenu()) {
-        API::LogPluginMessage("Draw on menu");
         return;
     }
     uint64_t now = GetTimeMS();
     for (const auto& [index, data] : MulTyHandler::posData) {
         API::LogPluginMessage("draw " + std::to_string(index));
-        /*if (data.newLevel != data.oldLevel) {
-            API::LogPluginMessage("Between levels");
-            continue;
-        }*/
+
         if (data.lastPos.size() != 4 || data.newPos.size() != 4) {
             API::LogPluginMessage("Weird Data");
             continue;
@@ -82,7 +78,7 @@ void MulTyHandler::InterpolateAndDraw() {
         float z = Lerp(data.lastPos[2], data.newPos[2], t);
         float yaw = LerpAngle(data.lastPos[3], data.newPos[3], t);
         int level = data.level;
-        //API::LogPluginMessage(std::to_string(index) + "Drawing x: " + std::to_string(x) + "y: " + std::to_string(y) + "z: " + std::to_string(z) + "yaw: " + std::to_string(yaw));
+        
         std::vector<float> interpolated{ x, y, z };
         auto playerPos = Hero::getPosition();
         std::vector<float> playerVec{ playerPos.x, playerPos.y, playerPos.z };
@@ -108,7 +104,6 @@ void MulTyHandler::InterpolateAndDraw() {
             return;
             API::LogPluginMessage("Not a Koala");
         }
-        API::LogPluginMessage("Draw koala x: " + std::to_string(x) + " y: " + std::to_string(y) + " z: " + std::to_string(z));
         *(float*)(baseKoalaAddress + 0x2A4 + koalaOffset) = x;
         *(float*)(baseKoalaAddress + 0x2A8 + koalaOffset) = y;
         *(float*)(baseKoalaAddress + 0x2AC + koalaOffset) = z;
