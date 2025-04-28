@@ -562,3 +562,19 @@ void CheckHandler::OnPickupLife(uintptr_t lifePtr) {
 	int lifeIndex = RUNNING_LIFE_COUNTS.at((int)level) + levelLifeIndex;
 	ArchipelagoHandler::Check(0x8750420 + static_cast<int64_t>(lifeIndex));
 }
+
+//void OnActivateKoalaObjective();
+//
+//void OnCollectKoala();
+//
+//void OnActivateBurnerObjective();
+//
+//void OnLiteBurner();
+//
+//void OnActivateSeahorseObjective();
+//
+//void OnCollectSeashorse();
+//
+//void OnActivateChestObjective();
+//
+//void OnCollectChest();

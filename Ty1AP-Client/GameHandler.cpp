@@ -518,6 +518,8 @@ void GameHandler::OnEnterLevel() {
 	if (*(int*)(Core::moduleBase + 0x27041C) != 0
 		&& SaveDataHandler::saveData.StopwatchesActive[(int)levelId] == 1)
 		*(int*)(*(int*)(Core::moduleBase + 0x270420) + 0x68) = 0x2;
+
+	ArchipelagoHandler::TryClaimKoalaIndex();
 }
 
 void GameHandler::SetOpalIndices() {
@@ -534,6 +536,7 @@ void GameHandler::OnMainMenu() {
 	if (!ArchipelagoHandler::ap_connected) {
 		*(char*)(menuAddr + 0x164) = 0x0;
 		*(char*)(menuAddr + 0x165) = 0x0;
+		*(int*)(Core::moduleBase + 0x286640) = 0x2;
 	}
 	*(char*)(menuAddr + 0x168 + 0x164) = 0x0;
 	*(char*)(menuAddr + 0x168 + 0x165) = 0x0;

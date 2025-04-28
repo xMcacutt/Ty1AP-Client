@@ -20,6 +20,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 
 void TickBeforeGame(float deltaSeconds) {
     ArchipelagoHandler::Poll();
+    MulTyHandler::InterpolateAndDraw();
     GUI::DrawUI();
 }
 
@@ -30,6 +31,7 @@ void OnTyInit() {
 void OnTyBeginShutdown() {
     ArchipelagoHandler::polling = false;
     ArchipelagoHandler::DisconnectAP();
+    MulTyHandler::IsRunning = false;
     GameHandler::isTyShutdown = true;
 }
 

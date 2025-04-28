@@ -76,6 +76,9 @@
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnableManifest>true</VcpkgEnableManifest>
   </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <VcpkgUseStatic>true</VcpkgUseStatic>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -117,7 +120,7 @@
       <AdditionalDependencies>TygerMemory.lib;libssl.lib;libcrypto.lib;crypt32.lib;ws2_32.lib;opengl32.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y /F "C:\Users\admin\source\repos\Ty1AP-Client\Release\Ty1AP-Client.dll" "C:\Users\admin\Documents\Mul-Ty-Player\Game\Plugins\Ty1AP-Client.dll"</Command>
+      <Command>xcopy /Y /F "C:\Users\iolds\OneDrive\Documents\CodeRepos\Ty1AP-Client\Release\Ty1AP-Client.dll" "E:\Applications\Steam\steamapps\common\Ty the Tasmanian Tiger - Mod Managed\Plugins\Ty1AP-Client.dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
