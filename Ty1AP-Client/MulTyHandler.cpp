@@ -102,10 +102,8 @@ void MulTyHandler::InterpolateAndDraw() {
     }
     uint64_t now = GetTimeMS();
     for (const auto& [index, data] : MulTyHandler::posData) {
-        API::LogPluginMessage("draw " + std::to_string(index));
 
         if (data.lastPos.size() != 4 || data.newPos.size() != 4) {
-            API::LogPluginMessage("Weird Data");
             continue;
         }
 
@@ -146,10 +144,10 @@ void MulTyHandler::InterpolateAndDraw() {
         auto baseKoalaAddress = *(uintptr_t*)(Core::moduleBase + 0x26B070);
         if (baseKoalaAddress == NULL) {
             return;
-            API::LogPluginMessage("Koala Null");
+            API::LogPluginMessage("Koala Null, Do you have the Patch?");
         }
         if (*(unsigned short*)(baseKoalaAddress) != (17327608 & 0xFFFF)) {
-            API::LogPluginMessage("Not a Koala");
+            API::LogPluginMessage("Not a Koala, Do you have the Patch?");
             return;
         }
         

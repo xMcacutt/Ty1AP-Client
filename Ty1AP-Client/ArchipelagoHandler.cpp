@@ -304,7 +304,6 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
         }
     });
     ap->set_retrieved_handler([](const std::map<std::string, json>& data, const json& message) {
-        API::LogPluginMessage("Retrieved");
         auto koalakey = "ty1_koalaId_" + std::to_string(ap->get_team_number()) + "_" + slot;
         ap->SetNotify({ koalakey });
         bool hasIndex = false;
@@ -331,10 +330,6 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
                 }
             }
         }
-        for (const auto& val : koalaMapping) {
-            API::LogPluginMessage("Value: " + val);
-        }
-        API::LogPluginMessage("After grab");
         if (koalaMapping.size() < 8) {
             if (!hasIndex) {
                 koalaIndex = koalaMapping.size();
@@ -342,6 +337,7 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
                 UpdateKoalaIndex();
             }
         }
+        LoggerWindow::Log("Joined. Total Users Joined : " + std::to_string(koalaMapping.size()));
     });
 
     ap->set_set_reply_handler([](const json& command) {
@@ -370,7 +366,7 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
                         }
                     }
                     koalaMapping = values;
-                    LoggerWindow::Log(newnames + "Joined. Total Users Joined: " + std::to_string(koalaMapping.size()));
+                    LoggerWindow::Log(newnames + "Joined. Total Koalas Joined: " + std::to_string(koalaMapping.size()));
                 }
                 // I was kicked out. I sort worse, so I find a new id and update
                 else if (koalaMapping[koalaIndex] < values[koalaIndex] && koalaMapping.size() < 8) {
@@ -497,12 +493,10 @@ void ArchipelagoHandler::SendLevel(int levelId) {
 
 void ArchipelagoHandler::ReadKoala() {
     auto key = "ty1_koalaId_" + std::to_string(ap->get_team_number()) + "_" + slot;
-    API::LogPluginMessage("ReadKoala");
     ap->Get({ key });
 }
 
 void ArchipelagoHandler::UpdateKoalaIndex() {
-    API::LogPluginMessage("Send Update");
     APClient::DataStorageOperation operation;
     operation.operation = "replace";
     operation.value = koalaMapping;
@@ -514,12 +508,11 @@ void ArchipelagoHandler::TryClaimKoalaIndex() {
     if (koalaIndex >= 0) {
         return;
     }
-    API::LogPluginMessage("I dont have an Index");
     for (int i = 0; i < 8; i++) {
         if (koalaConnected[i] < ap->get_server_time() - 10000) {
             koalaMapping[i] = mulTyName;
             koalaIndex = i;
-            API::LogPluginMessage("I Claim: " + i);
+            API::LogPluginMessage("I Claim Koala: " + i);
             UpdateKoalaIndex();
             break;
         }
