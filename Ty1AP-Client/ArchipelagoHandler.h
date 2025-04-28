@@ -69,6 +69,7 @@ public:
 	static bool LoadSaveData();
 	static void SendDeath();
 	static void SendPosition(int level, std::vector<float> pos);
+	static void SendObjectiveState(int state, std::string type, const std::vector<std::byte>& data, bool reply = false);
 	static void SendLevel(int levelId);
 	static void ReadKoala();
 	static void TryClaimKoalaIndex();

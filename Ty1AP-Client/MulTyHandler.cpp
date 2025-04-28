@@ -1,14 +1,6 @@
 #include "pch.h"
 #include "MulTyHandler.h"
 
-struct TimedPos {
-    int level;
-    std::vector<float> lastPos;
-    std::vector<float> newPos;
-    uint64_t lastTime = 0;   // ms
-    uint64_t newTime = 0;    // ms
-};
-
 std::map<int, MulTyHandler::TimedPos> MulTyHandler::posData;
 
 void MulTyHandler::HandlePosData(int level, int index, std::vector<float> pos)
@@ -31,6 +23,10 @@ void MulTyHandler::HandlePosData(int level, int index, std::vector<float> pos)
     data.level = level;
 }
 
+void MulTyHandler::DisableDraw(int index) {
+
+}
+
 void MulTyHandler::TryRemove(int index) {
     posData.erase(index);
 }
@@ -40,8 +36,6 @@ bool MulTyHandler::IsRunning;
 void MulTyHandler::Run() {
     IsRunning = true;
     posData = {};
-    //std::thread t(MulTyHandler::InterpolateAndDraw);
-    //t.detach();
 
     int frameCounter = 0;
     while (IsRunning) {
@@ -53,6 +47,48 @@ void MulTyHandler::Run() {
         pos.push_back(*(float*)(Core::moduleBase + 0x271C20)); // YAW
         ArchipelagoHandler::SendPosition((int)Level::getCurrentLevel(), pos);
         Sleep(50);
+    }
+}
+
+void MulTyHandler::RemoveCollision() {
+    //_baseKoalaAddress + 0x298 + koalaOffset
+    
+
+    for (const auto& [index, data] : MulTyHandler::posData) {
+        auto modifier = Level::getCurrentLevel() == LevelCode::B2 || Level::getCurrentLevel() == LevelCode::C2 ? 2 : 1;
+        auto offset = Level::getCurrentLevel() == LevelCode::B2 || Level::getCurrentLevel() == LevelCode::C2 ? 0x518 : 0x0;
+        auto koalaOffset = 0x518 * modifier * index + offset;
+        auto baseKoalaAddress = *(uintptr_t*)(Core::moduleBase + 0x26B070);
+
+        *(float*)(baseKoalaAddress + 0x298 + koalaOffset) = (byte)0;
+    }
+}
+
+void MulTyHandler::ScaleKoalas() {
+    //_baseKoalaAddress + 0x298 + koalaOffset
+    float outbackMultiplier = 1.0f;
+    if (Level::getCurrentLevel() == LevelCode::B3) {
+        outbackMultiplier = 2.0f;
+    }
+    float initialScale =  1.0f;
+    float scaleFactor = initialScale * outbackMultiplier;
+    if (scaleFactor < 0.5f) scaleFactor = 0.5f;
+    if (scaleFactor > 3) scaleFactor = 3;
+    const float snugsMultiplier = 1.0725f;
+    const float katieMultiplier = 0.825f;
+
+    for (const auto& [index, data] : MulTyHandler::posData) {
+
+        float tempScaleFactor = scaleFactor;
+        if (index == 0) tempScaleFactor = scaleFactor * katieMultiplier;
+        if (index == 3) tempScaleFactor = scaleFactor * snugsMultiplier;
+
+        auto modifier = Level::getCurrentLevel() == LevelCode::B2 || Level::getCurrentLevel() == LevelCode::C2 ? 2 : 1;
+        auto offset = Level::getCurrentLevel() == LevelCode::B2 || Level::getCurrentLevel() == LevelCode::C2 ? 0x518 : 0x0;
+        auto koalaOffset = 0x518 * modifier * index + offset;
+        auto baseKoalaAddress = *(uintptr_t*)(Core::moduleBase + 0x26B070);
+
+        *(float*)(baseKoalaAddress + 0x60 + koalaOffset) = tempScaleFactor;
     }
 }
 
@@ -101,9 +137,13 @@ void MulTyHandler::InterpolateAndDraw() {
             API::LogPluginMessage("Koala Null");
         }
         if (*(unsigned short*)(baseKoalaAddress) != (17327608 & 0xFFFF)) {
-            return;
             API::LogPluginMessage("Not a Koala");
+            return;
         }
+        
+        ScaleKoalas();
+        RemoveCollision();
+
         *(float*)(baseKoalaAddress + 0x2A4 + koalaOffset) = x;
         *(float*)(baseKoalaAddress + 0x2A8 + koalaOffset) = y;
         *(float*)(baseKoalaAddress + 0x2AC + koalaOffset) = z;
@@ -112,8 +152,6 @@ void MulTyHandler::InterpolateAndDraw() {
         *(float*)(position2Address + 0x74) = x;
         *(float*)(position2Address + 0x78) = y;
         *(float*)(position2Address + 0x7C) = z;
-
-
     }
 }
 

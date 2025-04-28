@@ -33,6 +33,14 @@ void LocationHandler::HandleLocation(int64_t location)
 		if (myCollection)
 			return;
 		SaveDataHandler::saveData.LevelData[levelId].ThunderEggs[theggIndex] = true;
+
+		if (!ArchipelagoHandler::gateTimeAttacks) {
+			SaveDataHandler::saveData.StopwatchesActive[levelId] = true;
+			if ((int)Level::getCurrentLevel() == levelId)
+				if (*(int*)(Core::moduleBase + 0x27041C) != 0)
+					*(int*)(*(int*)(Core::moduleBase + 0x270420) + 0x68) = 0x2;
+		}
+
 		SaveDataHandler::SaveGame();
 		if ((LevelCode)levelId != currentLevel)
 			return;

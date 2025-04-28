@@ -7,6 +7,7 @@ class MulTyHandler
 public:
 	static void InterpolateAndDraw();
 	static void HandlePosData(int level, int index, std::vector<float> pos);
+	static void DisableDraw(int index);
 	static void TryRemove(int index);
 	static void Run();
 	static bool IsRunning;
@@ -24,5 +25,7 @@ private:
 	static float LerpAngle(float a, float b, float t);
 	static uint64_t GetTimeMS();
 	static float DistanceSquared(const std::vector<float>& a, const std::vector<float>& b);
+	static void RemoveCollision();
+	static void ScaleKoalas();
 };
 
