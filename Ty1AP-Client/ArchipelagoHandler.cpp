@@ -368,11 +368,10 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
                     koalaMapping = values;
                     LoggerWindow::Log(newnames + "Joined. Total Koalas Joined: " + std::to_string(koalaMapping.size()));
                 }
-                // I was kicked out. I sort worse, so I find a new id and update
                 else if (koalaMapping[koalaIndex] < values[koalaIndex] && koalaMapping.size() < 8) {
                     koalaMapping = values;
-                    API::LogPluginMessage("Uh oh I'm in charge of fixing this");
-                    koalaIndex = koalaMapping.size();  // will be valid index after push_back
+                    //API::LogPluginMessage("Uh oh I'm in charge of fixing this");
+                    koalaIndex = koalaMapping.size();
                     koalaMapping.push_back(mulTyName);
                     UpdateKoalaIndex();
                 }
@@ -505,9 +504,13 @@ void ArchipelagoHandler::UpdateKoalaIndex() {
 }
 
 void ArchipelagoHandler::TryClaimKoalaIndex() {
+    if (!multylink)
+        return;
+
     if (koalaIndex >= 0) {
         return;
     }
+
     for (int i = 0; i < 8; i++) {
         if (koalaConnected[i] < ap->get_server_time() - 10000) {
             koalaMapping[i] = mulTyName;

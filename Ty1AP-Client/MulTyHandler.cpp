@@ -102,6 +102,7 @@ void MulTyHandler::InterpolateAndDraw() {
     }
     uint64_t now = GetTimeMS();
     for (const auto& [index, data] : MulTyHandler::posData) {
+        //API::LogPluginMessage(std::to_string(index) + " " + std::to_string(data.level));
 
         if (data.lastPos.size() != 4 || data.newPos.size() != 4) {
             continue;
