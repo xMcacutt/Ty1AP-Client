@@ -281,22 +281,7 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
                 else {
                     LoggerWindow::Log("Bad MulTy Pos");
                 }
-            //}
-            //if (tagsIt != cmd.end() && tagsIt->is_array()
-            //    && std::find(tagsIt->begin(), tagsIt->end(), "MulTyObjectives") != tagsIt->end())
-            //{
-            //    if (dataIt != cmd.end() && dataIt->is_object()) {
-            //        json data = *dataIt;
-            //        std::string type = data["type"].get<std::string>().c_str();
-            //        int state = data["state"].is_number_integer() ? data["state"].get<int>() : -1;
-            //        //if true, send a bounce packet to sync
-            //        bool reply = false;
-            //        ObjectiveHandler::Handler
-            //    }
-            //    else {
-            //        LoggerWindow::Log("Bad MulTy Objective");
-            //    }
-            //}
+            }
         }
         if (deathlink) {
             if (tagsIt != cmd.end() && tagsIt->is_array()
@@ -500,16 +485,6 @@ void ArchipelagoHandler::SendPosition(int level, std::vector<float> pos) {
         {"pos", pos},
     };
     ap->Bounce(data, { "Ty the Tasmanian Tiger" }, { ap->get_player_number()}, {"MulTyLink"});
-}
-
-void ArchipelagoHandler::SendObjectiveState(int state, std::string type, const std::vector<std::byte>& objData, bool reply = false) {
-    json data{
-        {"state", state},
-        {"type", type},
-        {"objData", objData},
-        {"reply", reply},
-    };
-    //ap->Bounce(data, { "Ty the Tasmanian Tiger" }, { ap->get_player_number() }, { "MulTyObjectives" });
 }
 
 void ArchipelagoHandler::SendLevel(int levelId) {

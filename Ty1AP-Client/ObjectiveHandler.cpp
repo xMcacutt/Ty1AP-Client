@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ObjectiveHandler.h";
 
 void ObjectiveHandler::HandleObjective(std::string name, int state, std::vector<std::byte>& data) {

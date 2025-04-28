@@ -23,14 +23,6 @@ void MulTyHandler::HandlePosData(int level, int index, std::vector<float> pos)
     data.level = level;
 }
 
-void MulTyHandler::DisableDraw(int index) {
-
-}
-
-void MulTyHandler::TryRemove(int index) {
-    posData.erase(index);
-}
-
 bool MulTyHandler::IsRunning;
 
 void MulTyHandler::Run() {
@@ -50,10 +42,22 @@ void MulTyHandler::Run() {
     }
 }
 
-void MulTyHandler::RemoveCollision() {
-    //_baseKoalaAddress + 0x298 + koalaOffset
-    
+void MulTyHandler::DisableDraw(int index) {
+    auto& data = posData[index];
+    data.lastPos = MulTyHandler::defaultpositions.at(Level::getCurrentLevel());
+    data.lastTime = 0;
 
+    data.newPos = MulTyHandler::defaultpositions.at(Level::getCurrentLevel());
+    data.newTime = 0;
+
+    data.level = (int)Level::getCurrentLevel();
+}
+
+void MulTyHandler::TryRemove(int index) {
+    posData.erase(index);
+}
+
+void MulTyHandler::RemoveCollision() {
     for (const auto& [index, data] : MulTyHandler::posData) {
         auto modifier = Level::getCurrentLevel() == LevelCode::B2 || Level::getCurrentLevel() == LevelCode::C2 ? 2 : 1;
         auto offset = Level::getCurrentLevel() == LevelCode::B2 || Level::getCurrentLevel() == LevelCode::C2 ? 0x518 : 0x0;
@@ -65,12 +69,11 @@ void MulTyHandler::RemoveCollision() {
 }
 
 void MulTyHandler::ScaleKoalas() {
-    //_baseKoalaAddress + 0x298 + koalaOffset
     float outbackMultiplier = 1.0f;
     if (Level::getCurrentLevel() == LevelCode::B3) {
         outbackMultiplier = 2.0f;
     }
-    float initialScale =  1.0f;
+    float initialScale =  1.5f;
     float scaleFactor = initialScale * outbackMultiplier;
     if (scaleFactor < 0.5f) scaleFactor = 0.5f;
     if (scaleFactor > 3) scaleFactor = 3;
@@ -104,6 +107,15 @@ void MulTyHandler::InterpolateAndDraw() {
         if (data.lastPos.size() != 4 || data.newPos.size() != 4) {
             API::LogPluginMessage("Weird Data");
             continue;
+        }
+
+        if ((int)Level::getCurrentLevel() != data.level) {
+            continue;
+        }
+
+        if (now - data.newTime >= 30000) // 30 seconds = 30,000 milliseconds
+        {
+            DisableDraw(index);
         }
 
         float t = (now - data.lastTime) / float(data.newTime - data.lastTime);

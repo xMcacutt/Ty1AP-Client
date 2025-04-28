@@ -536,6 +536,7 @@ void GameHandler::OnMainMenu() {
 	if (!ArchipelagoHandler::ap_connected) {
 		*(char*)(menuAddr + 0x164) = 0x0;
 		*(char*)(menuAddr + 0x165) = 0x0;
+		*(int*)(Core::moduleBase + 0x286640) = 0x2;
 	}
 	*(char*)(menuAddr + 0x168 + 0x164) = 0x0;
 	*(char*)(menuAddr + 0x168 + 0x165) = 0x0;
