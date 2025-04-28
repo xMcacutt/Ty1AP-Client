@@ -34,6 +34,10 @@ Interacting with any window in TygerFramework requires the TygerFramework window
 
 With the TygerFramework window and the Ty1 AP Client connection window open, enter your server address, password, and slot name and press connect. The load game button on the main menu should now be active. Upon pressing this, you will bypass the load select screen, a save is created in the saves directory in your Ty folder and you will be able to load directly into the save for the seed of the world.
 
+## Mul-Ty-Link
+
+As of v1.3.0, Ty AP now supports Mul-Ty-Link. This can be enabled in the user yaml. If activated, multiple players connecting to the same slot will be able to see each other as koalas. To ensure you always get the same koala, you should also provide a name in the Mul-Ty Name field when connecting. This is simply an identifier for you specifically within the player slot.
+
 ## Collectible Info Window
 
 As of 1.1.3, a new window is available. This window gives information on every collectible so hints showing locations such as 
